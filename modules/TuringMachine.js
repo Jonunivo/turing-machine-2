@@ -48,16 +48,14 @@ class TuringMachine{
     }
 
     simulationStep(state, charOnTape){
-        
 
-        
         //find corresponding transition in delta
         let deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
         
         ////logging
         console.log("-----------------------")
         console.log(`at State ${state.id} reading ${charOnTape}`);
-        console.log(`Tape: ${tape}`);
+        console.log(`Tape: ${this.tape}`);
         console.log("      " + "  ".repeat(this.tapePosition) + "#");
         console.log(`next State: ${deltaValue[0].id}`);
         ////
@@ -71,10 +69,21 @@ class TuringMachine{
         switch(deltaValue[2]){
             case "L":
                 console.log("Move Left");
+                //expand tape to left if needed
+                if(this.tapePosition === 0){
+                    console.log("expanding tape to left");
+                    this.tape = ["", this.tape];
+                    this.tapePosition++;
+                }
                 this.tapePosition--;
                 break;
             case "R":
                 console.log("Move Right");
+                //expand tape to right if needed
+                if(this.tapePosition === this.tape.length-1){
+                    console.log("expanding tape to right");
+                    this.tape.push("");
+                }
                 this.tapePosition++;
                 break;
             case "N":
@@ -90,10 +99,11 @@ class TuringMachine{
 
     //handles simulation result
     simulationResult(lastState){
+        ////logging
         console.log("-----------------------")
         console.log("FINAL RESULT");
-        console.log(`Tape: ${tape}`);
-        console.log("      " + "  ".repeat(this.tapePosition) + "#");
+        console.log(`Tape: ${this.tape}`);
+        ////
         if(lastState == this.acceptstate){
             console.log("accepting")
         }
@@ -110,6 +120,7 @@ class TuringMachine{
         return this.tape[this.tapePosition];
     }
 
+
     //helper
     getKeyByContent(content){
         for(const key of delta.keys()){
@@ -122,7 +133,7 @@ class TuringMachine{
 
 }
 
-//create a simple TM to test the code: add 1 to binary code on tape
+//create a simple TM to test the code: binary increment
 //Alphabets
 let sigma = new Set();
 sigma.add("0");
@@ -161,7 +172,7 @@ let delta = new Map();
  //no transitions needed -> accepting state
 
 //tape
-let tape = ["1", "0", "1", "1", ""];
+let tape = ["1", "1", "1", "1"];
 let tapePosition = 0;
 //create TM
 let testtm = new TuringMachine(states, sigma, gamma, delta, right, done, undefined, tape, tapePosition);
