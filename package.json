@@ -1,0 +1,21 @@
+{
+  "name": "default-package",
+  "version": "1.0.0",
+  "description": "this is the main & default package (created 01.08.)",
+  "main": "TuringMachine.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jonunivo/turing-machine.git"
+  },
+  "author": "Mauro Vogel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jonunivo/turing-machine/issues"
+  },
+  "homepage": "https://github.com/Jonunivo/turing-machine#readme",
+
+  "type": "module"
+}
