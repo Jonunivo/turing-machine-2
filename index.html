@@ -15,7 +15,21 @@
     <body>
         <h1 id="head-title">TuringMachine Simulator</h1>
 
+        <div id="cytoscape"></div>
+        <div id="cytoscape-tape"></div>
+        <button id="move-tape-left">Move Tape Left</button>
+        <button id="move-tape-right">Move Tape Right</button>
+
+
+
+
         <!--- links to the scripts -->
+          <!-- cytoscape -->
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js" integrity="sha512-rOsRHy2O7kykGotH99Bi0+LyynL6rfQpaMiKOwYa1K1jYAFksJUwXE1gE6Relgo88g6lQ/uf8NaWeyzi1T53Zg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+          <script type="module" src="./modules/Cytoscape.js"></script>
+          <script type="module" src="./modules/CytoscapeTape.js"></script>
+
+
         <script type="module" src="./modules/State.js" ></script>
         <script type="module" src="./modules/TuringMachine.js" ></script>
 

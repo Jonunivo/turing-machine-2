@@ -38,7 +38,7 @@ class TuringMachine{
             currentState !== this.rejectstate)
             {
                 currentState = this.simulationStep(currentState, this.readTape())
-
+                //terminate loop after 5 seconds
                 if(Date.now() - startTime > maxSimulationTime){
                     console.log("infinite loop prevention triggered");
                     break;
@@ -133,6 +133,7 @@ class TuringMachine{
 
 }
 
+/*
 //create a simple TM to test the code: binary increment
 //Alphabets
 let sigma = new Set();
@@ -177,3 +178,4 @@ let tapePosition = 0;
 //create TM
 let testtm = new TuringMachine(states, sigma, gamma, delta, right, done, undefined, tape, tapePosition);
 testtm.runSimulation()
+*/
