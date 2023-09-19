@@ -141,17 +141,14 @@ function userNodeInputHandler(){
     
     //Form Validation
     if(isStartingState){
-        startingStateExists = true;
         document.getElementById('stateStarting').disabled = true;
         document.getElementById('stateStarting').checked = false;
     }
     if(isAcceptingState){
-        acceptingStateExists = true;
         document.getElementById('stateAccepting').disabled = true;
         document.getElementById('stateAccepting').checked = false;
     }
     if(isRejectingState){
-        rejectingStateExists = true;
         document.getElementById('stateRejecting').disabled = true;
         document.getElementById('stateRejecting').checked = false;
     }
