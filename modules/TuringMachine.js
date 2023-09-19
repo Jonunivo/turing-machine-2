@@ -1,6 +1,6 @@
 import {State} from './State.js';
-
-class TuringMachine{
+//export {TuringMachine.createState()}
+export class TuringMachine{
     /**
      * Constructs a TuringMachine object with the provided attributes.
      *
@@ -25,6 +25,13 @@ class TuringMachine{
         this.rejectstate = rejectstate;
         this.tape = tape;
         this.tapePosition = tapePosition;
+    }
+
+
+    //adds state to TM object
+    createState(id, isStarting = false, isAccepting = false, isRejecting = false){
+        this.states.add(new State(id, isStarting, isAccepting, isRejecting));
+        console.log(this.states);
     }
 
     runSimulation(){

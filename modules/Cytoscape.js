@@ -1,5 +1,19 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
-//cytoscape object
+import {TuringMachine} from './TuringMachine.js';
+
+//global variables
+var nodeId = 0;
+var startingStateExists = false;
+var acceptingStateExists = false;
+var rejectingStateExists = false;
+//Turingmachine
+var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
+
+
+//////////////////////////////////////////////////////////////
+//// -------------------- Cytoscape --------------------- ////
+//////////////////////////////////////////////////////////////
+//// ----------- Cytoscape object
 var cy = cytoscape({
     container: document.getElementById('cytoscape'),
     style: [
@@ -31,28 +45,25 @@ var cy = cytoscape({
     userPanningEnabled: false,
   });
 
-
-  cy.add({
-    group: 'nodes',
-    data: { weight: 75 },
-    position: { x: 200, y: 200 },
-  });
-
-function cyCreateNode(id, xPos=200, yPos=200, color='grey', border=false){
-    //ensure creating within box & distance from each other
-    let xDistance = 150;
-    let yDistance = 100;
-    xPos = Math.max(50, (50 + xDistance*id) % document.getElementById('cytoscape').clientWidth);
-    yPos = 80 + yDistance*(Math.floor((50 + id*150) / document.getElementById('cytoscape').clientWidth));
-    let label = id;
+//// ----------- Node Creation
+function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
+    let label = nodeName;
+    console.log(nodeId);
+    let id = nodeId;
+    let color = 'lightgrey';
     //border
     let borderWidth = 0;
     let borderColor = 'white';
-    if(border){
+    if(isStarting){
         borderWidth = 2;
-        borderColor = 'black'
+        borderColor = 'black';
     }
-
+    if(isAccepting){
+        color = 'limegreen';
+    }
+    else if(isRejecting){
+        color = 'red';
+    }
     //core
     cy.add({
         group: 'nodes',
@@ -67,5 +78,89 @@ function cyCreateNode(id, xPos=200, yPos=200, color='grey', border=false){
         },
         position: { x: xPos, y: yPos},
     });
+    runLayout();
 }
+//// ----------- Edge Creation
 
+
+
+
+//////////////////////////////////////////////////////////////
+//// -------------------- User Input -------------------- ////
+//////////////////////////////////////////////////////////////
+//// ----------- Node Creation
+//dblclick -> create node
+ cy.on('dblclick', (event) => {
+    const position = event.position;
+    //open modal
+    const nodeModal = document.getElementById('nodeModal');
+    nodeModal.style.display = 'block';
+    //cyCreateNode(0, position.x, position.y);
+})
+
+//user submit node inputs
+document.getElementById('nodeButton').addEventListener('click', function(){
+    userNodeInputHandler();
+})
+function userNodeInputHandler(){
+    //Close the modal
+    nodeModal.style.display = 'none';
+    //Read user input
+    let stateName = document.getElementById('stateName').value;
+    let isStartingState = document.getElementById("stateStarting").checked === true;
+    let isAcceptingState = document.getElementById("stateAccepting").checked === true;
+    let isRejectingState = document.getElementById("stateRejecting").checked === true;
+    //catch accepting & rejecting case
+    if(isAcceptingState && isRejectingState){
+        alert("a state cannot be accepting & rejecting at the same time");
+        return;
+    }
+    //create cyto node
+    cyCreateNode(stateName, undefined, undefined, isStartingState, isAcceptingState, isRejectingState);
+    //Form Validation
+    if(isStartingState){
+        startingStateExists = true;
+        document.getElementById('stateStarting').disabled = true;
+        document.getElementById('stateStarting').checked = false;
+    }
+    if(isAcceptingState){
+        acceptingStateExists = true;
+        document.getElementById('stateAccepting').disabled = true;
+        document.getElementById('stateAccepting').checked = false;
+    }
+    if(isRejectingState){
+        rejectingStateExists = true;
+        document.getElementById('stateRejecting').disabled = true;
+        document.getElementById('stateRejecting').checked = false;
+    }
+    
+    //create node in TM
+    turingMachine.createState(nodeId, isStartingState, isAcceptingState, isRejectingState);
+    //adjust nodeId
+    nodeId++;
+}
+//Cancel button pressed
+document.getElementById("cancelButton").addEventListener('click', function(){
+    nodeModal.style.display = 'none';
+})
+
+//// ----------- Edge Creation
+
+
+//////////////////////////////////////////////////////////////
+//// ---------------------- Layout ---------------------- ////
+//////////////////////////////////////////////////////////////
+
+//specifies node (&edge) layout
+function runLayout(){
+    var layoutOptions = {
+        name: 'grid',
+        avoidOverlap: true,
+        padding: 20,
+        randomize: false,
+        fit: true,
+    };
+    
+    var layout = cy.layout(layoutOptions);
+    layout.run();
+}

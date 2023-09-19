@@ -26,17 +26,47 @@
         <input type="text" id="tape-input-field" required>
         <button id="tape-input">Write on Tape</button>
 
+        <div id="nodeModal" class="modal">
+            <div class="modal-content">
+                <h3>Node Properties</h3>
+                <label for="stateName">Node Name:</label>
+                <input type="text" id="stateName">
+                <div class="slider-div">
+                    <input type="checkbox" id="stateStarting" name="startingState" value="false" required checked>
+                    <label class="checkboxLabel" for="stateStarting">Starting?</label>
+                </div>
+                <div class="slider-div">
+                    <input type="checkbox" id="stateAccepting" name="acceptingState" value="true" required>
+                    <label class="checkboxLabel" for="stateAccepting">Accepting?</label>
+                </div>
+                <div class="slider-div">
+                    <input type="checkbox" id="stateRejecting" name="rejectingState" value="true" required>
+                    <label class="checkboxLabel" for="stateRejecting">Rejecting?</label>
+                </div>
+                
+                <br>
+                <div class="submit-button-div">
+                    <button id="nodeButton" type="button">Create Node</button>
+                </div>
+                <div class="cancel-button-div">
+                    <button id="cancelButton" type="button">cancel</button>
+                </div>
+            </div>
+        </div>
+
+
 
 
         <!--- links to the scripts -->
           <!-- cytoscape -->
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js" integrity="sha512-rOsRHy2O7kykGotH99Bi0+LyynL6rfQpaMiKOwYa1K1jYAFksJUwXE1gE6Relgo88g6lQ/uf8NaWeyzi1T53Zg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-          <script type="module" src="./modules/Cytoscape.js"></script>
-          <script type="module" src="./modules/CytoscapeTape.js"></script>
+
 
 
         <script type="module" src="./modules/State.js" ></script>
         <script type="module" src="./modules/TuringMachine.js" ></script>
+
+        <script type="module" src="./modules/Cytoscape.js"></script>
+        <script type="module" src="./modules/CytoscapeTape.js"></script>
 
     </body>
 
