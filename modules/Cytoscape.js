@@ -2,10 +2,11 @@ import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import {TuringMachine} from './TuringMachine.js';
 
 //global variables
+//Id for node creation (cyto id & turingmaschine id)
 var nodeId = 0;
-var startingStateExists = false;
-var acceptingStateExists = false;
-var rejectingStateExists = false;
+
+//Edge Creation (used to safe on which node the user clicked)
+var fromNode;
 //Turingmachine
 var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
 
@@ -45,6 +46,7 @@ var cy = cytoscape({
     userPanningEnabled: false,
   });
 
+
 //// ----------- Node Creation
 function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
     let label = nodeName;
@@ -80,8 +82,25 @@ function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isR
     });
     runLayout();
 }
-//// ----------- Edge Creation
 
+//// ----------- Edge Creation
+function cyCreateEdge(fromNode, toNode, label){
+    //core
+    console.log("cycreate " + fromNode + " | " + toNode + " | " + label);
+    cy.add({ 
+        group: 'edges', 
+        data: { 
+            source: `${fromNode}`, 
+            target: `${toNode}` 
+        },
+        style: {
+            'label': `${label}`,
+            "text-margin-y": "-10px",
+            "text-margin-x": "-10px",
+          }
+        }
+    );
+}
 
 
 
@@ -105,6 +124,7 @@ document.getElementById('nodeButton').addEventListener('click', function(){
 function userNodeInputHandler(){
     //Close the modal
     nodeModal.style.display = 'none';
+    
     //Read user input
     let stateName = document.getElementById('stateName').value;
     let isStartingState = document.getElementById("stateStarting").checked === true;
@@ -115,8 +135,10 @@ function userNodeInputHandler(){
         alert("a state cannot be accepting & rejecting at the same time");
         return;
     }
+
     //create cyto node
     cyCreateNode(stateName, undefined, undefined, isStartingState, isAcceptingState, isRejectingState);
+    
     //Form Validation
     if(isStartingState){
         startingStateExists = true;
@@ -139,12 +161,75 @@ function userNodeInputHandler(){
     //adjust nodeId
     nodeId++;
 }
-//Cancel button pressed
+//Cancel button (node) pressed
 document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
 
+
 //// ----------- Edge Creation
+//click on node to create edge from this node
+cy.on('tap', 'node', (event) => {
+    const node = event.target;
+    fromNode = turingMachine.getStatebyId(node.id());
+    //open modal
+    const edgeModal = document.getElementById('edgeModal');
+    edgeModal.style.display = 'block';
+});
+
+document.getElementById('edgeButton').addEventListener('click', function(){
+    userEdgeInputHandler();
+})
+//user submit edge inputs
+function userEdgeInputHandler(){
+    //Close the modal
+    edgeModal.style.display = 'none';
+
+    //read user input
+    //toNode
+    let toNodeId = parseInt(document.getElementById('toState').value);
+    let toNode = turingMachine.getStatebyId(toNodeId);
+    //readLabel
+    let readLabel = document.getElementById('readLabel').value;
+    //tapeMovement
+    let tapeMovementValue = document.getElementById('tapeMovement').value;
+    let tapeMovement = "N"
+    if(parseInt(tapeMovementValue) === -1){
+        tapeMovement = "L";
+    }
+    else if(parseInt(tapeMovementValue) === 1){
+        tapeMovement = "R";
+    }
+    //writeLabel
+    let cyLabel = "";
+    let writeLabel;
+    let writeEnabled = false;
+    if(document.getElementById('writeLabel').value !== ''){
+        writeLabel = document.getElementById('writeLabel').value;
+        writeEnabled = true;
+        cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + tapeMovement;
+    }
+    else{
+        writeLabel = "";
+        cyLabel = "R: " + readLabel + " | " + tapeMovement;
+    }
+
+    //create Edge Cytoscape
+    cyCreateEdge(`${fromNode.id}`, `${toNodeId}`, cyLabel);
+
+    //create edge in TM
+    let fromState = turingMachine.getStatebyId(fromNode.id);
+    let toState = turingMachine.getStatebyId(toNode.id);
+    turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
+    console.log(turingMachine);
+    //-- TO DO -- adjust Alphabet of TM if user enters new token
+
+}
+
+//Cancel button (edge) pressed
+document.getElementById("cancelButton2").addEventListener('click', function(){
+    edgeModal.style.display = 'none';
+})
 
 
 //////////////////////////////////////////////////////////////
@@ -160,7 +245,6 @@ function runLayout(){
         randomize: false,
         fit: true,
     };
-    
     var layout = cy.layout(layoutOptions);
     layout.run();
 }

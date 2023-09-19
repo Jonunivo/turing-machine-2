@@ -26,20 +26,21 @@
         <input type="text" id="tape-input-field" required>
         <button id="tape-input">Write on Tape</button>
 
+        <!-- Node Creation -->
         <div id="nodeModal" class="modal">
             <div class="modal-content">
                 <h3>Node Properties</h3>
                 <label for="stateName">Node Name:</label>
                 <input type="text" id="stateName">
-                <div class="slider-div">
+                <div class="checkbox-div">
                     <input type="checkbox" id="stateStarting" name="startingState" value="false" required checked>
                     <label class="checkboxLabel" for="stateStarting">Starting?</label>
                 </div>
-                <div class="slider-div">
+                <div class="checkbox-div">
                     <input type="checkbox" id="stateAccepting" name="acceptingState" value="true" required>
                     <label class="checkboxLabel" for="stateAccepting">Accepting?</label>
                 </div>
-                <div class="slider-div">
+                <div class="checkbox-div">
                     <input type="checkbox" id="stateRejecting" name="rejectingState" value="true" required>
                     <label class="checkboxLabel" for="stateRejecting">Rejecting?</label>
                 </div>
@@ -50,6 +51,34 @@
                 </div>
                 <div class="cancel-button-div">
                     <button id="cancelButton" type="button">cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- Edge Creation -->
+        <div id="edgeModal" class="modal">
+            <div class="modal-content">
+                <h3>Edge Properties</h3>
+                <label for="toState">To State (id):</label>
+                <input type="number" id="toState">
+                <br>
+                <label for="readLabel">When reading label</label>
+                <input type="text" id="readLabel">
+                <br>
+                <label for="writeLabel">Write Label?</label>
+                <input type="text" id="writeLabel">
+                <br>
+                <div class="slider-div">
+                    <label for="tapeMovement">Tape Movement</label>
+                    <input type="range" id="tapeMovement" min="-1" max="1" step="1" value="0">
+                </div>
+                
+                
+                <br>
+                <div class="submit-button-div">
+                    <button id="edgeButton" type="button">Create Edge</button>
+                </div>
+                <div class="cancel-button-div">
+                    <button id="cancelButton2" type="button">cancel</button>
                 </div>
             </div>
         </div>

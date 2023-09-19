@@ -27,6 +27,9 @@ export class TuringMachine{
         this.tapePosition = tapePosition;
     }
 
+    //////////////////////////////////////////////////////////////
+    //// -------------------- Creation --------------------- /////
+    //////////////////////////////////////////////////////////////
 
     //adds state to TM object
     createState(id, isStarting = false, isAccepting = false, isRejecting = false){
@@ -34,6 +37,16 @@ export class TuringMachine{
         console.log(this.states);
     }
 
+    //adds transition to TM object
+    createTransition(fromState, label, toState, writeLabel, tapeMovement){
+        this.delta.set([fromState, label], [toState, writeLabel, tapeMovement]);
+    }
+
+    //////////////////////////////////////////////////////////////
+    //// ------------------- Simulation -------------------- /////
+    //////////////////////////////////////////////////////////////
+
+    //runs TM simulation
     runSimulation(){
         //start at starting state
         let currentState = this.startstate;
@@ -127,8 +140,10 @@ export class TuringMachine{
         return this.tape[this.tapePosition];
     }
 
-
-    //helper
+    //////////////////////////////////////////////////////////////
+    //// -------------------- Helpers ---------------------- /////
+    //////////////////////////////////////////////////////////////
+    //returns key of delta when entered as a string
     getKeyByContent(content){
         for(const key of delta.keys()){
             if(JSON.stringify(key) === JSON.stringify(content)){
@@ -136,6 +151,16 @@ export class TuringMachine{
             }
         }
         throw new Error("Key not found in Delta");
+    }
+
+    //returns State with given id
+    getStatebyId(id){
+        for(const state of this.states){
+            if(parseInt(state.id) === parseInt(id)){
+                return state;
+            }
+        }
+        throw new Error(`There is no state with Id ${id}`)
     }
 
 }
