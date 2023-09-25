@@ -1,6 +1,8 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import {TuringMachine} from './TuringMachine.js';
 
+export {cy}
+
 //global variables
 //Id for node creation (cyto id & turingmaschine id)
 var nodeId = 0;
@@ -200,10 +202,8 @@ function userEdgeInputHandler(){
     //writeLabel
     let cyLabel = "";
     let writeLabel;
-    let writeEnabled = false;
     if(document.getElementById('writeLabel').value !== ''){
         writeLabel = document.getElementById('writeLabel').value;
-        writeEnabled = true;
         cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + tapeMovement;
     }
     else{

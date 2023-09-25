@@ -1,5 +1,5 @@
 import {State} from './State.js';
-//export {TuringMachine.createState()}
+export {simulationStep};
 export class TuringMachine{
     /**
      * Constructs a TuringMachine object with the provided attributes.

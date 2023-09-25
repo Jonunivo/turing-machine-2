@@ -1,9 +1,12 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
+export {cyTape, cyWriteOnTape, cyMoveTapeLeft, cyMoveTapeRight};
+
 //Tape object
 //Globals
 const width = 40;
 const height = 40;
+// TO DO: fetch animationTime from userinput
 const animationTime = 50;
 let rightOverflow = '';
 let leftOverflow = '';
