@@ -1,4 +1,5 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
+import { turingMachine } from './Cytoscape.js';
 
 export {cyTape, cyWriteOnTape, cyMoveTapeLeft, cyMoveTapeRight};
 
@@ -58,6 +59,8 @@ function cyCreateTape(){
     }
     //lock node movement
     cyTape.nodes().lock();
+
+    turingMachine.tape = new Array(17);
 }
 cyCreateTape();
 
@@ -233,7 +236,8 @@ function cyMoveTapeRight(){
 }
 document.getElementById("move-tape-right").addEventListener("click", cyMoveTapeRight);
 
-function cyWriteOnTape(input){
+//animate write on tape & handles turingMachine object
+function cyWriteOnTape(input, animationTime){
     //clear tape
     cyTape.nodes().remove();
     cyCreateTape();
@@ -290,6 +294,8 @@ function cyWriteOnTape(input){
             }
         });
 
+        //add to turingMachine tape object
+        turingMachine.tape[currid] = currToken;
         //update iterator
         i++;
         currid++;
@@ -297,9 +303,22 @@ function cyWriteOnTape(input){
     //safe rest of string to residual
     while(input.length - 1 >= i){
         rightOverflow = input[i] + rightOverflow;
+        //expand turingMachine tape object
+        turingMachine.tape.push(input[i]);
         i++;
+
+
     }
+    //set cursor of turingMachine object accordingly
+    turingMachine.tapePosition = middleid;
+
+    ////logging
+    console.log("TM tape now: ", turingMachine.tape);
+    console.log("TM tapePosition: ", turingMachine.tapePosition, "char: ", turingMachine.readTape());
+
 }
 document.getElementById("tape-input").addEventListener("click", function(){
-    cyWriteOnTape(document.getElementById("tape-input-field").value);
+    cyWriteOnTape(document.getElementById("tape-input-field").value, 
+                    1000/document.getElementById('simulationSpeed').value
+                );
 });

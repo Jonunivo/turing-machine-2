@@ -1,54 +1,77 @@
-import {cy} from './Cytoscape.js';
+import {cy, turingMachine} from './Cytoscape.js';
 import {cyTape, cyWriteOnTape, cyMoveTapeLeft, cyMoveTapeRight} from './CytoscapeTape.js';
-import { simulationStep } from './TuringMachine';
+import { TuringMachine } from './TuringMachine.js';
 
-simIsRunning = false;
-// TO DO: fetch animationTime from userinput
-animationTime = 1000;
+//// Global Variables
+let simIsRunning = false;
+// saves state the Sim is currently at
+let currentState = turingMachine.startstate;
+
 
 //User Action: Run Simulation Button
 document.getElementById('runSimulationButton').addEventListener('click', function(){
     simIsRunning = true;
-    runSimulation(/* TO DO */)
+    if(currentState === undefined){
+        currentState = turingMachine.startstate;
+    }
+    console.log("TM: ", turingMachine.tape);
+    animRunSimulation(turingMachine, currentState, turingMachine.readTape());
 })
 
-function runSimulation(startState, startCharOnTape){
-    let currentState = startState;
+function animRunSimulation(turingMachine, startState, startCharOnTape){
+    currentState = startState;
     let charOnTape = startCharOnTape;
     //run animation on initial node
-    animateSimulationStep(currentState, charOnTape);
-    while(simIsRunning){
-        //run Simulation in TuringMachine.js to get next state
-        currentState = simulationStep(currentState, charOnTape);
-        //TO DO - Get char on Tape!
+    animateSimulationStep(turingMachine, currentState, charOnTape);
+    while(simIsRunning && 
+        currentState !== turingMachine.acceptstate &&
+        currentState !== turingMachine.rejectstate){
+
+
+        //run Simulation in TuringMachine.js on turingMachine object to get next state
+        console.log("HEHEH", turingMachine);
+        currentState = turingMachine.simulationStep(currentState, charOnTape);
+        charOnTape = turingMachine.readTape();
+
+        ////logging
+        console.log("----------ANIMATION------------")
+        console.log(`at State ${currentState.id} reading ${charOnTape}`);
+        ////
+        
         //run Simulation Animation
-        animateSimulationStep(currentState, charOnTape);
-        //TO DO - terminate when final state reached
+        animateSimulationStep(turingMachine, currentState, charOnTape);
     }
 }
 
-function animateSimulationStep(tmState, charOnTape){
+function animateSimulationStep(turingMachine, tmState, charOnTape){
+    ////logging
+    console.log("--- animationStep ---")
+    console.log(tmState);
+    console.log(`at State ${tmState.id} reading ${charOnTape}`);
+
     //find corresponding transition in delta
-    let deltaValue = this.delta.get(this.getKeyByContent([tmState, charOnTape]))
+    let deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
+    //read animationTime
+    let animationTime = 1000/document.getElementById('simulationSpeed').value;
 
     //// animate node
-    animateNode(tmState);
+    animateNode(tmState, animationTime);
     
     //// animate tape read
-    animateTapeRead(deltaValue);
+    animateTapeRead(deltaValue, animationTime);
 
     //// animate edge
-    animateEdge(tmState, charOnTape);
+    animateEdge(tmState, charOnTape, animationTime);
 
     //// animate tape write
-    animateTapeWrite(deltaValue[1])
+    animateTapeWrite(deltaValue[1], animationTime)
 
     //// animate tape movement
-    animateTapeMovement(deltaValue[2])
+    animateTapeMovement(deltaValue[2], animationTime)
 
 }
 
-function animateNode(tmState){
+function animateNode(tmState, animationTime){
     //get cyto node
     let cyCurrentNode = cy.getElementById(tmState.id);
     //get node color
@@ -81,11 +104,11 @@ function animateNode(tmState){
     });
 }
 
-function animateTapeRead(deltaValue){
+function animateTapeRead(deltaValue, animationTime){
     //TO DO - find creative animation for TapeRead
 }
 
-function animateEdge(tmState, charOnTape){
+function animateEdge(tmState, charOnTape, animationTime){
     //get corresponding edge
     //TO DO
     /*
@@ -126,7 +149,7 @@ function animateEdge(tmState, charOnTape){
     */
 }
 
-function animateTapeWrite(writeToken){
+function animateTapeWrite(writeToken, animationTime){
     cyWriteOnTape(writeToken);
 }
 

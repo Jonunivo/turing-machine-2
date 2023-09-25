@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import {TuringMachine} from './TuringMachine.js';
 
-export {cy}
+export {cy, turingMachine}
 
 //global variables
 //Id for node creation (cyto id & turingmaschine id)
@@ -159,6 +159,13 @@ function userNodeInputHandler(){
     turingMachine.createState(nodeId, isStartingState, isAcceptingState, isRejectingState);
     //adjust nodeId
     nodeId++;
+
+    ////logging
+    console.log("-----NEW STATE CREATED-----");
+    console.log("new State with id: ", nodeId-1);
+    console.log("tm now: ", turingMachine);
+
+
 }
 //Cancel button (node) pressed
 document.getElementById("cancelButton").addEventListener('click', function(){

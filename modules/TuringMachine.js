@@ -1,5 +1,5 @@
 import {State} from './State.js';
-export {simulationStep};
+//export {simulationStep};
 export class TuringMachine{
     /**
      * Constructs a TuringMachine object with the provided attributes.
@@ -33,8 +33,27 @@ export class TuringMachine{
 
     //adds state to TM object
     createState(id, isStarting = false, isAccepting = false, isRejecting = false){
-        this.states.add(new State(id, isStarting, isAccepting, isRejecting));
-        console.log(this.states);
+        let newState = new State(id, isStarting, isAccepting, isRejecting)
+        //add to TM object
+        this.states.add(newState);
+
+        ////logging
+        console.log("---- TM OBJECT ----")
+        console.log("State added")
+
+        //set startstate, acceptstate, rejectstate if needed
+        if(isStarting){
+            this.startstate = newState
+            console.log("startstate set")
+        }
+        if(isAccepting){
+            this.acceptstate = newState
+            console.log("acceptstate set")
+        }
+        if(isRejecting){
+            this.rejectstate = newState
+            console.log("rejectstate set")
+        }
     }
 
     //adds transition to TM object
@@ -50,20 +69,14 @@ export class TuringMachine{
     runSimulation(){
         //start at starting state
         let currentState = this.startstate;
-        //terminate loop after 5 seconds
-        let startTime = Date.now();
-        let maxSimulationTime = 5000;
+
 
         while(currentState !== this.acceptstate && 
             currentState !== this.rejectstate)
             {
                 currentState = this.simulationStep(currentState, this.readTape())
-                //terminate loop after 5 seconds
-                if(Date.now() - startTime > maxSimulationTime){
-                    console.log("infinite loop prevention triggered");
-                    break;
-                }
             }
+        //final result handler
         this.simulationResult(currentState);
     }
 
@@ -73,7 +86,7 @@ export class TuringMachine{
         let deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
         
         ////logging
-        console.log("-----------------------")
+        console.log("//--------TM CORE-------------")
         console.log(`at State ${state.id} reading ${charOnTape}`);
         console.log(`Tape: ${this.tape}`);
         console.log("      " + "  ".repeat(this.tapePosition) + "#");
@@ -120,7 +133,7 @@ export class TuringMachine{
     //handles simulation result
     simulationResult(lastState){
         ////logging
-        console.log("-----------------------")
+        console.log("//-----------FINAL RESULT------------")
         console.log("FINAL RESULT");
         console.log(`Tape: ${this.tape}`);
         ////
@@ -145,7 +158,7 @@ export class TuringMachine{
     //////////////////////////////////////////////////////////////
     //returns key of delta when entered as a string
     getKeyByContent(content){
-        for(const key of delta.keys()){
+        for(const key of this.delta.keys()){
             if(JSON.stringify(key) === JSON.stringify(content)){
                 return key;
             }
