@@ -1,14 +1,13 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { turingMachine } from './Cytoscape.js';
 
-export {cyTape, cyWriteOnTape, cyMoveTapeLeft, cyMoveTapeRight};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight};
 
 //Tape object
 //Globals
 const width = 40;
 const height = 40;
 // TO DO: fetch animationTime from userinput
-const animationTime = 50;
 let rightOverflow = '';
 let leftOverflow = '';
 
@@ -59,13 +58,13 @@ function cyCreateTape(){
     }
     //lock node movement
     cyTape.nodes().lock();
-
-    turingMachine.tape = new Array(17);
+    //initialize TM Array to all empty strings
+    turingMachine.tape = Array.from({ length: 17 }, () => "");
 }
 cyCreateTape();
 
 //moves tape to left (adds & removes nodes & does animation)
-function cyMoveTapeLeft(){
+function cyMoveTapeLeft(animationTime){
     //add node to right end
     //get coordinates & id dynamically
     let minxcoor = Number.POSITIVE_INFINITY;
@@ -148,11 +147,13 @@ function cyMoveTapeLeft(){
     console.log("moved left: new node: ", "xcoor:", Math.floor(xcoor+width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
-document.getElementById("move-tape-left").addEventListener("click", cyMoveTapeLeft);
+document.getElementById("move-tape-left").addEventListener("click", function(){
+    cyMoveTapeLeft(200)
+});
 
 
 //moves tape to right (adds & removes nodes & does animation)
-function cyMoveTapeRight(){
+function cyMoveTapeRight(animationTime){
     //get coordinates & id dynamically
     let maxxcoor = 0;
     let highestXElement = null;
@@ -234,7 +235,9 @@ function cyMoveTapeRight(){
     console.log("moved right: new node: ", "xcoor:", Math.ceil(xcoor - width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
-document.getElementById("move-tape-right").addEventListener("click", cyMoveTapeRight);
+document.getElementById("move-tape-right").addEventListener("click", function(){
+    cyMoveTapeRight(200)
+});
 
 //animate write on tape & handles turingMachine object
 function cyWriteOnTape(input, animationTime){
@@ -322,3 +325,61 @@ document.getElementById("tape-input").addEventListener("click", function(){
                     1000/document.getElementById('simulationSpeed').value
                 );
 });
+
+
+function cyWriteCurrentPos(inputToken, animationTime){
+
+    //get id of middle object
+    cyTape.nodes().lock();
+
+    let maxid = Number.NEGATIVE_INFINITY;
+    let minid = Number.POSITIVE_INFINITY;
+    cyTape.nodes().forEach(element => {
+        let currid = parseInt(element.id());
+        if(minid > currid){
+            minid = currid;
+        }
+        if(maxid < currid){
+            maxid = currid;
+        }
+    })
+    let middleid = (maxid+minid)/2;
+    console.log("minid", minid, "middleid", middleid, "maxid", maxid);
+    //animate writing node
+    let currNode = cyTape.getElementById(middleid);
+    let currNodeId = currNode.id();
+    let currNodeX = currNode.position().x;
+    let currNodeY = currNode.position().y;
+    //remove old node
+    currNode.remove();
+    //create new node (animate fade in)
+    cyTape.add({
+        group: 'nodes',
+        data: { id: currNodeId },
+        position: { x: currNodeX, y: currNodeY-10},
+        style:{
+            'background-color': `grey`,
+            'label': `${inputToken}`,
+            'text-valign': "center",
+            'text-halign': "center",
+            'opacity': 0,
+        }
+    }).animate({
+        position: { x: currNodeX, y: currNodeY}, 
+        style: {opacity: 1},
+        duration: animationTime,               
+        easing: 'ease-in-out'         
+        },
+        {
+        complete: function(){
+            cyTape.nodes().lock();
+        }
+    });
+
+    //add to turingMachine tape object (!TO DO negative TM tape ids)
+    turingMachine.tape[middleid] = inputToken;
+    console.log("current tape", turingMachine.tape);
+}
+document.getElementById("writeCurrentPos").addEventListener("click", function(){
+    cyWriteCurrentPos("0", 1000);
+})

@@ -94,14 +94,14 @@ export class TuringMachine{
         ////
 
         //write on tape if needed
-        if(deltaValue[1] !== null && deltaValue[1] !== undefined){
+        if(deltaValue[1] !== null && deltaValue[1] !== undefined && deltaValue[1] !== ""){
             console.log(`write ${deltaValue[1]}`);
             this.tape[this.tapePosition] = deltaValue[1];
         }
         //adjust tapePosition if needed
         switch(deltaValue[2]){
-            case "L":
-                console.log("Move Left");
+            case "R":
+                console.log("Move Right");
                 //expand tape to left if needed
                 if(this.tapePosition === 0){
                     console.log("expanding tape to left");
@@ -110,8 +110,8 @@ export class TuringMachine{
                 }
                 this.tapePosition--;
                 break;
-            case "R":
-                console.log("Move Right");
+            case "L":
+                console.log("Move Left");
                 //expand tape to right if needed
                 if(this.tapePosition === this.tape.length-1){
                     console.log("expanding tape to right");
@@ -163,6 +163,7 @@ export class TuringMachine{
                 return key;
             }
         }
+        console.log("JSON: ", JSON.stringify(content))
         throw new Error("Key not found in Delta");
     }
 

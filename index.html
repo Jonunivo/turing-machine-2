@@ -25,13 +25,26 @@
 
         <input type="text" id="tape-input-field" required>
         <button id="tape-input">Write on Tape</button>
+        <button id="writeCurrentPos">Write Current Pos (0)</button>
+
 
         <button id="runSimulationButton">Run Simulation</button>
 
+        
         <div id="simulationSpeeddiv">
             <input type="range" min="1" max="4" step=0.01 value="2" class="slider" id="simulationSpeed">
             <label for="simulationSpeed">Simulation Speed</label>
         </div>
+        <!-- Preset -->
+
+        <div id="choosePreset" class="optionMenu">
+            <select id="presetSelect" name="preset">
+                <option value="empty" selected>No Preset</option>
+                <option value="PresetOne">add one binary</option>
+            </select>
+        </div>
+
+        <button id="loadPresetOne">Load Preset</button>
 
         <!-- Node Creation -->
         <div id="nodeModal" class="modal">
@@ -104,6 +117,8 @@
         <script type="module" src="./modules/Cytoscape.js"></script>
         <script type="module" src="./modules/CytoscapeTape.js"></script>
 
+
+        <script type="module" src="./modules/Presets.js"></script>
         <script type="module" src="./modules/Simulation.js"></script>
 
 

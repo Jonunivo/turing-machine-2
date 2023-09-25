@@ -1,5 +1,5 @@
 import {cy, turingMachine} from './Cytoscape.js';
-import {cyTape, cyWriteOnTape, cyMoveTapeLeft, cyMoveTapeRight} from './CytoscapeTape.js';
+import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight} from './CytoscapeTape.js';
 import { TuringMachine } from './TuringMachine.js';
 
 //// Global Variables
@@ -14,22 +14,24 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
     if(currentState === undefined){
         currentState = turingMachine.startstate;
     }
-    console.log("TM: ", turingMachine.tape);
+    console.log("Run Simulation Button pressed", turingMachine);
     animRunSimulation(turingMachine, currentState, turingMachine.readTape());
 })
 
-function animRunSimulation(turingMachine, startState, startCharOnTape){
+async function animRunSimulation(turingMachine, startState, startCharOnTape){
     currentState = startState;
     let charOnTape = startCharOnTape;
+    let animationTime = 1000/document.getElementById('simulationSpeed').value;
     //run animation on initial node
     animateSimulationStep(turingMachine, currentState, charOnTape);
+    //wait for simulation step to finish
+    await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
+
     while(simIsRunning && 
         currentState !== turingMachine.acceptstate &&
         currentState !== turingMachine.rejectstate){
 
-
         //run Simulation in TuringMachine.js on turingMachine object to get next state
-        console.log("HEHEH", turingMachine);
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         charOnTape = turingMachine.readTape();
 
@@ -40,10 +42,14 @@ function animRunSimulation(turingMachine, startState, startCharOnTape){
         
         //run Simulation Animation
         animateSimulationStep(turingMachine, currentState, charOnTape);
+        //wait for simulation step to finish
+        await new Promise(resolve => setTimeout(resolve, 9*(animationTime+10)));
+        console.log("animation finished");
+
     }
 }
 
-function animateSimulationStep(turingMachine, tmState, charOnTape){
+async function animateSimulationStep(turingMachine, tmState, charOnTape){
     ////logging
     console.log("--- animationStep ---")
     console.log(tmState);
@@ -56,18 +62,39 @@ function animateSimulationStep(turingMachine, tmState, charOnTape){
 
     //// animate node
     animateNode(tmState, animationTime);
-    
+    //wait for simulation step to finish
+    console.log("nodeAnimation start");
+    await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
+    console.log("nodeAnimation stop");
+
     //// animate tape read
     animateTapeRead(deltaValue, animationTime);
+    //wait for simulation step to finish
+    console.log("tapeReadAnimation start");
+    await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
+    console.log("tapeReadAnimation stop");
 
     //// animate edge
     animateEdge(tmState, charOnTape, animationTime);
+    //wait for simulation step to finish
+    console.log("edgeAnimation start");
+    await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
+    console.log("edgeAnimation stop");
 
     //// animate tape write
+    console.log("TM delta: ", turingMachine.delta, " ",deltaValue[1]);
     animateTapeWrite(deltaValue[1], animationTime)
+    //wait for simulation step to finish
+    console.log("tapeWriteAnimation start");
+    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+    console.log("tapeWriteAnimation stop");
 
     //// animate tape movement
     animateTapeMovement(deltaValue[2], animationTime)
+    //wait for simulation step to finish
+    console.log("tapeMoveAnimation start");
+    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+    console.log("tapeMoveAnimation stop");
 
 }
 
@@ -150,16 +177,20 @@ function animateEdge(tmState, charOnTape, animationTime){
 }
 
 function animateTapeWrite(writeToken, animationTime){
-    cyWriteOnTape(writeToken);
+    console.log("Tape Write: ", writeToken);
+    //only write when token isn't empty
+    if(writeToken !== ""){
+        cyWriteCurrentPos(writeToken, animationTime);
+    }
 }
 
-function animateTapeMovement(move){
+function animateTapeMovement(move, animationTime){
     switch (move){
         case "L":
-            cyMoveTapeLeft();
+            cyMoveTapeLeft(animationTime);
             break;
         case "R":
-            cyMoveTapeRight();
+            cyMoveTapeRight(animationTime);
             break;
         case "N":
             //no movement on neutral

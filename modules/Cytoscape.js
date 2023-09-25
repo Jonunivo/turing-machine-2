@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import {TuringMachine} from './TuringMachine.js';
 
-export {cy, turingMachine}
+export {cy, turingMachine, cyCreateNode, cyCreateEdge, nodePresetHelper};
 
 //global variables
 //Id for node creation (cyto id & turingmaschine id)
@@ -52,7 +52,7 @@ var cy = cytoscape({
 //// ----------- Node Creation
 function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
     let label = nodeName;
-    console.log(nodeId);
+    console.log("cyCreateNode with id", nodeId);
     let id = nodeId;
     let color = 'lightgrey';
     //border
@@ -172,6 +172,10 @@ document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
 
+function nodePresetHelper(){
+    nodeId++;
+}
+
 
 //// ----------- Edge Creation
 //click on node to create edge from this node
@@ -214,7 +218,7 @@ function userEdgeInputHandler(){
         cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + tapeMovement;
     }
     else{
-        writeLabel = "";
+        writeLabel = undefined;
         cyLabel = "R: " + readLabel + " | " + tapeMovement;
     }
 
