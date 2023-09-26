@@ -10,6 +10,8 @@ const height = 40;
 //overflow to save tape content not visible
 let rightOverflow = '';
 let leftOverflow = '';
+//declares on certain parts if function is used in simulation mode or manually
+let simulation = true;
 
 //cytoscape object
 var cyTape = cytoscape({
@@ -143,12 +145,25 @@ function cyMoveTapeLeft(animationTime){
         })
     });
 
+    
+    //adjust TM tape (if not in simulation mode)
+    if(!simulation){
+        if(turingMachine.tapePosition === turingMachine.tape.length-1){
+            console.log("expanding tape to right");
+            turingMachine.tape.push("");
+        }
+        turingMachine.tapePosition++;
+        console.log("Tape: " + turingMachine.tape + " " + turingMachine.tapePosition);
+    }
+
     ////Logging
     console.log("moved left: new node: ", "xcoor:", Math.floor(xcoor+width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
 document.getElementById("move-tape-left").addEventListener("click", function(){
+    simulation = false;
     cyMoveTapeLeft(200)
+    simulation = true;
 });
 
 
@@ -230,12 +245,26 @@ function cyMoveTapeRight(animationTime){
         })
     });
 
+    //adjust TM tape (if not in simulation mode)
+    if(!simulation){
+        if(turingMachine.tapePosition === 0){
+            console.log("expanding tape to left");
+            turingMachine.tape = ["", turingMachine.tape];
+            turingMachine.tapePosition++;
+        }
+        turingMachine.tapePosition--;
+        console.log("Tape: " + turingMachine.tape + " " + turingMachine.tapePosition);
+    }
+
+
     ////Logging
     console.log("moved right: new node: ", "xcoor:", Math.ceil(xcoor - width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
 document.getElementById("move-tape-right").addEventListener("click", function(){
+    simulation = false;
     cyMoveTapeRight(200)
+    simulation = true;
 });
 
 //animate write on tape & handles turingMachine object
@@ -360,13 +389,7 @@ function cyWriteCurrentPos(inputToken, animationTime){
         }
     });
 
-    //add to turingMachine tape object (!TO DO negative TM tape ids)
-    turingMachine.tape[middleid] = inputToken;
-    console.log("current tape", turingMachine.tape);
 }
-document.getElementById("writeCurrentPos").addEventListener("click", function(){
-    cyWriteCurrentPos("0", 1000);
-})
 
 //Helper to get id of middle node
 function getMiddleNodeId(){

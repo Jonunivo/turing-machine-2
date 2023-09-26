@@ -3,17 +3,17 @@
     width: 680px;
     height: 300px;
     position: absolute;
-    top: 150px;
-    left: 50px;
+    top: 170px;
+    left: 10px;
     border: dotted 1px black;
 }
 #cytoscape-tape {
     width: 680px;
     height: 50px;
     position: absolute;
-    top: 470px;
-    left: 50px;
-    border: dotted 1px black;
+    top: 485px;
+    left: 10px;
+    
 }
 
 .arrow-down {
@@ -23,8 +23,8 @@
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-top: 15px solid #000; 
-    left: 374px;
-    top: 380px;
+    left: 334px;
+    top: 395px;
   }
 
 /* Modal */

@@ -3,32 +3,52 @@ import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNod
 import { TuringMachine, turingMachine } from './TuringMachine.js';
 
 //// Global Variables
+// used to run / pause simulation
 let simIsRunning = false;
-// saves state the Sim is currently at
+// saves state the Sim is currently at (sets to startstate initially)
 let currentState = turingMachine.startstate;
+
 
 
 //User Action: Run Simulation Button
 document.getElementById('runSimulationButton').addEventListener('click', function(){
-    simIsRunning = true;
-    if(currentState === undefined){
-        currentState = turingMachine.startstate;
+    if(!simIsRunning){
+        //(re-) run simulation
+        document.getElementById('runSimulationButton').innerHTML = "Pause Simulation";
+        simIsRunning = true;
+        if(currentState === undefined){
+            currentState = turingMachine.startstate;
+        }
+        animRunSimulation(turingMachine, currentState, turingMachine.readTape());
     }
-    animRunSimulation(turingMachine, currentState, turingMachine.readTape());
+    else{
+        //pause simulation
+        //disable runsimulation button until animation finished
+        document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
+        simIsRunning = false;
+    }
+
 })
 
 async function animRunSimulation(turingMachine, startState, startCharOnTape){
+    //initial values
     currentState = startState;
     let charOnTape = startCharOnTape;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
-    //run animation on initial node
-    animateSimulationStep(turingMachine, currentState, charOnTape);
-    //wait for simulation step to finish
-    await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
-
+    //loop
     while(simIsRunning && 
         currentState !== turingMachine.acceptstate &&
         currentState !== turingMachine.rejectstate){
+
+        //run animation
+        //recalculate animation time
+        animationTime = 1000/document.getElementById('simulationSpeed').value;
+        animateSimulationStep(turingMachine, currentState, charOnTape);
+        //wait for simulation step to finish
+        await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
+        //reenable Run Simulation Button when simulation finished
+        document.getElementById('runSimulationButton').disabled = false;
 
         //run Simulation in TuringMachine.js on turingMachine object to get next state
         currentState = turingMachine.simulationStep(currentState, charOnTape);
@@ -38,14 +58,12 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         console.log("----------ANIMATION------------")
         console.log(`at State ${currentState.id} reading ${charOnTape}`);
         ////
-        
-        //run Simulation Animation
-        animateSimulationStep(turingMachine, currentState, charOnTape);
-        //wait for simulation step to finish
-        await new Promise(resolve => setTimeout(resolve, 9*(animationTime+10)));
 
     }
-    turingMachine.simulationResult(currentState);
+    if(simIsRunning){
+        //handle simulation result when accept or reject state reached
+        turingMachine.simulationResult(currentState);
+    }
 }
 
 async function animateSimulationStep(turingMachine, tmState, charOnTape){
@@ -175,7 +193,7 @@ function animateEdge(tmState, charOnTape, animationTime){
         outgoingEdges.forEach(edge => {
             if(edge.style('label').startsWith('R: ')){
                 const readChar = edge.style('label').charAt(3);
-                if(readChar === 'W' || readChar === ' '){
+                if(readChar === ' '){
                     edgeToAnimate = edge;
                 }
             }
