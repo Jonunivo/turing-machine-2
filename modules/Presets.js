@@ -32,13 +32,13 @@ function loadPresetOne(){
     //0->1 & move right when reading ""
     cyLabel = "R: " + '' + " | " + "R";
     cyCreateEdge(0, 1, cyLabel);
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(0), '', 'R')
+    turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(1), '', 'R')
     
     ////from carry
-    //1 -> 0, L
-    cyLabel = "R: " + '1' + "W: " + '0' + " | " + "L";
+    //1 -> 0, R
+    cyLabel = "R: " + '1' + "W: " + '0' + " | " + "R";
     cyCreateEdge(1, 1, cyLabel);
-    turingMachine.createTransition(turingMachine.getStatebyId(1), '1', turingMachine.getStatebyId(1), '0', 'L')
+    turingMachine.createTransition(turingMachine.getStatebyId(1), '1', turingMachine.getStatebyId(1), '0', 'R')
     //0 -> 1, L
     cyLabel = "R: " + '0' + "W: " + '1' + " | " + "L";
     cyCreateEdge(1, 2, cyLabel);

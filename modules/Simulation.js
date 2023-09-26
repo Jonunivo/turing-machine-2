@@ -14,7 +14,6 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
     if(currentState === undefined){
         currentState = turingMachine.startstate;
     }
-    console.log("Run Simulation Button pressed", turingMachine);
     animRunSimulation(turingMachine, currentState, turingMachine.readTape());
 })
 
@@ -44,57 +43,52 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         animateSimulationStep(turingMachine, currentState, charOnTape);
         //wait for simulation step to finish
         await new Promise(resolve => setTimeout(resolve, 9*(animationTime+10)));
-        console.log("animation finished");
 
     }
+    turingMachine.simulationResult(currentState);
 }
 
 async function animateSimulationStep(turingMachine, tmState, charOnTape){
-    ////logging
-    console.log("--- animationStep ---")
-    console.log(tmState);
-    console.log(`at State ${tmState.id} reading ${charOnTape}`);
-
-    //find corresponding transition in delta
-    let deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
     //read animationTime
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
-
+    let deltaValue = null;
+        
+    //find corresponding transition in delta
+    try{
+        deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
+    }
+    catch(error){
+        animateNode(tmState, animationTime);
+        return;
+    }
+    
     //// animate node
     animateNode(tmState, animationTime);
     //wait for simulation step to finish
-    console.log("nodeAnimation start");
     await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
-    console.log("nodeAnimation stop");
+
 
     //// animate tape read
     animateTapeRead(deltaValue, animationTime);
     //wait for simulation step to finish
-    console.log("tapeReadAnimation start");
     await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
-    console.log("tapeReadAnimation stop");
+
 
     //// animate edge
     animateEdge(tmState, charOnTape, animationTime);
     //wait for simulation step to finish
-    console.log("edgeAnimation start");
     await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
-    console.log("edgeAnimation stop");
+
 
     //// animate tape write
-    console.log("TM delta: ", turingMachine.delta, " ",deltaValue[1]);
     animateTapeWrite(deltaValue[1], animationTime)
     //wait for simulation step to finish
-    console.log("tapeWriteAnimation start");
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
-    console.log("tapeWriteAnimation stop");
 
     //// animate tape movement
     animateTapeMovement(deltaValue[2], animationTime)
     //wait for simulation step to finish
-    console.log("tapeMoveAnimation start");
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
-    console.log("tapeMoveAnimation stop");
 
 }
 
@@ -122,9 +116,6 @@ function animateNode(tmState, animationTime){
                 },
                 {
                     duration: animationTime,
-                    complete: function(){
-                        console.log("nodeAnimation complete")
-                    }
                 }
             );
         }
@@ -177,7 +168,6 @@ function animateEdge(tmState, charOnTape, animationTime){
 }
 
 function animateTapeWrite(writeToken, animationTime){
-    console.log("Tape Write: ", writeToken);
     //only write when token isn't empty
     if(writeToken !== ""){
         cyWriteCurrentPos(writeToken, animationTime);

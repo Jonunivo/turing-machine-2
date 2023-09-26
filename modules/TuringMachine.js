@@ -89,7 +89,6 @@ export class TuringMachine{
         console.log("//--------TM CORE-------------")
         console.log(`at State ${state.id} reading ${charOnTape}`);
         console.log(`Tape: ${this.tape}`);
-        console.log("      " + "  ".repeat(this.tapePosition) + "#");
         console.log(`next State: ${deltaValue[0].id}`);
         ////
 
