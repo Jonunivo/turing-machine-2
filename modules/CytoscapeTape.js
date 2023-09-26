@@ -1,13 +1,13 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
-import { turingMachine } from './Cytoscape.js';
+import { turingMachine } from './TuringMachine.js';
 
-export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId};
 
-//Tape object
-//Globals
+//------ global variables ------//
+//width & height of tape cell
 const width = 40;
 const height = 40;
-// TO DO: fetch animationTime from userinput
+//overflow to save tape content not visible
 let rightOverflow = '';
 let leftOverflow = '';
 
@@ -116,7 +116,7 @@ function cyMoveTapeLeft(animationTime){
         data: { id: id },
         position: { x: Math.floor(xcoor + width), y: ycoor },
         style:{
-            'background-color': `grey`,
+
             'label': `${readToken}`,
             'text-valign': "center",
             'text-halign': "center",
@@ -205,7 +205,6 @@ function cyMoveTapeRight(animationTime){
         data: { id: id },
         position: { x: Math.ceil(xcoor - width), y: ycoor },
         style:{
-            'background-color': `grey`,
             'label': `${readToken}`,
             'text-valign': "center",
             'text-halign': "center",
@@ -279,7 +278,6 @@ function cyWriteOnTape(input, animationTime){
             data: { id: currNodeId },
             position: { x: currNodeX, y: currNodeY-10},
             style:{
-                'background-color': `grey`,
                 'label': `${currToken}`,
                 'text-valign': "center",
                 'text-halign': "center",
@@ -328,23 +326,10 @@ document.getElementById("tape-input").addEventListener("click", function(){
 
 
 function cyWriteCurrentPos(inputToken, animationTime){
-
-    //get id of middle object
     cyTape.nodes().lock();
+    //get id of middle object
+    let middleid = getMiddleNodeId();
 
-    let maxid = Number.NEGATIVE_INFINITY;
-    let minid = Number.POSITIVE_INFINITY;
-    cyTape.nodes().forEach(element => {
-        let currid = parseInt(element.id());
-        if(minid > currid){
-            minid = currid;
-        }
-        if(maxid < currid){
-            maxid = currid;
-        }
-    })
-    let middleid = (maxid+minid)/2;
-    console.log("minid", minid, "middleid", middleid, "maxid", maxid);
     //animate writing node
     let currNode = cyTape.getElementById(middleid);
     let currNodeId = currNode.id();
@@ -358,7 +343,6 @@ function cyWriteCurrentPos(inputToken, animationTime){
         data: { id: currNodeId },
         position: { x: currNodeX, y: currNodeY-10},
         style:{
-            'background-color': `grey`,
             'label': `${inputToken}`,
             'text-valign': "center",
             'text-halign': "center",
@@ -383,3 +367,21 @@ function cyWriteCurrentPos(inputToken, animationTime){
 document.getElementById("writeCurrentPos").addEventListener("click", function(){
     cyWriteCurrentPos("0", 1000);
 })
+
+//Helper to get id of middle node
+function getMiddleNodeId(){
+    let maxid = Number.NEGATIVE_INFINITY;
+    let minid = Number.POSITIVE_INFINITY;
+    cyTape.nodes().forEach(element => {
+        let currid = parseInt(element.id());
+        if(minid > currid){
+            minid = currid;
+        }
+        if(maxid < currid){
+            maxid = currid;
+        }
+    })
+    let middleid = (maxid+minid)/2;
+
+    return middleid;
+}

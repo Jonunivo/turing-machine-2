@@ -1,6 +1,6 @@
-import {cy, turingMachine} from './Cytoscape.js';
-import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight} from './CytoscapeTape.js';
-import { TuringMachine } from './TuringMachine.js';
+import {cy} from './Cytoscape.js';
+import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId} from './CytoscapeTape.js';
+import { TuringMachine, turingMachine } from './TuringMachine.js';
 
 //// Global Variables
 let simIsRunning = false;
@@ -123,20 +123,70 @@ function animateNode(tmState, animationTime){
 }
 
 function animateTapeRead(deltaValue, animationTime){
-    //TO DO - find creative animation for TapeRead
+    //blink center node
+    //get center tape node
+    let middleid = getMiddleNodeId()
+    //get corresponding cyto node
+    let currNode = cyTape.getElementById(middleid);
+    let originalColor = currNode.style("background-color");
+    //animate
+    currNode.animate({
+        style: {
+            "background-color": "red",
+        },
+
+    },
+    {
+        duration: animationTime,
+        //fade out
+        complete: function(){
+            currNode.animate(
+                {
+                    style: {
+                    "background-color": `${originalColor}`,
+                    },
+                },
+                {
+                    duration: animationTime,
+                }
+            );
+        }
+    });
 }
 
 function animateEdge(tmState, charOnTape, animationTime){
     //get corresponding edge
-    //TO DO
-    /*
-    edge = ...
-    */
-    /*
+    //ATTENTION: this method relies on the edge being labelled as "R: {charOnTape} [...]"
+    //find corresponding edge
+    let edgeToAnimate = null;
+    let edgeFound = false;
+    const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
+    outgoingEdges.forEach(edge => {
+        if(edge.style('label').startsWith('R: ')){
+            const readChar = edge.style('label').charAt(3);
+            if(readChar === charOnTape){
+                edgeToAnimate = edge;
+                edgeFound = true;
+            }
+        }
+    })
+    //catch Write "" case
+    if(!edgeFound){
+        outgoingEdges.forEach(edge => {
+            if(edge.style('label').startsWith('R: ')){
+                const readChar = edge.style('label').charAt(3);
+                if(readChar === 'W' || readChar === ' '){
+                    edgeToAnimate = edge;
+                }
+            }
+        })
+    }
+
+    //Animation
     //fade-in
-    if(edge != null){
-        let originalColor = edge.style("background-color");
-        edge.animate( 
+    if(edgeToAnimate != null){
+        let originalColor = edgeToAnimate.style("background-color");
+        edgeToAnimate.animate( 
         {
         style: {
             "line-color": "red",
@@ -146,7 +196,7 @@ function animateEdge(tmState, charOnTape, animationTime){
         duration: animationTime,
         //fade-out
         complete: function(){
-            edge.animate( 
+            edgeToAnimate.animate( 
                 {
                 style: {
                     "line-color": `${originalColor}`,
@@ -164,7 +214,7 @@ function animateEdge(tmState, charOnTape, animationTime){
         );
         
     }
-    */
+
 }
 
 function animateTapeWrite(writeToken, animationTime){

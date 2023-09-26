@@ -1,5 +1,8 @@
 import {State} from './State.js';
-//export {simulationStep};
+export {turingMachine};
+
+
+
 export class TuringMachine{
     /**
      * Constructs a TuringMachine object with the provided attributes.
@@ -26,6 +29,8 @@ export class TuringMachine{
         this.tape = tape;
         this.tapePosition = tapePosition;
     }
+
+   
 
     //////////////////////////////////////////////////////////////
     //// -------------------- Creation --------------------- /////
@@ -177,6 +182,10 @@ export class TuringMachine{
     }
 
 }
+
+ //------ global variables ------//
+    //Basic TuringMachine object used for Creation & Simulation (imported by man other modules!)
+    var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
 
 /*
 //create a simple TM to test the code: binary increment

@@ -1,16 +1,13 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
-import {TuringMachine} from './TuringMachine.js';
+import {TuringMachine, turingMachine} from './TuringMachine.js';
 
-export {cy, turingMachine, cyCreateNode, cyCreateEdge, nodePresetHelper};
+export {cy, cyCreateNode, cyCreateEdge, nodePresetHelper};
 
-//global variables
+//------ global variables ------//
 //Id for node creation (cyto id & turingmaschine id)
 var nodeId = 0;
-
-//Edge Creation (used to safe on which node the user clicked)
+//fromNode at Edge Creation (used to safe on which node the user clicked)
 var fromNode;
-//Turingmachine
-var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
 
 
 //////////////////////////////////////////////////////////////
@@ -26,17 +23,16 @@ var cy = cytoscape({
             shape: 'round-rectangle',
             'background-color': 'red',
             'width': '50px',
-            'target-arrow-shape': 'triangle',
-            'target-arrow-color': 'blue'
         }
     },
     {
         
         selector: 'edge',
         style: {
-            'line-color': 'black',
+            'line-color': '#404040',
+            'width': 2,
             'target-arrow-shape': 'triangle',
-            'target-arrow-color': 'blue',
+            'target-arrow-color': '#2371f7',
             'curve-style': 'bezier',
             'loop-direction': '0deg'
         }
@@ -51,16 +47,19 @@ var cy = cytoscape({
 
 //// ----------- Node Creation
 function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
-    let label = nodeName;
     console.log("cyCreateNode with id", nodeId);
+    
+    //default values
+    let label = nodeName;
     let id = nodeId;
     let color = 'lightgrey';
-    //border
     let borderWidth = 0;
     let borderColor = 'white';
+
     if(isStarting){
         borderWidth = 2;
         borderColor = 'black';
+        color = 'darkgrey';
     }
     if(isAccepting){
         color = 'limegreen';
@@ -87,8 +86,9 @@ function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isR
 
 //// ----------- Edge Creation
 function cyCreateEdge(fromNode, toNode, label){
+    console.log("cyCreateEdge " + fromNode + " | " + toNode + " | " + label);
+
     //core
-    console.log("cycreate " + fromNode + " | " + toNode + " | " + label);
     cy.add({ 
         group: 'edges', 
         data: { 
@@ -97,8 +97,9 @@ function cyCreateEdge(fromNode, toNode, label){
         },
         style: {
             'label': `${label}`,
-            "text-margin-y": "-10px",
-            "text-margin-x": "-10px",
+            'font-size': '12px',
+            "text-margin-y": "-5px",
+
           }
         }
     );
@@ -116,7 +117,6 @@ function cyCreateEdge(fromNode, toNode, label){
     //open modal
     const nodeModal = document.getElementById('nodeModal');
     nodeModal.style.display = 'block';
-    //cyCreateNode(0, position.x, position.y);
 })
 
 //user submit node inputs
@@ -165,13 +165,13 @@ function userNodeInputHandler(){
     console.log("new State with id: ", nodeId-1);
     console.log("tm now: ", turingMachine);
 
-
 }
 //Cancel button (node) pressed
 document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
 
+//Helper function to increase global variable nodeId (used in Presets.js)
 function nodePresetHelper(){
     nodeId++;
 }
@@ -209,6 +209,9 @@ function userEdgeInputHandler(){
     }
     else if(parseInt(tapeMovementValue) === 1){
         tapeMovement = "R";
+    }
+    else{
+        tapeMovement = "N";
     }
     //writeLabel
     let cyLabel = "";

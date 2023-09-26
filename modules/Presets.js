@@ -1,5 +1,5 @@
-import { turingMachine, cyCreateNode, cyCreateEdge, nodePresetHelper } from "./Cytoscape.js";
-
+import { cyCreateNode, cyCreateEdge, nodePresetHelper } from "./Cytoscape.js";
+import { turingMachine } from "./TuringMachine.js";
 
 function loadPresetOne(){
     console.log("load preset 1 clicked");
