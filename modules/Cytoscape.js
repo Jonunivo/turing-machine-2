@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import {TuringMachine, turingMachine} from './TuringMachine.js';
 
-export {cy, cyCreateNode, cyCreateEdge, nodePresetHelper};
+export {cy, cyCreateNode, cyCreateEdge, nodePresetHelper, nodePresetReset, cyClearCanvas};
 
 //------ global variables ------//
 //Id for node creation (cyto id & turingmaschine id)
@@ -105,6 +105,12 @@ function cyCreateEdge(fromNode, toNode, label){
     );
 }
 
+//// ----------- Clear Canvas
+function cyClearCanvas(){
+    var cyNodes = cy.nodes();
+    cyNodes.remove();
+}
+
 
 
 //////////////////////////////////////////////////////////////
@@ -171,9 +177,12 @@ document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
 
-//Helper function to increase global variable nodeId (used in Presets.js)
+//Helper functions to adjust global variable nodeId (used in Presets.js)
 function nodePresetHelper(){
     nodeId++;
+}
+function nodePresetReset(){
+    nodeId = 0;
 }
 
 

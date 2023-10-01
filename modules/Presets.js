@@ -1,10 +1,18 @@
-import { cyCreateNode, cyCreateEdge, nodePresetHelper } from "./Cytoscape.js";
+import { cyCreateNode, cyCreateEdge, nodePresetHelper, nodePresetReset, cyClearCanvas } from "./Cytoscape.js";
+import { cyTapeClear } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js";
+
+function empty(){
+    turingMachine.createTuringMachineBasic();
+    nodePresetReset();
+    cyClearCanvas();
+    cyTapeClear();
+}
 
 function loadPresetOne(){
     console.log("load preset 1 clicked");
     //reset
-    //TO DO
+    empty();
     //Create States
     //right state
     cyCreateNode('right', undefined, undefined, true, false, false)
@@ -56,7 +64,7 @@ var presetSelect = document.getElementById("presetSelect");
     
 presetSelect.addEventListener("change", function() {
         if (presetSelect.value === "empty") {
-            //empty()
+            empty()
             console.log("empty clicked");
         }
         else if (presetSelect.value === "PresetOne") {

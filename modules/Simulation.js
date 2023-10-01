@@ -5,8 +5,8 @@ import { TuringMachine, turingMachine } from './TuringMachine.js';
 //// Global Variables
 // used to run / pause simulation
 let simIsRunning = false;
-// saves state the Sim is currently at (sets to startstate initially)
-let currentState = turingMachine.startstate;
+// saves state the Sim is currently at 
+let currentState;
 
 
 
@@ -30,6 +30,20 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
     }
 
 })
+//User Action: Run Single Step of Animation
+document.getElementById('stepSimulationButton').addEventListener('click', function(){
+    //catch undefined case
+    if(currentState === undefined){
+        currentState = turingMachine.startstate;
+    }
+    ////disable buttons
+    document.getElementById('stepSimulationButton').disabled = true;
+    document.getElementById('runSimulationButton').disabled = true;
+
+    animateSimulationStep(turingMachine, currentState, turingMachine.readTape());
+    //run Simulation in TuringMachine.js on turingMachine object to get next state
+    currentState = turingMachine.simulationStep(currentState, turingMachine.readTape());
+})
 
 async function animRunSimulation(turingMachine, startState, startCharOnTape){
     //initial values
@@ -41,14 +55,15 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         currentState !== turingMachine.acceptstate &&
         currentState !== turingMachine.rejectstate){
 
+        //disable things that shouldn't be accessed during simulation
+        document.getElementById('stepSimulationButton').disabled = true;
+
         //run animation
         //recalculate animation time
         animationTime = 1000/document.getElementById('simulationSpeed').value;
         animateSimulationStep(turingMachine, currentState, charOnTape);
         //wait for simulation step to finish
         await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
-        //reenable Run Simulation Button when simulation finished
-        document.getElementById('runSimulationButton').disabled = false;
 
         //run Simulation in TuringMachine.js on turingMachine object to get next state
         currentState = turingMachine.simulationStep(currentState, charOnTape);
@@ -76,6 +91,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
     }
     catch(error){
+        //animtate final node
         animateNode(tmState, animationTime);
         return;
     }
@@ -107,6 +123,11 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     animateTapeMovement(deltaValue[2], animationTime)
     //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+
+    //re-enable run simulation button after simulation step finished (for single step)
+    document.getElementById('runSimulationButton').disabled = false;
+    document.getElementById('stepSimulationButton').disabled = false;
+
 
 }
 

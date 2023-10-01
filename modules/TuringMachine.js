@@ -36,6 +36,11 @@ export class TuringMachine{
     //// -------------------- Creation --------------------- /////
     //////////////////////////////////////////////////////////////
 
+    //creates default turingmachine object (also used to reset TM object)
+    createTuringMachineBasic(){
+        turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
+    }
+
     //adds state to TM object
     createState(id, isStarting = false, isAccepting = false, isRejecting = false){
         let newState = new State(id, isStarting, isAccepting, isRejecting)

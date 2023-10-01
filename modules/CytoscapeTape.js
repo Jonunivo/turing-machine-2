@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { turingMachine } from './TuringMachine.js';
 
-export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId, cyTapeClear};
 
 //------ global variables ------//
 //width & height of tape cell
@@ -407,4 +407,10 @@ function getMiddleNodeId(){
     let middleid = (maxid+minid)/2;
 
     return middleid;
+}
+
+//Helper to clear canvas (used in Presets.js)
+function cyTapeClear(){
+    cyTape.nodes().remove();
+    cyCreateTape();
 }
