@@ -14,7 +14,7 @@
 
     <body>
         <h1 id="head-title">TuringMachine Simulator</h1>
-
+    
         <div id="cytoscape"></div>
         <div id="cytoscape-tape"></div>
 
@@ -30,6 +30,7 @@
         <button id="runSimulationButton">Run Simulation</button>
         
         <button id="stepSimulationButton">Step Simulation</button>
+        <button id="resetSimulationButton">Reset Simulation</button>
         
         <div id="simulationSpeeddiv">
             <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
@@ -79,7 +80,8 @@
             <div class="modal-content">
                 <h3>Edge Properties</h3>
                 <label for="toState">To State (id):</label>
-                <input type="number" id="toState">
+                <select id="toState"></select>
+                
                 <br>
                 <label for="readLabel">When reading label</label>
                 <input type="text" id="readLabel">
@@ -104,7 +106,11 @@
         </div>
 
 
-
+        <footer>
+            Note: this is a developer build, some things might not yet be working as intended
+            <br>
+            <a href="prototype/">Prototype</a>
+        </footer>
 
         <!--- links to the scripts -->
           <!-- cytoscape -->

@@ -8,13 +8,19 @@ let simIsRunning = false;
 // saves state the Sim is currently at 
 let currentState;
 
+//////////////////////////////////////////////////////////////
+//// -------------------- User Action ------------------- ////
+//////////////////////////////////////////////////////////////
 
-
-//User Action: Run Simulation Button
+//Run Simulation Button
 document.getElementById('runSimulationButton').addEventListener('click', function(){
+
     if(!simIsRunning){
         //(re-) run simulation
+        //Button manipulation
         document.getElementById('runSimulationButton').innerHTML = "Pause Simulation";
+        document.getElementById("resetSimulationButton").disabled = true;
+
         simIsRunning = true;
         if(currentState === undefined){
             currentState = turingMachine.startstate;
@@ -25,12 +31,14 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
         //pause simulation
         //disable runsimulation button until animation finished
         document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('stepSimulationButton').disabled = true;
         document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
         simIsRunning = false;
     }
 
 })
-//User Action: Run Single Step of Animation
+
+//Run Single Step of Animation
 document.getElementById('stepSimulationButton').addEventListener('click', function(){
     //catch undefined case
     if(currentState === undefined){
@@ -38,12 +46,26 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     }
     ////disable buttons
     document.getElementById('stepSimulationButton').disabled = true;
+    document.getElementById('resetSimulationButton').disabled = true;
     document.getElementById('runSimulationButton').disabled = true;
 
     animateSimulationStep(turingMachine, currentState, turingMachine.readTape());
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     currentState = turingMachine.simulationStep(currentState, turingMachine.readTape());
 })
+//Go back to start state (Reset Simulation)
+document.getElementById('resetSimulationButton').addEventListener('click', function(){
+    currentState = turingMachine.startstate;
+    //quickly blink start state
+    animateNode(currentState, 200);
+
+    document.getElementById("runSimulationButton").disabled = false;
+})
+
+
+//////////////////////////////////////////////////////////////
+//// ---------------- Simulation Core ------------------- ////
+//////////////////////////////////////////////////////////////
 
 async function animRunSimulation(turingMachine, startState, startCharOnTape){
     //initial values
@@ -57,6 +79,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
 
         //disable things that shouldn't be accessed during simulation
         document.getElementById('stepSimulationButton').disabled = true;
+        document.getElementById('resetSimulationButton').disabled = true;
 
         //run animation
         //recalculate animation time
@@ -77,6 +100,14 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
     }
     if(simIsRunning){
         //handle simulation result when accept or reject state reached
+        //button manipulation
+        document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
+        document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById("resetSimulationButton").disabled = false;
+
+        simIsRunning = false;
+
+        //turingMachine Resulthandler
         turingMachine.simulationResult(currentState);
     }
 }
@@ -127,9 +158,14 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     //re-enable run simulation button after simulation step finished (for single step)
     document.getElementById('runSimulationButton').disabled = false;
     document.getElementById('stepSimulationButton').disabled = false;
+    document.getElementById('resetSimulationButton').disabled = false;
 
 
 }
+
+//////////////////////////////////////////////////////////////
+//// ----------------- Animation Steps ------------------ ////
+//////////////////////////////////////////////////////////////
 
 function animateNode(tmState, animationTime){
     //get cyto node
@@ -194,32 +230,14 @@ function animateTapeRead(deltaValue, animationTime){
 }
 
 function animateEdge(tmState, charOnTape, animationTime){
-    //get corresponding edge
-    //ATTENTION: this method relies on the edge being labelled as "R: {charOnTape} [...]"
     //find corresponding edge
     let edgeToAnimate = null;
-    let edgeFound = false;
     const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
     outgoingEdges.forEach(edge => {
-        if(edge.style('label').startsWith('R: ')){
-            const readChar = edge.style('label').charAt(3);
-            if(readChar === charOnTape){
-                edgeToAnimate = edge;
-                edgeFound = true;
-            }
+        if(edge.data().readToken === charOnTape){
+            edgeToAnimate = edge;
         }
     })
-    //catch Write "" case
-    if(!edgeFound){
-        outgoingEdges.forEach(edge => {
-            if(edge.style('label').startsWith('R: ')){
-                const readChar = edge.style('label').charAt(3);
-                if(readChar === ' '){
-                    edgeToAnimate = edge;
-                }
-            }
-        })
-    }
 
     //Animation
     //fade-in

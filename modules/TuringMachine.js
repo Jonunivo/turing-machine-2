@@ -42,8 +42,8 @@ export class TuringMachine{
     }
 
     //adds state to TM object
-    createState(id, isStarting = false, isAccepting = false, isRejecting = false){
-        let newState = new State(id, isStarting, isAccepting, isRejecting)
+    createState(id, name = "", isStarting = false, isAccepting = false, isRejecting = false){
+        let newState = new State(id, name, isStarting, isAccepting, isRejecting)
         //add to TM object
         this.states.add(newState);
 

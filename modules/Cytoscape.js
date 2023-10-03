@@ -85,7 +85,7 @@ function cyCreateNode(nodeName, xPos=200, yPos=200, isStarting, isAccepting, isR
 }
 
 //// ----------- Edge Creation
-function cyCreateEdge(fromNode, toNode, label){
+function cyCreateEdge(fromNode, toNode, label, readToken){
     console.log("cyCreateEdge " + fromNode + " | " + toNode + " | " + label);
 
     //core
@@ -93,7 +93,8 @@ function cyCreateEdge(fromNode, toNode, label){
         group: 'edges', 
         data: { 
             source: `${fromNode}`, 
-            target: `${toNode}` 
+            target: `${toNode}`,
+            readToken: `${[readToken]}`,
         },
         style: {
             'label': `${label}`,
@@ -103,6 +104,31 @@ function cyCreateEdge(fromNode, toNode, label){
           }
         }
     );
+}
+
+//// ----------- Edge Merging
+//TO DO - decide how to merge edges 
+function mergeEdges(edge1, edge2){
+    //catch source/target not matching
+    if(edge1.data().source !== edge2.data().source ||
+    edge1.data().target !== edge2.data().target){
+        return;
+    }
+
+    //save edge data
+
+    let mergedSource = edge1.data().source;
+    let mergedTarget = edge1.data().target;
+    let readToken1 = edge1.data().readToken;
+    let readToken2 = edge2.data().readToken;
+
+    //remove old edges
+    cy.remove(edge1);
+    cy.remove(edge2);
+
+    //create merged edge
+    cyCreateEdge(mergedSource, mergedTarget, label, readToken1);
+
 }
 
 //// ----------- Clear Canvas
@@ -119,9 +145,21 @@ function cyClearCanvas(){
 //// ----------- Node Creation
 //dblclick -> create node
  cy.on('dblclick', (event) => {
+    //get doubleclick position
     const position = event.position;
-    //open modal
+
+    //
     const nodeModal = document.getElementById('nodeModal');
+    const modal = document.querySelector('.modal-content');
+
+    //get cytoscape window position
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+    //display modal at doubleclick position
+    modal.style.marginLeft = `${position.x + leftValue}px`
+    modal.style.marginTop = `${position.y + topValue}px`;
     nodeModal.style.display = 'block';
 })
 
@@ -162,7 +200,7 @@ function userNodeInputHandler(){
     }
     
     //create node in TM
-    turingMachine.createState(nodeId, isStartingState, isAcceptingState, isRejectingState);
+    turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
     //adjust nodeId
     nodeId++;
 
@@ -189,11 +227,35 @@ function nodePresetReset(){
 //// ----------- Edge Creation
 //click on node to create edge from this node
 cy.on('tap', 'node', (event) => {
+    ////open modal
+    //save click position
+    const position = event.position;
+
+    //
+    const edgeModal = document.getElementById('edgeModal');
+    const modal = document.querySelector('.modal-content');
+
+    //get cytoscape window position
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+    //display modal at click position TO DO: not yet working correctly
+    
+    modal.style.marginLeft = `${position.x + leftValue}px`
+    modal.style.marginTop = `${position.y + topValue}px`;
+
+
+    edgeModal.style.display = 'block';
+
+
+    createDropdownMenues()
+
+
+    //save node clicked on
     const node = event.target;
     fromNode = turingMachine.getStatebyId(node.id());
-    //open modal
-    const edgeModal = document.getElementById('edgeModal');
-    edgeModal.style.display = 'block';
+
 });
 
 document.getElementById('edgeButton').addEventListener('click', function(){
@@ -204,10 +266,17 @@ function userEdgeInputHandler(){
     //Close the modal
     edgeModal.style.display = 'none';
 
-    //read user input
-    //toNode
-    let toNodeId = parseInt(document.getElementById('toState').value);
+    //// read user input
+
+    //toNode 
+    //!for this to work properly, it is assumed that the states in turingMachine are ordered ascendingly by ID!
+    let dropdown = document.getElementById("toState")
+    let toNodeId = parseInt(dropdown.selectedIndex);
     let toNode = turingMachine.getStatebyId(toNodeId);
+    console.log(toNodeId);
+
+
+
     //readLabel
     let readLabel = document.getElementById('readLabel').value;
     //tapeMovement
@@ -235,7 +304,7 @@ function userEdgeInputHandler(){
     }
 
     //create Edge Cytoscape
-    cyCreateEdge(`${fromNode.id}`, `${toNodeId}`, cyLabel);
+    cyCreateEdge(`${fromNode.id}`, `${toNodeId}`, cyLabel, readLabel);
 
     //create edge in TM
     let fromState = turingMachine.getStatebyId(fromNode.id);
@@ -250,6 +319,33 @@ function userEdgeInputHandler(){
 document.getElementById("cancelButton2").addEventListener('click', function(){
     edgeModal.style.display = 'none';
 })
+
+
+//Helper: Creates dropdown menus dynamically
+function createDropdownMenues(){
+    //// toNode
+    //remove all dropdown elements created earlier
+    let dropdown = document.getElementById("toState")
+    while(dropdown.options.length > 0){
+        dropdown.remove(0);
+    }
+    //fetch options from existing nodeIds
+    let options = [];
+    for(const state of turingMachine.states){
+        options.push(state.name);
+    }
+    //create HTML elements from options
+    for(const option of options){
+        const optionElement = document.createElement('option');
+        optionElement.text = option;
+        dropdown.add(optionElement);
+    }
+
+
+
+    ////
+}
+
 
 
 //////////////////////////////////////////////////////////////

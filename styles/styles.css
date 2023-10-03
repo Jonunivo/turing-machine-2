@@ -30,7 +30,7 @@
 /* Modal */
 .modal {
     display: none;
-    position: fixed;
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
@@ -40,12 +40,70 @@
 .modal-content {
     background-color: white;
     width: 300px;
-    margin: 100px auto;
     padding: 20px;
     border-radius: 5px;
     text-align: center;
 }
 
+/* on-off switch */
+/* --- on off switch  code adapted from https://alvarotrigo.com/blog/toggle-switch-css/ --- */
+input[type=checkbox]{
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+.checkboxLabel {
+    cursor: pointer;
+    text-indent: 60px;
+    width: 40px;
+    height: 22px;
+    background: #ccc;
+    display: block;
+    border-radius: 100px;
+    border: solid 2px #ccc;
+    position: relative;
+}
+input[type=checkbox]:enabled:hover + .checkboxLabel{
+    border: solid 2px rgb(109, 109, 109);
+    transition: border 0.2s;
+    transform: scale(1.05);
+}
+
+input[type=checkbox]:disabled + .checkboxLabel{
+    background-color: #ff9f9f88;
+    border: 2px solid rgb(194, 194, 194);
+}
+
+.checkboxLabel:after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+input[type=checkbox]:checked + .checkboxLabel {
+    background: #bfdf56;
+    border: solid 2px #bfdf56;
+}
+
+input[type=checkbox]:checked + label:after {
+    left: calc(100% - 2px);
+    transform: translateX(-100%);
+}
+
+
+
+
 button {
     background-color: yellowgreen;
+}
+
+footer {
+    margin-top: 400px;
 }
