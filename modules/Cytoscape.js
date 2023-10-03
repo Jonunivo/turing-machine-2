@@ -168,8 +168,18 @@ function cyClearCanvas(){
         nodeButton.innerText = "Create Node";
         // Replace the existing button with the new button
         nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
+        //user submit node inputs (Event Listener) (if not yet existent)
+        addEventListenerWithCheck(document.getElementById('nodeButton'), 'click', userNodeInputHandler)
+
+    }
+    else{
+        //nodeButton already exists:
+        addEventListenerWithCheck(document.getElementById('nodeButton'), 'click', userNodeInputHandler)
     }
 
+
+    //disable sliders
+    disableSliders();
 
 
 
@@ -179,10 +189,7 @@ function cyClearCanvas(){
     nodeModal.style.display = 'block';
 })
 
-//user submit node inputs (Event Listener)
-document.getElementById('nodeButton').addEventListener('click', function(){
-    userNodeInputHandler();
-})
+
 
 function userNodeInputHandler(){
     //Close the modal
@@ -201,20 +208,6 @@ function userNodeInputHandler(){
 
     //create cyto node
     cyCreateNode(stateName, undefined, undefined, isStartingState, isAcceptingState, isRejectingState);
-    
-    //Form Validation
-    if(isStartingState){
-        document.getElementById('stateStarting').disabled = true;
-        document.getElementById('stateStarting').checked = false;
-    }
-    if(isAcceptingState){
-        document.getElementById('stateAccepting').disabled = true;
-        document.getElementById('stateAccepting').checked = false;
-    }
-    if(isRejectingState){
-        document.getElementById('stateRejecting').disabled = true;
-        document.getElementById('stateRejecting').checked = false;
-    }
     
     //create node in TM
     turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
@@ -373,14 +366,12 @@ function createDropdownMenues(){
 //// -------------------- User Edit --------------------- ////
 //////////////////////////////////////////////////////////////
 cy.on('cxttap', 'node', function(event){
-    event.preventDefault();
-    console.log("right click on node")
 
     //save node clicked on (global vars)
     cytoEditNode = event.target;
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
 
-    //open Modal
+    ////open Modal at click position
     //get click position
     const position = event.position;
 
@@ -392,6 +383,12 @@ cy.on('cxttap', 'node', function(event){
     const cytoWindow = document.querySelector('#cytoscape');
     const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
     const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+    //display modal at node position
+    modal.style.marginLeft = `${position.x + leftValue}px`
+    modal.style.marginTop = `${position.y + topValue}px`;
+    nodeModal.style.display = 'block';
+
 
 
     ////change button from "create node" to "edit node"
@@ -412,46 +409,33 @@ cy.on('cxttap', 'node', function(event){
         newButton.innerText = "Delete Node";
         document.getElementById("deleteNodeDiv").appendChild(newButton);
 
-            //user delete node (Event Listener)
-        newButton.addEventListener('click', function(){
-        userDeleteNodeHandler();
-        })
+        //user delete node (Event Listener)
+        addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
     }
     else{
         //user delete node (Event Listener)
-        deleteButton.addEventListener('click', function(){
-        userDeleteNodeHandler();
-        })
+        addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
     }
 
-
-
-
-
-
     ////get current node properties
+    //disable sliders
+    disableSliders();
+
     //get name
     document.getElementById("stateName").value = editNode.name;
     //get Starting/Accepting/Rejecting property
-    document.getElementById("stateStarting").checked = false;
-    document.getElementById("stateAccepting").checked = false;
-    document.getElementById("stateRejecting").checked = false;
     if(editNode.isStarting){
+        document.getElementById("stateStarting").disabled = false;
         document.getElementById("stateStarting").checked = true;
     }
     if(editNode.isAccepting){
+        document.getElementById("stateAccepting").disabled = false;
         document.getElementById("stateAccepting").checked = true;
     }
     if(editNode.isRejecting){
+        document.getElementById("stateRejecting").disabled = false;
         document.getElementById("stateRejecting").checked= true;
     }
-
-
-    //display modal at node position
-    modal.style.marginLeft = `${position.x + leftValue}px`
-    modal.style.marginTop = `${position.y + topValue}px`;
-    nodeModal.style.display = 'block';
-
 
     //user submit node inputs (Event Listener)
     document.getElementById('nodeEditButton').addEventListener('click', function(){
@@ -480,6 +464,15 @@ function userEditNodeHandler(){
 
     ////Starting/Accepting/Rejecting property
     var isStarting = document.getElementById("stateStarting").checked;
+    var isAccepting = document.getElementById("stateAccepting").checked;
+    var isRejecting = document.getElementById("stateRejecting").checked;
+    //catch accepting&rejecting case
+    if(isAccepting && isRejecting){
+        alert("A node cannot be accepting & rejecting at the same time")
+        return;
+    }
+
+    //isStarting
     if (isStarting){
         //cyto
         cytoEditNode.style('background-color', 'darkgrey');
@@ -489,8 +482,17 @@ function userEditNodeHandler(){
         turingMachine.startstate = editNode;
         editNode.isStarting = true;
     }
+    else if(editNode.isStarting){
+        //edit node was starting node but edit removed starting node property
+        //cyto
+        cytoEditNode.style('background-color', 'lightgrey');
+        cytoEditNode.style('border-width', 0);
+        //tm object
+        editNode.isStarting = false;
+        turingMachine.startstate = null;
+    }
 
-    var isAccepting = document.getElementById("stateAccepting").checked;
+    //isAccepting
     if (isAccepting){
         //cyto
         cytoEditNode.style('background-color', 'limegreen');
@@ -498,14 +500,34 @@ function userEditNodeHandler(){
         turingMachine.acceptstate = editNode;
         editNode.isAccepting = true;
     }
+    else if(editNode.isAccepting){
+        //edit node was accepting node but edit removed starting node property
+        //cyto
+        if(!isRejecting){
+            cytoEditNode.style('background-color', 'lightgrey');
+        }
+        //tm object
+        editNode.isAccepting = false;
+        turingMachine.acceptstate = null;
+    }
 
-    var isRejecting = document.getElementById("stateRejecting").checked;
+    //isRejecting
     if (isRejecting){
         //cyto
         cytoEditNode.style('background-color', 'red');
         //TM object
         turingMachine.rejectstate = editNode;
         editNode.isRejecting = true;
+    }
+    else if(editNode.isRejecting){
+        //edit node was rejecting node but edit removed starting node property
+        //cyto
+        if(!isAccepting){
+            cytoEditNode.style('background-color', 'lightgrey');
+        }
+        //tm object
+        editNode.isRejecting = false;
+        turingMachine.rejectstate = null;
     }
 }
 
@@ -519,6 +541,15 @@ function userDeleteNodeHandler(){
     ////delete from TM object
     //remove node
     turingMachine.states.delete(editNode);
+    if(editNode.isStarting){
+        turingMachine.startstate = null;
+    }
+    if(editNode.isAccepting){
+        turingMachine.acceptstate = null;
+    }
+    if(editNode.isRejecting){
+        turingMachine.rejectstate = null;
+    }
     //remove all edges from / to this node
     let updatedDelta = new Map();
     for(const [key, value] of turingMachine.delta){
@@ -530,7 +561,32 @@ function userDeleteNodeHandler(){
 
 }
 
+//Helper: Disables sliders (avoid creating multiple starting/accep/.. noded)
+function disableSliders(){
+    if(turingMachine.startstate !== null && turingMachine.startstate !== undefined){
+        document.getElementById("stateStarting").disabled = true;
+    }
+    if(turingMachine.acceptstate !== null && turingMachine.acceptstate !== undefined){
+        document.getElementById("stateAccepting").disabled = true;
+    }
+    if(turingMachine.rejectstate !== null && turingMachine.rejectstate !== undefined){
+        document.getElementById("stateRejecting").disabled = true;
+    }
 
+    document.getElementById("stateStarting").checked = false;
+    document.getElementById("stateAccepting").checked = false;
+    document.getElementById("stateRejecting").checked = false;
+
+}
+
+//Helper: create eventlistener if not yet existent (avoids duplication of eventlisteners)
+function addEventListenerWithCheck(element, eventType, listener){
+    const existingListeners = element.__eventListeners || {};
+    if(!existingListeners[eventType]){
+        element.addEventListener(eventType, listener);
+        existingListeners[eventType] = listener;
+    }
+}
 
 
 //////////////////////////////////////////////////////////////
