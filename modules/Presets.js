@@ -1,6 +1,7 @@
-import { cyCreateNode, cyCreateEdge, nodePresetHelper, nodePresetReset, cyClearCanvas } from "./Cytoscape.js";
+import { cyCreateNode, cyCreateEdge, cyClearCanvas } from "./Cytoscape.js";
 import { cyTapeClear } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js";
+import { nodePresetHelper, nodePresetReset } from "./UserInput.js";
 
 function empty(){
     turingMachine.createTuringMachineBasic();
@@ -15,16 +16,17 @@ function loadPresetOne(){
     empty();
     //Create States
     //right state
-    cyCreateNode('right', undefined, undefined, true, false, false)
+    cyCreateNode(0, 'right', undefined, undefined, true, false, false)
     turingMachine.createState(0, 'right', true, false, false);
-    nodePresetHelper();
+    
     //carry state
-    cyCreateNode('carry', undefined, undefined, false, false, false)
+    cyCreateNode(nodePresetHelper(),'carry', undefined, undefined, false, false, false)
     turingMachine.createState(1, 'carry', false, false, false);
-    nodePresetHelper();
+
     //done state
-    cyCreateNode('done', undefined, undefined, false, true, false)
+    cyCreateNode(nodePresetHelper(),'done', undefined, undefined, false, true, false)
     turingMachine.createState(2, 'done', false, true, false);
+
     nodePresetHelper();
 
     //Create Transitions

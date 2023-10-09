@@ -1,31 +1,251 @@
-/*
-export {userNodeInputForm};
+import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, disableSliders } from "./Cytoscape.js";
+import { turingMachine } from "./TuringMachine.js";
 
-let wait = true;
+export {createDropdownMenues, nodePresetHelper, nodePresetReset };
 
 
-//opens nodeModal Form
-function userNodeInputForm(){
-    //open nodeModal
+//////////////////////////////////////////////////////////////
+//// ------------------ User Creation ------------------- ////
+//////////////////////////////////////////////////////////////
+
+//globals
+//Id for node creation (cyto id & turingmaschine id)
+var nodeId = 0;
+//fromNode at Edge Creation (used to safe on which node the user clicked)
+var fromNode;
+
+
+
+//// ----------- Node Creation
+//dblclick -> create node
+cy.on('dblclick', (event) => {
+    //get doubleclick position
+    const position = event.position;
+
+    //
     const nodeModal = document.getElementById('nodeModal');
-    console.log("before block");
-    nodeModal.style.display = 'block';
-    console.log("before wait");
-    while(wait){
-        //Busy waiting for form response
+    const modal = document.querySelector('.modal-content');
+
+    //get cytoscape window position
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+    ////change button from "edit node" to "create node"
+    var nodeEditButton = document.getElementById("nodeEditButton");
+    var nodeButton = document.createElement("button");
+    nodeButton.id = "nodeButton";
+    nodeButton.innerText = "Create Node";
+    if(nodeEditButton){
+        // Replace the existing button with the new button
+        nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
     }
-    console.log("after wait");
-    return null;
+    addEventListenerWithCheck(document.getElementById('nodeButton'), 'click', userNodeInputHandler)
 
-}
-//handles user input from nodeModal Form & Creates Cyto Node
-function userNodeInputHandler(){
+    //disable sliders
+    disableSliders();
 
-}
-document.getElementById('nodeButton').addEventListener('click', function(){
-    const nodeId = document.getElementById('nodeId').value;
-    wait = false;
-    console.log(nodeId, wait);
-    userNodeInputHandler();
+
+    //remove delete node button
+    let deleteButton = document.getElementById("nodeDeleteButton");
+    if(deleteButton){
+        document.getElementById("deleteNodeDiv").removeChild(deleteButton);
+    }
+
+
+    //display modal at doubleclick position
+    nodeModal.style.paddingLeft = `${position.x + leftValue}px`
+    nodeModal.style.paddingTop = `${position.y + topValue}px`;
+    nodeModal.style.display = 'block';
 })
-*/
+
+
+
+function userNodeInputHandler(){
+    //Close the modal
+    nodeModal.style.display = 'none';
+    
+    //Read user input
+    let stateName = document.getElementById('stateName').value;
+    let isStartingState = document.getElementById("stateStarting").checked === true;
+    let isAcceptingState = document.getElementById("stateAccepting").checked === true;
+    let isRejectingState = document.getElementById("stateRejecting").checked === true;
+    //catch accepting & rejecting case
+    if(isAcceptingState && isRejectingState){
+        alert("a state cannot be accepting & rejecting at the same time");
+        return;
+    }
+
+    //create cyto node
+    cyCreateNode(nodeId, stateName, undefined, undefined, isStartingState, isAcceptingState, isRejectingState);
+    
+    //create node in TM
+    turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
+    //adjust nodeId
+    nodeId++;
+
+    ////logging
+    console.log("-----NEW STATE CREATED-----");
+    console.log("new State with id: ", nodeId-1);
+    console.log("tm now: ", turingMachine);
+
+}
+//Cancel button (node) pressed
+document.getElementById("cancelButton").addEventListener('click', function(){
+    nodeModal.style.display = 'none';
+})
+
+//Helper functions to adjust global variable nodeId (used in Presets.js)
+function nodePresetHelper(){
+    nodeId++;
+    return nodeId;
+}
+function nodePresetReset(){
+    nodeId = 0;
+}
+
+
+//// ----------- Edge Creation
+//click on node to create edge from this node
+cy.on('tap', 'node', (event) => {
+    ////open modal
+    //save click position
+    const position = event.position;
+
+    //
+    const edgeModal = document.getElementById('edgeModal');
+    const modal = document.querySelector('.modal-content');
+
+    //get cytoscape window position
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+    ////change button from "edit node" to "create node" (if necessary)
+    var edgeEditButton = document.getElementById("edgeEditButton");
+    var edgeButton = document.createElement("button");
+    edgeButton.id = "edgeButton";
+    edgeButton.innerText = "Create Edge";
+    if(edgeEditButton){
+        //replace if needed
+        edgeEditButton.parentNode.replaceChild(edgeButton, edgeEditButton);
+    }
+    //user submit node inputs (Event Listener)
+    addEventListenerWithCheck(document.getElementById("edgeButton"), 'click', userEdgeInputHandler)
+
+    //remove delete edge button (if exists)
+    const deleteButton = document.getElementById("edgeDeleteButton");
+    if(deleteButton){
+        document.getElementById("deleteEdgeDiv").removeChild(deleteButton);
+    }
+    //remove fromnode field (if exists)
+    const fromNode1 = document.getElementById("fromState");
+    const fromNode2 = document.getElementById("fromStateLabel");
+    if(fromNode1){
+        document.getElementById("fromStateDiv").removeChild(fromNode1);
+    }
+    if(fromNode2){
+        document.getElementById("fromStateDiv").removeChild(fromNode2);
+    }
+
+    //display modal at click position
+    edgeModal.style.paddingLeft = `${position.x + leftValue}px`
+    edgeModal.style.paddingTop = `${position.y + topValue}px`;
+    edgeModal.style.display = 'block';
+
+    //create DropDownMenu for ToNode
+    createDropdownMenues(document.getElementById("toState"))
+
+
+    //save node clicked on
+    const node = event.target;
+    fromNode = turingMachine.getStatebyId(node.id());
+
+});
+
+//user submit edge inputs
+function userEdgeInputHandler(){
+    //Close the modal
+    edgeModal.style.display = 'none';
+
+    //// read user input
+
+    //toNode 
+    //!for this to work properly, it is assumed that the states in turingMachine are ordered ascendingly by ID!
+    let dropdown = document.getElementById("toState")
+    let toNodeId = parseInt(dropdown.selectedIndex);
+    let toNode = turingMachine.getStatebyId(toNodeId);
+    console.log(toNodeId);
+
+
+
+    //readLabel
+    let readLabel = document.getElementById('readLabel').value;
+    //tapeMovement
+    let tapeMovementValue = document.getElementById('tapeMovement').value;
+    let tapeMovement = "N"
+    if(parseInt(tapeMovementValue) === -1){
+        tapeMovement = "L";
+    }
+    else if(parseInt(tapeMovementValue) === 1){
+        tapeMovement = "R";
+    }
+    else{
+        tapeMovement = "N";
+    }
+    //writeLabel
+    let cyLabel = "";
+    let writeLabel;
+    if(document.getElementById('writeLabel').value !== ''){
+        writeLabel = document.getElementById('writeLabel').value;
+        cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + tapeMovement;
+    }
+    else{
+        writeLabel = undefined;
+        cyLabel = "R: " + readLabel + " | " + tapeMovement;
+    }
+
+    //create Edge Cytoscape
+    cyCreateEdge(`${fromNode.id}`, `${toNodeId}`, cyLabel, readLabel);
+
+    //create edge in TM
+    let fromState = turingMachine.getStatebyId(fromNode.id);
+    let toState = turingMachine.getStatebyId(toNode.id);
+    turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
+    console.log(turingMachine);
+    //-- TO DO -- adjust Alphabet of TM if user enters new token
+
+}
+
+//Cancel button (edge) pressed
+document.getElementById("cancelButton2").addEventListener('click', function(){
+
+    edgeModal.style.display = 'none';
+})
+
+//Helper: Creates dropdown menus dynamically
+function createDropdownMenues(dropdown){
+    //remove all dropdown elements created earlier
+    while(dropdown.options.length > 0){
+        dropdown.remove(0);
+    }
+    //fetch options from existing nodeIds
+    let options = [];
+    for(const state of turingMachine.states){
+        options.push(state.name);
+    }
+    //create HTML elements from options
+    for(const option of options){
+        const optionElement = document.createElement('option');
+        optionElement.text = option;
+        dropdown.add(optionElement);
+    }
+
+
+
+    ////
+}
+
+
+
+

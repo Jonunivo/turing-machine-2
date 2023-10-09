@@ -1,6 +1,7 @@
-import { cyClearCanvas, cyCreateEdge, cyCreateNode, nodePresetHelper, nodePresetReset } from "./Cytoscape.js";
+import { cyClearCanvas, cyCreateEdge, cyCreateNode } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
+import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 
 let tmProperties = []
 
@@ -121,8 +122,8 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                 const isAccepting = parsedData.isAccepting;
                 const isRejecting = parsedData.isRejecting;
                 turingMachine.createState(id, name, isStarting, isAccepting, isRejecting);
-                cyCreateNode(name, undefined, undefined, isStarting, isAccepting, isRejecting);
-                nodePresetHelper();
+                cyCreateNode(nodePresetHelper()-1, name, undefined, undefined, isStarting, isAccepting, isRejecting);
+
             } catch(error){
                 console.log('Error parsing JSON:', error.message);
                 alert("Failed to load .json file, try again");
