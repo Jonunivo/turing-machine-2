@@ -52,6 +52,25 @@
         </div>
 
 
+        <!-- Save Modal -->
+        <div id="saveModal" class="modal">
+            <div id="saveModalContent" class="modal-content">
+                <h2>Enter a filename for the downloaded file:</h2>
+                <div>
+                    <label id="saveTapeContent" for="filenameInput">filename: </label>            
+                    <input type="text" id="filenameInput" placeholder="MyTuringMachine.json">
+
+                </div>
+                <div>
+                    <input type="checkbox" class="basic-checkbox" id="saveTape">
+                    <label id="saveTapeCheckbox" for="saveTape">also save tape?</label>
+                </div>
+                <br>
+                <button id="saveConfirm">Save</button>
+            </div>
+        </div>
+
+
 
         <!-- Node Creation -->
         <div id="nodeModal" class="modal">
@@ -60,15 +79,15 @@
                 <label for="stateName">Node Name:</label>
                 <input type="text" id="stateName">
                 <div class="checkbox-div">
-                    <input type="checkbox" id="stateStarting" name="startingState" value="false" required checked>
+                    <input type="checkbox" id="stateStarting" class="fancy-checkbox" name="startingState" value="false" required checked>
                     <label class="checkboxLabel" for="stateStarting">Starting?</label>
                 </div>
                 <div class="checkbox-div">
-                    <input type="checkbox" id="stateAccepting" name="acceptingState" value="true" required>
+                    <input type="checkbox" id="stateAccepting" class="fancy-checkbox" name="acceptingState" value="true" required>
                     <label class="checkboxLabel" for="stateAccepting">Accepting?</label>
                 </div>
                 <div class="checkbox-div">
-                    <input type="checkbox" id="stateRejecting" name="rejectingState" value="true" required>
+                    <input type="checkbox" id="stateRejecting" class="fancy-checkbox" name="rejectingState" value="true" required>
                     <label class="checkboxLabel" for="stateRejecting">Rejecting?</label>
                 </div>
                 

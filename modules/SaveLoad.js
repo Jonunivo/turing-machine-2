@@ -1,9 +1,11 @@
 import { cyClearCanvas, cyCreateEdge, cyCreateNode, nodePresetHelper, nodePresetReset } from "./Cytoscape.js";
+import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
+
+let tmProperties = []
 
 function saveTuringMachine(){
     //convert states to JSON
-    let tmProperties = []
     for(const state of turingMachine.states){
         tmProperties.push(JSON.stringify(state));
     }
@@ -17,15 +19,39 @@ function saveTuringMachine(){
             key[1], value[0].id, value[0].name, value[0].isStarting, value[0].isAccepting, value[0].isRejecting,
             value[1], value[2]]);
     }
-    //convert data to string
-    const tmPropString = tmProperties.join('\n');
+
     
     //User Prompt file name
-    const filename = window.prompt('Enter a filename for the downloaded file:', 'MyTuringMachine.json');
+    openModal()
+
+    
+}
+document.getElementById("saveButton").addEventListener("click", saveTuringMachine);
+
+function openModal(){
+    const modal = document.getElementById("saveModal");
+    modal.style.display = "block";
+}
+
+function saveFile(){
+    //close the modal
+    document.getElementById("saveModal").style.display = "none";
+    //get user input
+    const filename = document.getElementById("filenameInput").value;
     if(!filename){
         //user cancelled prompt
         return;
     }
+    console.log(document.getElementById("filenameInput").value);
+    console.log(document.getElementById("saveTape").checked);
+    if(document.getElementById("saveTape").checked){
+        //also save tape content
+        tmProperties.push("\n");
+        tmProperties.push(turingMachine.tape);
+    }
+
+    //convert data to string
+    const tmPropString = tmProperties.join('\n');
 
     // Create a Blob containing the serialized data
     const blob = new Blob([tmPropString], { type: 'application/json' });
@@ -46,7 +72,7 @@ function saveTuringMachine(){
     // Clean up the object URL
     URL.revokeObjectURL(downloadLink.href);
 }
-document.getElementById("saveButton").addEventListener("click", saveTuringMachine);
+document.getElementById("saveConfirm").addEventListener("click", saveFile);
 
 
 //load TM
@@ -136,5 +162,24 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             }
             i++;
         }
+        i+=2;
+
+
+        //load Tape
+        const tapeString = lines[i];
+        console.log(tapeString);
+        if(tapeString !== "" && tapeString !== undefined){
+            //convert to string[]
+            const tape = tapeString.split(",");
+            //add to TM object
+            turingMachine.tape = tape;
+            //cyto
+            cyWriteOnTape(tapeString.replace(/,/g, ''));
+        }
+        else{
+            //reset tape to empty
+            cyWriteOnTape("");
+        }
+
     }
 });
