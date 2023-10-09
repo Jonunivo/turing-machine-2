@@ -96,7 +96,9 @@
                 <div class="submit-button-div">
                     <button id="nodeButton" type="button">Create Node</button>
                 </div>
-                <div id="deleteNodeDiv"></div>
+                <div id="deleteNodeDiv">
+                    <!-- cytoscape.js will insert a delete button here -->
+                </div>
                 <div class="cancel-button-div">
                     <button id="cancelButton" type="button">cancel</button>
                 </div>
@@ -106,7 +108,8 @@
         <div id="edgeModal" class="modal">
             <div id="edgeModalContent" class="modal-content">
                 <h3>Edge Properties</h3>
-                <label for="toState">To State (id):</label>
+                <div id="fromStateDiv"></div>
+                <label for="toState">To State:</label>
                 <select id="toState"></select>
                 
                 <br>
@@ -126,6 +129,9 @@
                 <div class="submit-button-div">
                     <button id="edgeButton" type="button">Create Edge</button>
                 </div>
+                <div id="deleteEdgeDiv">
+                    <!-- cytoscape.js will insert a delete button here -->
+                </div>
                 <div class="cancel-button-div">
                     <button id="cancelButton2" type="button">cancel</button>
                 </div>
@@ -134,7 +140,14 @@
 
 
         <footer>
-            doubleclick to create node, click on node to create edge, right click on node to edit node
+            doubleclick to create Node, 
+            <br>
+            right click on node to edit Node,
+            <br>
+            click on node to create Edge, 
+            <br>
+            click on edge to edit Edge
+            <br>
             <br>
             Note: this is a developer build, some things might not yet be working as intended
             <br>
