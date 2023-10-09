@@ -7,6 +7,8 @@ import { TuringMachine, turingMachine } from './TuringMachine.js';
 let simIsRunning = false;
 // saves state the Sim is currently at 
 let currentState;
+// wait-notify
+let isReady = false;
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Action ------------------- ////
@@ -191,6 +193,10 @@ function animateNode(tmState, animationTime){
                 },
                 {
                     duration: animationTime,
+                    complete: function(){
+                        console.log("here");
+                        notify();
+                    }
                 }
             );
         }
@@ -291,5 +297,28 @@ function animateTapeMovement(move, animationTime){
             break;
         case "N":
             //no movement on neutral
+    }
+}
+
+//////////////////////////////////////////////////////////////
+//// ------------------- wait/notify -------------------- ////
+//////////////////////////////////////////////////////////////
+
+//tried to do simulation with wait/notify, not yet working
+
+function waitFor(ms){
+    return new Promise((resolve) => {setTimeout(resolve, ms);
+    })
+}
+
+function notify(){
+    console.log("notify");
+    isReady = true;
+}
+
+async function waitUntilReady(){
+    while(!isReady){
+        console.log("waiting");
+        await waitFor(100);
     }
 }

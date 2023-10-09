@@ -3,7 +3,7 @@
     width: 680px;
     height: 300px;
     position: absolute;
-    top: 170px;
+    top: 200px;
     left: 10px;
     border: dotted 1px black;
 }
@@ -11,7 +11,7 @@
     width: 680px;
     height: 50px;
     position: absolute;
-    top: 485px;
+    top: 515px;
     left: 10px;
     
 }
@@ -24,7 +24,7 @@
     border-right: 10px solid transparent;
     border-top: 15px solid #000; 
     left: 334px;
-    top: 395px;
+    top: 425px;
   }
 
 /* Modal */
