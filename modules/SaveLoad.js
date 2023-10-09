@@ -73,6 +73,12 @@ function saveFile(){
     URL.revokeObjectURL(downloadLink.href);
 }
 document.getElementById("saveConfirm").addEventListener("click", saveFile);
+//Cancel button pressed
+document.getElementById("cancelButton3").addEventListener('click', function(){
+    document.getElementById("saveModal").style.display = "none";
+})
+
+
 
 
 //load TM
@@ -183,3 +189,4 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
 
     }
 });
+

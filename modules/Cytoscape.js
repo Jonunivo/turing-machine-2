@@ -184,8 +184,8 @@ function cyClearCanvas(){
 
 
     //display modal at doubleclick position
-    modal.style.marginLeft = `${position.x + leftValue}px`
-    modal.style.marginTop = `${position.y + topValue}px`;
+    nodeModal.style.paddingLeft = `${position.x + leftValue}px`
+    nodeModal.style.paddingTop = `${position.y + topValue}px`;
     nodeModal.style.display = 'block';
 })
 
@@ -258,8 +258,8 @@ cy.on('tap', 'node', (event) => {
 
     //display modal at click position TO DO: not yet working correctly
     
-    modal.style.marginLeft = `${position.x + leftValue}px`
-    modal.style.marginTop = `${position.y + topValue}px`;
+    edgeModal.style.paddingLeft = `${position.x + leftValue}px`
+    edgeModal.style.paddingTop = `${position.y + topValue}px`;
 
 
     edgeModal.style.display = 'block';
@@ -374,6 +374,7 @@ cy.on('cxttap', 'node', function(event){
     ////open Modal at click position
     //get click position
     const position = event.position;
+    console.log(position);
 
     //
     const nodeModal = document.getElementById('nodeModal');
@@ -385,8 +386,8 @@ cy.on('cxttap', 'node', function(event){
     const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
 
     //display modal at node position
-    modal.style.marginLeft = `${position.x + leftValue}px`
-    modal.style.marginTop = `${position.y + topValue}px`;
+    nodeModal.style.paddingLeft = `${position.x + leftValue}px`
+    nodeModal.style.paddingTop = `${position.y + topValue}px`;
     nodeModal.style.display = 'block';
 
 
