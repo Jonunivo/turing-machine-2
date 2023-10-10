@@ -91,10 +91,19 @@ export class TuringMachine{
     }
 
     simulationStep(state, charOnTape){
-
+        let deltaValue;
         //find corresponding transition in delta
-        let deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
-        
+        try{
+            deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
+        }
+        catch(error){
+            document.getElementById('runSimulationButton').disabled = true;
+            document.getElementById('resetSimulationButton').disabled = false;
+            document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
+            alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
+
+            return null;
+        }
         ////logging
         console.log("//--------TM CORE-------------")
         console.log(`at State ${state.id} reading ${charOnTape}`);

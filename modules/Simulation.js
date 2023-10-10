@@ -65,6 +65,7 @@ document.getElementById('resetSimulationButton').addEventListener('click', funct
     animateNode(currentState, 200);
 
     document.getElementById("runSimulationButton").disabled = false;
+    document.getElementById("stepSimulationButton").disabled = false;
 })
 
 
@@ -94,8 +95,16 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
 
         //run Simulation in TuringMachine.js on turingMachine object to get next state
+
         currentState = turingMachine.simulationStep(currentState, charOnTape);
+        if(currentState === null){
+            //error occured in turingMachine.simulationStep
+            simIsRunning = false;
+            break;
+        }
         charOnTape = turingMachine.readTape();
+
+
 
         ////logging
         console.log("----------ANIMATION------------")
