@@ -1,21 +1,63 @@
-/* ----- CytoScape ----- */
-#cytoscape {
-    width: 680px;
-    height: 300px;
-    position: absolute;
-    top: 200px;
-    left: 10px;
-    border: dotted 1px black;
-}
-#cytoscape-tape {
-    width: 680px;
-    height: 50px;
-    position: absolute;
-    top: 515px;
-    left: 10px;
+/* ----- Body ----- */
+body{
     
 }
 
+/* ----- Behavoir of very narrow window ----- */
+
+@media screen and (max-width: 940px) {
+    /* tape control buttons */
+    #tapeControlDiv{
+        padding-left: 370px;
+        text-align: left;
+        overflow: hidden;
+    }
+    #simulationControlDiv{
+        padding-left: 340px;
+        text-align: left;
+    }
+    #rightWindow{
+        text-align: left !important;
+        padding-left: 800px;
+    }
+}
+
+
+.centered-content{
+    text-align: center;
+}
+
+
+
+
+/* ----- CytoScape ----- */
+#cytoscape {
+
+    min-width: 640px;
+    width: calc(100% - 300px);
+    margin-left: 150px;
+    margin-right: 150px;
+    height: 400px;
+    position: absolute;
+    top: 90px;
+
+    border: dotted 1px black;
+
+}
+#cytoscape-tape {
+    min-width: 640px;
+    max-width: calc(100% - 300px);
+    width: 100%;
+    margin-left: 150px;
+    margin-right: 150px;
+    height: 50px;
+    position: absolute;
+    top: 515px;
+
+   
+
+}
+/* ----- Arrow Tape Position ----- */
 .arrow-down {
     position: relative;
     width: 0;
@@ -23,9 +65,34 @@
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-top: 15px solid #000; 
-    left: 334px;
+    left: 462px;
     top: 425px;
   }
+
+
+/* ----- Move Tape div ----- */
+#tapeControlDiv{
+    min-width: max-content;
+    position: relative;
+    top: 480px;
+}
+/* ----- Simulation Control div ----- */
+#simulationControlDiv{
+    min-width: max-content;
+    position: relative;
+    top: 490px;
+}
+
+/* ----- presets & save & load ----- */
+#rightWindow{
+    min-width: max-content;
+    position: relative;
+    top: -100px;
+    text-align: right;
+}
+#fileInput{
+    width: 125px;
+}
 
   /*save  modal */
 #saveModal{

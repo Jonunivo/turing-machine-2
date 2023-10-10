@@ -1,5 +1,5 @@
 import {cy} from './Cytoscape.js';
-import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId} from './CytoscapeTape.js';
+import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId} from './CytoscapeTape.js';
 import { TuringMachine, turingMachine } from './TuringMachine.js';
 
 //// Global Variables
@@ -225,7 +225,7 @@ function animateNode(tmState, animationTime){
 function animateTapeRead(deltaValue, animationTime){
     //blink center node
     //get center tape node
-    let middleid = getMiddleNodeId()
+    let middleid = getWriteNodeId()
     //get corresponding cyto node
     let currNode = cyTape.getElementById(middleid);
     let originalColor = currNode.style("background-color");

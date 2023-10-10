@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { turingMachine } from './TuringMachine.js';
 
-export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getMiddleNodeId, cyTapeClear, cyWriteOnTape};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, cyTapeClear, cyWriteOnTape};
 
 //------ global variables ------//
 //width & height of tape cell
@@ -43,13 +43,15 @@ var cyTape = cytoscape({
 
 //create tape (17 Elements) (reset tape)
 function cyCreateTape(){
+    let numElements = 41
+
     rightOverflow = "";
     leftOverflow = "";
-    for(let i = 0; i<17; i++){
+    for(let i = 0; i<numElements; i++){
         cyTape.add({
             group: 'nodes',
             data: {id: i},
-            position: { x: width/2 + i*width, y: height/2+10 },
+            position: { x: i*width, y: height/2+10 },
             style: {
                 'label': "",
                 'text-valign': "center",
@@ -277,8 +279,8 @@ function cyWriteOnTape(input, animationTime){
     //clear tape
     cyTape.nodes().remove();
     cyCreateTape();
-    //write on visible tape starting from middle
-        //get id of middle object
+    //write on visible tape starting from position 8
+    //get id of position 8 object
     let maxid = Number.NEGATIVE_INFINITY;
     let minid = Number.POSITIVE_INFINITY;
     cyTape.nodes().forEach(element => {
@@ -290,10 +292,10 @@ function cyWriteOnTape(input, animationTime){
             maxid = currid;
         }
     })
-    let middleid = (maxid+minid)/2;
-    console.log("minid", minid, "middleid", middleid, "maxid", maxid);
-        //write on tape until maxid
-    let currid = middleid;
+    let writeid = minid + 8;
+    console.log("minid", minid, "writeid", writeid, "maxid", maxid);
+    //write on tape until maxid
+    let currid = writeid;
     let i = 0;
     while((currid <= maxid) && ((input.length - 1) >= i)){
         //get token
@@ -345,7 +347,7 @@ function cyWriteOnTape(input, animationTime){
 
     }
     //set cursor of turingMachine object accordingly
-    turingMachine.tapePosition = middleid;
+    turingMachine.tapePosition = writeid;
 
     ////logging
     console.log("TM tape now: ", turingMachine.tape);
@@ -362,7 +364,7 @@ document.getElementById("tape-input").addEventListener("click", function(){
 function cyWriteCurrentPos(inputToken, animationTime){
     cyTape.nodes().lock();
     //get id of middle object
-    let middleid = getMiddleNodeId();
+    let middleid = getWriteNodeId();
 
     //animate writing node
     let currNode = cyTape.getElementById(middleid);
@@ -397,21 +399,17 @@ function cyWriteCurrentPos(inputToken, animationTime){
 }
 
 //Helper to get id of middle node
-function getMiddleNodeId(){
-    let maxid = Number.NEGATIVE_INFINITY;
+function getWriteNodeId(){
     let minid = Number.POSITIVE_INFINITY;
     cyTape.nodes().forEach(element => {
         let currid = parseInt(element.id());
         if(minid > currid){
             minid = currid;
         }
-        if(maxid < currid){
-            maxid = currid;
-        }
-    })
-    let middleid = (maxid+minid)/2;
 
-    return middleid;
+    })
+    let writeid = minid+8;
+    return writeid;
 }
 
 //Helper to clear canvas (used in Presets.js)

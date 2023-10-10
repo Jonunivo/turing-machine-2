@@ -13,43 +13,70 @@
     </head>
 
     <body>
-        <h1 id="head-title">TuringMachine Simulator</h1>
-    
+        <!-- Title -->
+        <div id="titleDiv" class="centered-content">        
+            <h1 id="head-title">TuringMachine Simulator</h1>
+        </div>
+
+        <!-- Cytoscape windows -->
         <div id="cytoscape"></div>
         <div id="cytoscape-tape"></div>
 
+        <!-- Tape Arrow -->
         <div class="arrow-down"></div>
 
-        <button id="move-tape-left">Move Tape Left</button>
-        <button id="move-tape-right">Move Tape Right</button>
+        <!-- Tape control -->
+        <div id="tapeControlDiv" class="centered-content">
+            <button id="move-tape-left">Move Tape Left</button>
+            <button id="move-tape-right">Move Tape Right</button>
+            <div id="writeOnTapeDiv">
+                <input type="text" id="tape-input-field" required>
+                <button id="tape-input">Write on Tape</button>
+            </div>
+        </div>
 
-        <input type="text" id="tape-input-field" required>
-        <button id="tape-input">Write on Tape</button>
+        <!-- Simulation Control -->
+        <div id="simulationControlDiv" class="centered-content">
+            <button id="resetSimulationButton">Reset Simulation</button>
+            <button id="runSimulationButton">Run Simulation</button>
+            <button id="stepSimulationButton">Step Simulation</button>
+            <div id="simulationSpeeddiv">
+                <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
+                <br>
+                <label for="simulationSpeed">Simulation Speed</label>
+            </div>
+        </div>
+
+        <!-- Presets & Save & Load -->
+        <div id="rightWindow">
+
+            <!-- Preset -->
+            <div id="choosePreset" class="optionMenu">
+                <select id="presetSelect" name="preset">
+                    <option value="empty" selected>No Preset</option>
+                    <option value="PresetOne">add one binary</option>
+                </select>
+            </div>
+
+            <!-- Save/Load -->
+            <div id="saveLoad">
+                <input id="fileInput" type="file" accept=".json">
+                <br>
+                <button id="saveButton" class="button">Save current build</button>
+            </div>
+        </div>
 
 
-        <button id="runSimulationButton">Run Simulation</button>
+        <!-- User Description -->
         
-        <button id="stepSimulationButton">Step Simulation</button>
-        <button id="resetSimulationButton">Reset Simulation</button>
+
+
+
+
+
+
         
-        <div id="simulationSpeeddiv">
-            <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
-            <label for="simulationSpeed">Simulation Speed</label>
-        </div>
-        <!-- Preset -->
 
-        <div id="choosePreset" class="optionMenu">
-            <select id="presetSelect" name="preset">
-                <option value="empty" selected>No Preset</option>
-                <option value="PresetOne">add one binary</option>
-            </select>
-        </div>
-
-        <!-- Save/Load -->
-        <div id="saveLoad">
-            <input id="fileInput" type="file" accept=".json">
-            <button id="saveButton" class="button">Save current build</button>
-        </div>
 
 
         <!-- Save Modal -->
