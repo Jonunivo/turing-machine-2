@@ -50,6 +50,8 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     document.getElementById('stepSimulationButton').disabled = true;
     document.getElementById('resetSimulationButton').disabled = true;
     document.getElementById('runSimulationButton').disabled = true;
+    document.getElementById('move-tape-right').disabled = true;
+    document.getElementById('move-tape-left').disabled = true;
 
     console.log("readTape: ", turingMachine.readTape());
 
@@ -86,6 +88,9 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         //disable things that shouldn't be accessed during simulation
         document.getElementById('stepSimulationButton').disabled = true;
         document.getElementById('resetSimulationButton').disabled = true;
+        document.getElementById('move-tape-right').disabled = true;
+        document.getElementById('move-tape-left').disabled = true;
+
 
         //run animation
         //recalculate animation time
@@ -173,6 +178,8 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     document.getElementById('runSimulationButton').disabled = false;
     document.getElementById('stepSimulationButton').disabled = false;
     document.getElementById('resetSimulationButton').disabled = false;
+    document.getElementById('move-tape-right').disabled = false;
+    document.getElementById('move-tape-left').disabled = false;
 
 
 }

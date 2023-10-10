@@ -340,13 +340,12 @@ function userEditEdgeHandler(){
 
     //writeToken
     let cyLabel = "";
-    let writeToken;
+    let writeToken = "";
     if(document.getElementById('writeLabel').value !== ''){
         writeToken = document.getElementById('writeLabel').value;
         cyLabel = "R: " + readToken + " W: " + writeToken + " | " + tapeMovement;
     }
     else{
-        writeToken = undefined;
         cyLabel = "R: " + readToken + " | " + tapeMovement;
     }
 
@@ -373,6 +372,7 @@ function userEditEdgeHandler(){
     cy.remove(cytoEditEdge);
     //create new
     cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
+
 
     //refresh();
     //runLayout();

@@ -146,7 +146,7 @@ function cyMoveTapeLeft(animationTime){
     });
 
     
-    //adjust TM tape (if not in simulation mode)
+    //adjust TMobject tape (if not in simulation mode)
     if(!simulation){
         if(turingMachine.tapePosition === turingMachine.tape.length-1){
             console.log("expanding tape to right");
@@ -162,9 +162,12 @@ function cyMoveTapeLeft(animationTime){
 }
 document.getElementById("move-tape-left").addEventListener("click", function(){
     simulation = false;
-    cyMoveTapeLeft(200)
+    let animationTime = 1000/document.getElementById('simulationSpeed').value;
+    cyMoveTapeLeft(animationTime)
+    deactivateButtons(animationTime);
     simulation = true;
 });
+
 
 
 //moves tape to right (adds & removes nodes & does animation)
@@ -263,7 +266,9 @@ function cyMoveTapeRight(animationTime){
 }
 document.getElementById("move-tape-right").addEventListener("click", function(){
     simulation = false;
-    cyMoveTapeRight(200)
+    let animationTime = 1000/document.getElementById('simulationSpeed').value;
+    cyMoveTapeRight(animationTime)
+    deactivateButtons(animationTime);
     simulation = true;
 });
 
@@ -413,4 +418,16 @@ function getMiddleNodeId(){
 function cyTapeClear(){
     cyTape.nodes().remove();
     cyCreateTape();
+}
+
+//Helper: disables MoveTapeRigth & MoveTapeLeft buttons until animation complete
+//user in manual moving of tape
+async function deactivateButtons(time){
+    document.getElementById("move-tape-left").disabled = true;
+    document.getElementById("move-tape-right").disabled = true;
+
+    await new Promise(resolve => setTimeout(resolve, time+10));
+
+    document.getElementById("move-tape-left").disabled = false;
+    document.getElementById("move-tape-right").disabled = false;
 }
