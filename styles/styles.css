@@ -11,7 +11,7 @@ body{
         text-align: left !important;
         left: 10px;
         right: auto;
-        padding-left: 800px;
+        margin-left: 800px;
     }
 }
 
@@ -163,6 +163,32 @@ button{
 #saveButton{
     width: 120px;;
 }
+
+/* Text Fields */
+.modal-input{
+    width: 20px !important;
+    font-weight: 700 !important;
+}
+
+input[type="text"]{
+    width: 150px;
+    height: 24px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding-left: 5px;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+input[type="text"]:hover{
+    background-color: #f2f2f2;
+    border: 2px solid #666;
+}
+input[type="text"]:focus{
+    border: 2px solid #bfdf56;
+    outline: none;
+}
+
+
 
 /* Preset */
 select {

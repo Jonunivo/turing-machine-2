@@ -21,7 +21,7 @@ var cyTape = cytoscape({
         selector: 'nodes',
         style: {
             shape: 'rectangle',
-            'background-color': 'lightgrey',
+            'background-color': 'darkgrey',
             'width': `${width}px`,
             'height': `${height}px`,
             'border-width': `1px`, // Set the border width for the nodes
@@ -314,6 +314,7 @@ function cyWriteOnTape(input, animationTime){
             data: { id: currNodeId },
             position: { x: currNodeX, y: currNodeY-10},
             style:{
+                'background-color': 'lightgrey',
                 'label': `${currToken}`,
                 'text-valign': "center",
                 'text-halign': "center",
@@ -379,6 +380,7 @@ function cyWriteCurrentPos(inputToken, animationTime){
         data: { id: currNodeId },
         position: { x: currNodeX, y: currNodeY-10},
         style:{
+            'background-color': 'lightgrey',
             'label': `${inputToken}`,
             'text-valign': "center",
             'text-halign': "center",
