@@ -109,18 +109,18 @@ export class TuringMachine{
         }
         //adjust tapePosition if needed
         switch(deltaValue[2]){
-            case "R":
-                console.log("Move Right");
+            case "L":
+                console.log("Move Curso Left");
                 //expand tape to left if needed
                 if(this.tapePosition === 0){
                     console.log("expanding tape to left");
-                    this.tape = ["", this.tape];
+                    this.tape.unshift("");
                     this.tapePosition++;
                 }
                 this.tapePosition--;
                 break;
-            case "L":
-                console.log("Move Left");
+            case "R":
+                console.log("Move Cursor Right");
                 //expand tape to right if needed
                 if(this.tapePosition === this.tape.length-1){
                     console.log("expanding tape to right");

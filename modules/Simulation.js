@@ -51,10 +51,13 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     document.getElementById('resetSimulationButton').disabled = true;
     document.getElementById('runSimulationButton').disabled = true;
 
+    console.log("readTape: ", turingMachine.readTape());
+
     animateSimulationStep(turingMachine, currentState, turingMachine.readTape());
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     currentState = turingMachine.simulationStep(currentState, turingMachine.readTape());
 })
+
 //Go back to start state (Reset Simulation)
 document.getElementById('resetSimulationButton').addEventListener('click', function(){
     currentState = turingMachine.startstate;
@@ -290,10 +293,10 @@ function animateTapeWrite(writeToken, animationTime){
 function animateTapeMovement(move, animationTime){
     switch (move){
         case "L":
-            cyMoveTapeLeft(animationTime);
+            cyMoveTapeRight(animationTime);
             break;
         case "R":
-            cyMoveTapeRight(animationTime);
+            cyMoveTapeLeft(animationTime);
             break;
         case "N":
             //no movement on neutral
