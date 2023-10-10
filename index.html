@@ -27,20 +27,20 @@
 
         <!-- Tape control -->
         <div id="tapeControlDiv" class="centered-content">
-            <button id="move-tape-left">Move Tape Left</button>
-            <button id="move-tape-right">Move Tape Right</button>
+            <button id="move-tape-left" class="grey-button">Band nach links</button>
+            <button id="move-tape-right" class="grey-button">Band nach rechts</button>
             <div id="writeOnTapeDiv">
                 <input type="text" id="tape-input-field" required>
-                <button id="tape-input">Write on Tape</button>
+                <button id="tape-input" class="grey-button">Band schreiben</button>
             </div>
         </div>
 
         <!-- Simulation Control -->
         <div id="simulationControlDiv" class="centered-content">
-            <button id="resetSimulationButton">Reset Simulation</button>
-            <button id="runSimulationButton">Run Simulation</button>
-            <button id="stepSimulationButton">Step Simulation</button>
-            <div id="simulationSpeeddiv">
+            <button id="resetSimulationButton" class="green-button"><| Reset</button>
+            <button id="runSimulationButton" class="green-button">Run Simulation</button>
+            <button id="stepSimulationButton" class="green-button">Schritt ></button>
+            <div id="simulationSpeeddiv" class="centered-content">
                 <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
                 <br>
                 <label for="simulationSpeed">Simulation Speed</label>
@@ -62,13 +62,24 @@
             <div id="saveLoad">
                 <input id="fileInput" type="file" accept=".json">
                 <br>
-                <button id="saveButton" class="button">Save current build</button>
+                <button id="saveButton" class="button grey-button">TM speichern</button>
             </div>
         </div>
 
 
         <!-- User Description -->
-        
+        <div id="leftWindow">
+            <h3>Bedienung:</h3>
+            <div id="userGuide">
+                Doppelklick erstellt Zustand 
+                <br><br>
+                Rechtsklick auf Zustand, <br> um ihn zu bearbeiten
+                <br><br>
+                Klick auf Zustand, <br> um Übergang zu erstellen
+                <br><br>
+                Klick auf Übergang, <br> um Übergang zu bearbeiten
+            </div>
+        </div>
 
 
 
@@ -167,15 +178,7 @@
 
 
         <footer>
-            doubleclick to create Node, 
-            <br>
-            right click on node to edit Node,
-            <br>
-            click on node to create Edge, 
-            <br>
-            click on edge to edit Edge
-            <br>
-            <br>
+
             Note: this is a developer build, some things might not yet be working as intended
             <br>
             <a href="prototype/">Prototype</a>

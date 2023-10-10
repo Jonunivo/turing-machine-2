@@ -1,23 +1,16 @@
 /* ----- Body ----- */
 body{
-    
+    font-family: Helvetica;
 }
 
 /* ----- Behavoir of very narrow window ----- */
 
+
 @media screen and (max-width: 940px) {
-    /* tape control buttons */
-    #tapeControlDiv{
-        padding-left: 370px;
-        text-align: left;
-        overflow: hidden;
-    }
-    #simulationControlDiv{
-        padding-left: 340px;
-        text-align: left;
-    }
     #rightWindow{
         text-align: left !important;
+        left: 10px;
+        right: auto;
         padding-left: 800px;
     }
 }
@@ -25,9 +18,13 @@ body{
 
 .centered-content{
     text-align: center;
+    align-items: center;
 }
 
-
+/* ----- Title ------- */
+#titleDiv{
+    min-width: 920px;
+}
 
 
 /* ----- CytoScape ----- */
@@ -72,13 +69,13 @@ body{
 
 /* ----- Move Tape div ----- */
 #tapeControlDiv{
-    min-width: max-content;
+    min-width: 950px;
     position: relative;
     top: 480px;
 }
 /* ----- Simulation Control div ----- */
 #simulationControlDiv{
-    min-width: max-content;
+    min-width: 950px;
     position: relative;
     top: 490px;
 }
@@ -86,15 +83,137 @@ body{
 /* ----- presets & save & load ----- */
 #rightWindow{
     min-width: max-content;
-    position: relative;
-    top: -100px;
+    position: fixed;
+    width: max-content;
+    top: 100px;
+    right: 10px;
     text-align: right;
 }
 #fileInput{
     width: 125px;
 }
 
-  /*save  modal */
+/* ----- user Guide ----- */
+h3{
+    font-size: 17px;
+}
+
+#leftWindow{
+    position: absolute;
+    width: max-content;
+    top: 80px;
+}
+#userGuide{
+    font-size: 11px;
+}
+
+
+/* ----- Button Design ----- */
+button{
+    width: 150px;
+    height: 30px;
+    font-weight: 700;
+    padding: 5px;
+    margin: 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color:#363636
+}
+/*Move Tape Buttons*/
+.grey-button{
+    background-color: #ccc;
+    border: 2px solid darkgray;
+}
+.grey-button:hover{
+    color: rgba(0, 0, 0, 0.815);
+    background-color: darkgray;
+    border: 2px solid darkgray
+}
+.grey-button:disabled{
+    color: rgba(206, 118, 118, 0.815);
+    background-color: rgb(238, 238, 238);
+    border: 2px solid rgb(255, 173, 173);
+    cursor: not-allowed;
+}
+
+/*Simulation Buttons*/
+.green-button{
+    color: white;
+    background-color: #bfdf56;
+    border: 2px solid #adca4d;
+}
+.green-button:hover{
+    background-color: #adca4d;
+    border: 2px solid #adca4d;
+}
+.green-button:disabled{
+    color: rgba(206, 118, 118, 0.815);
+    background-color: rgb(238, 238, 238);
+    border: 2px solid rgb(255, 173, 173);
+    cursor: not-allowed;
+}
+
+/*Step Simulation*/
+#stepSimulationButton, #resetSimulationButton{
+    width: 80px;
+}
+
+/*Save Button*/
+#saveButton{
+    width: 120px;;
+}
+
+/* Preset */
+select {
+    width: 120px;
+    height: 30px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    border: 2px solid darkgrey;
+    text-align: center;
+    font-weight: 700;
+    transition: transform 0.2s;
+}
+select:hover{
+    background-color: darkgrey;
+};
+/* Style the options */
+option {
+    background-color: #f2f2f2;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+/*Simulation Speed */
+/* ----- Simulation Speed Slider */
+.slider {
+    -webkit-appearance: none;
+    cursor: pointer;
+    width: 200px;
+    height: 22px;
+    border-radius: 100px;
+    background: #ccc;
+    margin: 0 auto; /* Center the slider horizontally */
+    margin-top: 8px;
+    transition: transform 0.2s;
+}
+.slider:hover{
+    border: solid 2px rgb(109, 109, 109);
+    transition: background-color 0.3s;
+
+}
+#simulationSpeed{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* ------- Modals ------*/
+
+/*save  modal */
 #saveModal{
     padding-top: 100px;
     padding-left: 100px;
@@ -181,5 +300,6 @@ button {
 }
 
 footer {
-    margin-top: 400px;
+    position: absolute;
+    top: 800px;
 }

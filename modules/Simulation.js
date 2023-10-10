@@ -52,6 +52,8 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     document.getElementById('runSimulationButton').disabled = true;
     document.getElementById('move-tape-right').disabled = true;
     document.getElementById('move-tape-left').disabled = true;
+    document.getElementById('tape-input').disabled = true;
+
 
     console.log("readTape: ", turingMachine.readTape());
 
@@ -90,6 +92,8 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         document.getElementById('resetSimulationButton').disabled = true;
         document.getElementById('move-tape-right').disabled = true;
         document.getElementById('move-tape-left').disabled = true;
+        document.getElementById('tape-input').disabled = true;
+
 
 
         //run animation
@@ -123,6 +127,11 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
         document.getElementById('runSimulationButton').disabled = true;
         document.getElementById("resetSimulationButton").disabled = false;
+        document.getElementById('move-tape-left').disabled = false;
+        document.getElementById('move-tape-right').disabled = false;
+        document.getElementById('tape-input').disabled = false;
+
+
 
         simIsRunning = false;
 
@@ -175,11 +184,16 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
 
     //re-enable run simulation button after simulation step finished (for single step)
-    document.getElementById('runSimulationButton').disabled = false;
-    document.getElementById('stepSimulationButton').disabled = false;
-    document.getElementById('resetSimulationButton').disabled = false;
-    document.getElementById('move-tape-right').disabled = false;
-    document.getElementById('move-tape-left').disabled = false;
+    if(!simIsRunning){
+        document.getElementById('runSimulationButton').disabled = false;
+        document.getElementById('stepSimulationButton').disabled = false;
+        document.getElementById('resetSimulationButton').disabled = false;
+        document.getElementById('move-tape-right').disabled = false;
+        document.getElementById('move-tape-left').disabled = false;
+        document.getElementById('tape-input').disabled = false;
+    }
+
+
 
 
 }
