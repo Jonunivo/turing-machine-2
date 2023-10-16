@@ -187,3 +187,62 @@ function disableSliders(){
     document.getElementById("stateAccepting").checked = false;
     document.getElementById("stateRejecting").checked = false;
 }
+
+//disallow user drag out of window
+// https://stackoverflow.com/questions/39280268/disable-dragging-nodes-outside-of-area-in-cytoscape-js
+cy.on('mouseup', function (e) {
+    moveNodesIntoWindow();
+    /*
+    let tg = e.target;
+    if (tg.group != undefined && tg.group() == 'nodes') {
+        let w = cy.width();
+        let h = cy.height();
+        if (tg.position().x > w-20) tg.position().x = w-50;
+        if (tg.position().x < 0+20) tg.position().x = 0+50;
+        if (tg.position().y > h-20) tg.position().y = h-20;
+        if (tg.position().y < 0+60) tg.position().y = 0+60;
+    }
+    */
+})
+
+//Helper: move all nodes back to inside of window
+function moveNodesIntoWindow(){
+    let w = cy.width();
+    let h = cy.height();
+    console.log(cy.width(), " || ", cy.height());
+    cy.nodes().forEach(node => {
+        if(node.position().x > w-20){
+            console.log("CATCH", node.position().x, " ", w-20);
+            node.position().x = w-50;
+        }
+        if(node.position().x < 0+20){ 
+            console.log("CATCH2", node.position().x, " ", 0+20);
+            node.position().x = 0+50;
+        }
+        if(node.position().y > h-20){
+            node.position().y = h-20;
+        } 
+        if(node.position().y < 0+60){
+            node.position().y = 0+60;
+        } 
+    })
+
+    var layoutOptions = {
+        name: 'preset',
+    }
+    cy.layout(layoutOptions).run();
+
+    
+    seperateNodes();
+}
+//call function whenever window resizes
+window.addEventListener('resize', function () {
+    moveNodesIntoWindow();
+});
+
+//Helper: seperates Nodes too close to each other
+//TO DO
+function seperateNodes(){
+    
+}
+
