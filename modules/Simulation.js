@@ -83,9 +83,13 @@ function fastSimulation(){
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     let charOnTape = turingMachine.readTape()
     currentState = turingMachine.startstate;
+    //limit run time to 5 seconds
+    const startTime = new Date().getTime();
+    const timeLimit = 5000; // 5 seconds in milliseconds
     while(
         currentState !== turingMachine.acceptstate &&
-        currentState !== turingMachine.rejectstate){
+        currentState !== turingMachine.rejectstate &&
+        new Date().getTime() - startTime < timeLimit){
         
         console.log(currentState + " " + charOnTape);
 
@@ -93,8 +97,13 @@ function fastSimulation(){
         charOnTape = turingMachine.readTape();
 
     }
+    //simulation timeout
+    if(new Date().getTime() - startTime >= timeLimit){
+        alert("Simulation timed out after 5 seconds, maybe it would run forever");
+    }
     //simulation finished
     console.log(turingMachine.tape);
+    currentState = turingMachine.startstate;
     tmTapetoCyto();
 
 }

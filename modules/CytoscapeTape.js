@@ -114,6 +114,16 @@ function cyMoveTapeLeft(animationTime){
         leftOverflow += " ";
     }
 
+    let color;
+
+    if(readToken === " "){
+        readToken = "";
+        color = "darkgrey";
+    }
+    else{
+        color = "lightgrey";
+    }
+
     //add node
     cyTape.add({
         group: 'nodes',
@@ -124,6 +134,7 @@ function cyMoveTapeLeft(animationTime){
             'label': `${readToken}`,
             'text-valign': "center",
             'text-halign': "center",
+            'background-color': `${color}`
         }
     });
     
@@ -218,6 +229,16 @@ function cyMoveTapeRight(animationTime){
         rightOverflow += " ";
     }
 
+    let color;
+
+    if(readToken === " " || readToken == ""){
+        readToken = "";
+        color = "darkgrey";
+    }
+    else{
+        color = "lightgrey";
+    }
+
     
     //add node
     cyTape.add({
@@ -228,6 +249,7 @@ function cyMoveTapeRight(animationTime){
             'label': `${readToken}`,
             'text-valign': "center",
             'text-halign': "center",
+            'background-color': `${color}`
         }
     });
     //move nodes animation (&remove node after animation)
@@ -468,21 +490,29 @@ function tmTapetoCyto(){
     rightOverflow = "";
     leftOverflow = "";
 
+    let shift = 0;
+
+    ////ensure tape position 8
     //expand tm array to left if necessary
     while(turingMachine.tapePosition < 8){
         turingMachine.tape.unshift("");
         turingMachine.tapePosition++;
 
     }
-    let k = 0;
-    while(turingMachine.tapePosition > 8){
-        if (turingMachine.tape[k] === ""){
-            turingMachine.tape.slice(1, turingMachine.tape.length);
-        }
-        else{
+    //shift left if possible
+    let j = 0;
+    while(turingMachine.tapePosition > 8 && turingMachine.tape[0] === ""){
+        turingMachine.tape.shift();
+        turingMachine.tape.push("");
+        turingMachine.tapePosition--;
+    }
+    //account for leftoverflow:
+    if(turingMachine.tapePosition > 8){
+        //add to leftoverflow
+        shift = turingMachine.tapePosition-8
+        for(let k = 0; k<shift; k++){
             leftOverflow += turingMachine.tape[k];
         }
-        turingMachine.tapePosition--;
     }
 
     console.log("Tape B:", turingMachine.tape);
@@ -490,28 +520,48 @@ function tmTapetoCyto(){
 
 
     cyTape.nodes().remove();
-    let j = 0;
+
     let color;
-    for(let i = 0; i<numElements; i++){
+    console.log("SHIFT: ", shift);
+    for(let i = 0+shift; i<numElements+shift; i++){
         if(turingMachine.tape[i] === ""){
             color = "darkgrey";
         }
         else{
             color = "lightgrey";
         }
-
-        cyTape.add({
-            group: 'nodes',
-            data: {id: i},
-            position: { x: i*width, y: height/2+10 },
-            style: {
-                'label': `${turingMachine.tape[i]}`,
-                'text-valign': "center",
-                'text-halign': "center",
-                'background-color': `${color}`,
-            }
+        //catch index out of bounds
+        if(i >= turingMachine.tape.length){
+            cyTape.add({
+                group: 'nodes',
+                data: {id: i},
+                position: { x: (i-shift)*width, y: height/2+10 },
+                style: {
+                    'label': `""`,
+                    'text-valign': "center",
+                    'text-halign': "center",
+                    'background-color': `darkgrey`,
+                }
+                
+            });
             
-        });
+        }
+        else{
+            //normal
+            cyTape.add({
+                group: 'nodes',
+                data: {id: i},
+                position: { x: (i-shift)*width, y: height/2+10 },
+                style: {
+                    'label': `${turingMachine.tape[i]}`,
+                    'text-valign': "center",
+                    'text-halign': "center",
+                    'background-color': `${color}`,
+                }
+                
+            });
+        }
+
         j++;
     }
     //add remaining nodes to rightOverflow
