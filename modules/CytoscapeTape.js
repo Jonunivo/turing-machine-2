@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { turingMachine } from './TuringMachine.js';
 
-export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, cyTapeClear, cyWriteOnTape, fixTapePosition};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, cyTapeClear, cyWriteOnTape, fixTapePosition, tmTapetoCyto};
 
 //------ global variables ------//
 //width & height of tape cell
@@ -63,7 +63,7 @@ function cyCreateTape(){
     //lock node movement
     cyTape.nodes().lock();
     //initialize TM Array to all empty strings
-    turingMachine.tape = Array.from({ length: 17 }, () => "");
+    turingMachine.tape = Array.from({ length: 41 }, () => "");
 }
 cyCreateTape();
 
@@ -254,7 +254,7 @@ function cyMoveTapeRight(animationTime){
     if(!simulation){
         if(turingMachine.tapePosition === 0){
             console.log("expanding tape to left");
-            turingMachine.tape = ["", turingMachine.tape];
+            turingMachine.tape.unshift("");
             turingMachine.tapePosition++;
         }
         turingMachine.tapePosition--;
@@ -400,13 +400,12 @@ function cyWriteCurrentPos(inputToken, animationTime){
 
 }
 
-//not yet working correctly! (TO DO (?))
+//fixes tape position (if animation didnt work correctly)
 function fixTapePosition(){
     //get 8th elements position
     let cursorid = getWriteNodeId();
-    console.log("POSITION: ", cyTape.getElementById(cursorid).position().x)
     if(Math.abs(cyTape.getElementById(cursorid).position().x - 320) > 5){
-        console.log("FIX TAPE triggerd")
+        console.log("FIX TAPE triggered")
         let minid = Number.POSITIVE_INFINITY;
         let maxid = Number.NEGATIVE_INFINITY;
         let tapeContent = [];
@@ -459,7 +458,70 @@ function fixTapePosition(){
 
 }
 
+//not yet quite correct
+function tmTapetoCyto(){
+    let numElements = 41
+    console.log("TAPEPOS:", turingMachine.tapePosition);
+    console.log("Tape A:", turingMachine.tape);
 
+
+    rightOverflow = "";
+    leftOverflow = "";
+
+    //expand tm array to left if necessary
+    while(turingMachine.tapePosition < 8){
+        turingMachine.tape.unshift("");
+        turingMachine.tapePosition++;
+
+    }
+    let k = 0;
+    while(turingMachine.tapePosition > 8){
+        if (turingMachine.tape[k] === ""){
+            turingMachine.tape.slice(1, turingMachine.tape.length);
+        }
+        else{
+            leftOverflow += turingMachine.tape[k];
+        }
+        turingMachine.tapePosition--;
+    }
+
+    console.log("Tape B:", turingMachine.tape);
+    console.log("TAPEPOS:", turingMachine.tapePosition);
+
+
+    cyTape.nodes().remove();
+    let j = 0;
+    let color;
+    for(let i = 0; i<numElements; i++){
+        if(turingMachine.tape[i] === ""){
+            color = "darkgrey";
+        }
+        else{
+            color = "lightgrey";
+        }
+
+        cyTape.add({
+            group: 'nodes',
+            data: {id: i},
+            position: { x: i*width, y: height/2+10 },
+            style: {
+                'label': `${turingMachine.tape[i]}`,
+                'text-valign': "center",
+                'text-halign': "center",
+                'background-color': `${color}`,
+            }
+            
+        });
+        j++;
+    }
+    //add remaining nodes to rightOverflow
+    while(j < turingMachine.tape.length){
+        rightOverflow += turingMachine.tape[j];
+        j++;
+    }
+    //lock node movement
+    cyTape.nodes().lock();
+}
 
 
 

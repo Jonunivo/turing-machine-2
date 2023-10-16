@@ -45,6 +45,10 @@
                 <br>
                 <label for="simulationSpeed">Simulation Speed</label>
             </div>
+            <div class="checkbox-div" class="centered-content">
+                <input type="checkbox" id="fastSimulation" class="fancy-checkbox" name="fastSimulation" value="false" required>
+                <label class="checkboxLabel" for="fastSimulation">Animation</label>
+            </div>
         </div>
 
         <!-- Presets & Save & Load -->
@@ -188,6 +192,8 @@
         
 
         <!--- links to the scripts -->
+
+        <!-- function directly used in index.html -->
         <script>
             // Disable the default context menu on the entire document (right click)
             document.addEventListener('contextmenu', function(event) {

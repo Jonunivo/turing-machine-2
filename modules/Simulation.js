@@ -1,5 +1,5 @@
 import {cy} from './Cytoscape.js';
-import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition} from './CytoscapeTape.js';
+import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
 import { TuringMachine, turingMachine } from './TuringMachine.js';
 
 //// Global Variables
@@ -16,7 +16,11 @@ let isReady = false;
 
 //Run Simulation Button
 document.getElementById('runSimulationButton').addEventListener('click', function(){
-
+    if(!document.getElementById('fastSimulation').checked){
+        fastSimulation();
+        console.log("fast simulation");
+        return;
+    }
     if(!simIsRunning){
         //(re-) run simulation
         //Button manipulation
@@ -72,9 +76,32 @@ document.getElementById('resetSimulationButton').addEventListener('click', funct
     document.getElementById("stepSimulationButton").disabled = false;
 })
 
+//////////////////////////////////////////////////////////////
+//// ---------------- Fast Simulation ------------------- ////
+//////////////////////////////////////////////////////////////
+function fastSimulation(){
+    //run Simulation in TuringMachine.js on turingMachine object to get next state
+    let charOnTape = turingMachine.readTape()
+    currentState = turingMachine.startstate;
+    while(
+        currentState !== turingMachine.acceptstate &&
+        currentState !== turingMachine.rejectstate){
+        
+        console.log(currentState + " " + charOnTape);
+
+        currentState = turingMachine.simulationStep(currentState, charOnTape);
+        charOnTape = turingMachine.readTape();
+
+    }
+    //simulation finished
+    console.log(turingMachine.tape);
+    tmTapetoCyto();
+
+}
+
 
 //////////////////////////////////////////////////////////////
-//// ---------------- Simulation Core ------------------- ////
+//// ----------- Simulation/Animation Core -------------- ////
 //////////////////////////////////////////////////////////////
 
 async function animRunSimulation(turingMachine, startState, startCharOnTape){
