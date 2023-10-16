@@ -75,7 +75,16 @@ function userNodeInputHandler(){
     //catch accepting & rejecting case
     if(isAcceptingState && isRejectingState){
         alert("a state cannot be accepting & rejecting at the same time");
+        nodeModal.style.display = 'block';
         return;
+    }
+    //catch name already exists
+    for(const state of turingMachine.states){
+        if(state.name === stateName){
+            alert(`state with Name ${state.name} already exists, please choose a unique name`);
+            nodeModal.style.display = 'block';
+            return;
+        }
     }
 
     //create cyto node

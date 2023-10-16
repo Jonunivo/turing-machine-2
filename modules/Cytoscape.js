@@ -188,24 +188,8 @@ function disableSliders(){
     document.getElementById("stateRejecting").checked = false;
 }
 
-//disallow user drag out of window
-// https://stackoverflow.com/questions/39280268/disable-dragging-nodes-outside-of-area-in-cytoscape-js
-cy.on('mouseup', function (e) {
-    moveNodesIntoWindow();
-    /*
-    let tg = e.target;
-    if (tg.group != undefined && tg.group() == 'nodes') {
-        let w = cy.width();
-        let h = cy.height();
-        if (tg.position().x > w-20) tg.position().x = w-50;
-        if (tg.position().x < 0+20) tg.position().x = 0+50;
-        if (tg.position().y > h-20) tg.position().y = h-20;
-        if (tg.position().y < 0+60) tg.position().y = 0+60;
-    }
-    */
-})
 
-//Helper: move all nodes back to inside of window
+//Helper: move all nodes back to inside of window (disallow user drag out of window)
 function moveNodesIntoWindow(){
     let w = cy.width();
     let h = cy.height();
@@ -232,7 +216,7 @@ function moveNodesIntoWindow(){
     }
     cy.layout(layoutOptions).run();
 
-    
+
     seperateNodes();
 }
 //call function whenever window resizes
