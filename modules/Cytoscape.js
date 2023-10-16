@@ -223,6 +223,11 @@ function moveNodesIntoWindow(){
 window.addEventListener('resize', function () {
     moveNodesIntoWindow();
 });
+//call function on user moving node (releasing node)
+cy.on('mouseup', function (e) {
+    moveNodesIntoWindow();
+})
+
 
 //Helper: seperates Nodes too close to each other
 //TO DO
