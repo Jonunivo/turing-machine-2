@@ -317,13 +317,12 @@ function userEditEdgeHandler(){
     ////Read User Input
 
     //fromNode
-    //!for this to work properly, it is assumed that the states in turingMachine are ordered ascendingly by ID!
     let dropdown1 = document.getElementById("fromState");
-    let newfromNode = turingMachine.getStatebyId(parseInt(dropdown1.selectedIndex));
+    let newfromNode = turingMachine.getStatebyName(dropdown1.value);
     
     //toNode
     let dropdown2 = document.getElementById("toState");
-    let newtoNode = turingMachine.getStatebyId(parseInt(dropdown2.selectedIndex));
+    let newtoNode = turingMachine.getStatebyName(dropdown2.value);
     
     //readToken
     let readToken = document.getElementById("readLabel").value;

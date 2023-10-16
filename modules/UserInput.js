@@ -171,13 +171,9 @@ function userEdgeInputHandler(){
     //// read user input
 
     //toNode 
-    //!for this to work properly, it is assumed that the states in turingMachine are ordered ascendingly by ID!
     let dropdown = document.getElementById("toState")
-    let toNodeId = parseInt(dropdown.selectedIndex);
-    let toNode = turingMachine.getStatebyId(toNodeId);
-    console.log(toNodeId);
-
-
+    let toNode = turingMachine.getStatebyName(dropdown.value);
+    let toNodeId = toNode.id;
 
     //readLabel
     let readLabel = document.getElementById('readLabel').value;

@@ -72,6 +72,8 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
             'label': `${label}`,
             "text-valign": "center",
             "text-halign": "center",
+            'width': `${label.length*10 + 10}px`
+
         },
         position: { x: xPos, y: yPos},
     });

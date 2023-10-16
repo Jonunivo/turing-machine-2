@@ -195,6 +195,16 @@ export class TuringMachine{
         throw new Error(`There is no state with Id ${id}`)
     }
 
+    //returns State with given name
+    getStatebyName(name){
+        for(const state of this.states){
+            if(state.name === name){
+                return state;
+            }
+        }
+        throw new Error(`There is no state with Name ${name}`)
+    }
+
 }
 
  //------ global variables ------//

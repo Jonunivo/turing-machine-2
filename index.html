@@ -115,8 +115,8 @@
         <div id="nodeModal" class="modal">
             <div id="nodeModalContent" class="modal-content">
                 <h3>Node Properties</h3>
-                <label for="stateName">Node Name:</label>
-                <input type="text" id="stateName">
+                <label for="stateName" >Node Name:</label>
+                <input type="text" id="stateName" oninput="limitNameSize(8)">
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateStarting" class="fancy-checkbox" name="startingState" value="false" required checked>
                     <label class="checkboxLabel" for="stateStarting">Starting?</label>
@@ -211,6 +211,15 @@
                 let input = document.getElementById("tape-input-field").value;
                 let output = input.replace(/ /g, '\uFE4D');
                 document.getElementById("tape-input-field").value = output;
+            }
+
+            //limit node name size to size
+            function limitNameSize(size){
+                let input = document.getElementById("stateName").value;
+                if(input.length > size){
+                    let output = input.slice(0,size);
+                    document.getElementById("stateName").value = output;
+                }
             }
 
         
