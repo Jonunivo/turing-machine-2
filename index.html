@@ -30,7 +30,7 @@
             <button id="move-tape-left" class="grey-button">Band nach links</button>
             <button id="move-tape-right" class="grey-button">Band nach rechts</button>
             <div id="writeOnTapeDiv">
-                <input type="text" id="tape-input-field" required>
+                <input type="text" id="tape-input-field" required oninput="replaceSpace()">
                 <button id="tape-input" class="grey-button">Band schreiben</button>
             </div>
         </div>
@@ -152,10 +152,10 @@
                 
                 <br>
                 <label for="readLabel">When reading label</label>
-                <input type="text" id="readLabel"  class="modal-input">
+                <input type="text" id="readLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
                 <br>
                 <label for="writeLabel">Write Label?</label>
-                <input type="text" id="writeLabel"  class="modal-input">
+                <input type="text" id="writeLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
                 <br>
                 <div class="slider-div">
                     <label for="tapeMovement">Cursor Movement</label>
@@ -193,6 +193,27 @@
             document.addEventListener('contextmenu', function(event) {
                 event.preventDefault();
             });
+
+            //limit input to 1 character
+            function limitInputTo1Character(input) {
+                if (input.value.length >= 1) {
+                    // If more than one character is entered, only keep the first character
+                    input.value = input.value.charAt(0);
+                    //replace " " with ﹍
+                    if(input.value === " "){
+                        input.value = "﹍"
+                    }
+                }
+            }
+
+            //replace " " with ﹍ in input field
+            function replaceSpace(){
+                let input = document.getElementById("tape-input-field").value;
+                let output = input.replace(/ /g, '\uFE4D');
+                document.getElementById("tape-input-field").value = output;
+            }
+
+        
         </script>
         
         <!-- modules -->
