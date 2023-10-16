@@ -23,14 +23,23 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
     }
     if(!simIsRunning){
         //(re-) run simulation
+        simIsRunning = true;
+
+        //catch first iteration & no start state
+        if(currentState === undefined){
+            currentState = turingMachine.startstate;
+
+        }
+        if(turingMachine.startstate === undefined){
+            alert("Please create Start State first");
+            simIsRunning = false;
+            return;
+        }
         //Button manipulation
         document.getElementById('runSimulationButton').innerHTML = "Pause Simulation";
         document.getElementById("resetSimulationButton").disabled = true;
 
-        simIsRunning = true;
-        if(currentState === undefined){
-            currentState = turingMachine.startstate;
-        }
+        //CORE
         animRunSimulation(turingMachine, currentState, turingMachine.readTape());
     }
     else{
@@ -50,18 +59,19 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     if(currentState === undefined){
         currentState = turingMachine.startstate;
     }
+
+    if(turingMachine.startstate === undefined){
+        alert("Please create Start State first");
+        return;
+    }
+
     if(!document.getElementById('fastSimulation').checked){
         console.log("fast simulation step");
         fastSimulationStep();
         return;
     }
     ////disable buttons
-    document.getElementById('stepSimulationButton').disabled = true;
-    document.getElementById('resetSimulationButton').disabled = true;
-    document.getElementById('runSimulationButton').disabled = true;
-    document.getElementById('move-tape-right').disabled = true;
-    document.getElementById('move-tape-left').disabled = true;
-    document.getElementById('tape-input').disabled = true;
+    disableButtons("all");
 
 
     console.log("readTape: ", turingMachine.readTape());
@@ -88,6 +98,14 @@ function fastSimulation(){
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     let charOnTape = turingMachine.readTape()
     currentState = turingMachine.startstate;
+
+    //catch no startstate
+    if(turingMachine.startstate === undefined){
+        alert("Please create Start State first");
+        return;
+    }
+
+
     //limit run time to 5 seconds
     const startTime = new Date().getTime();
     const timeLimit = 5000; // 5 seconds in milliseconds
@@ -115,6 +133,13 @@ function fastSimulation(){
 }
 
 function fastSimulationStep(){
+
+    //catch no startstate
+    if(turingMachine.startstate === undefined){
+        alert("Please create Start State first");
+        return;
+    }
+
     let charOnTape = turingMachine.readTape()
     console.log(currentState + " " + charOnTape);
     //get next state
@@ -141,13 +166,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         currentState !== turingMachine.rejectstate){
 
         //disable things that shouldn't be accessed during simulation
-        document.getElementById('stepSimulationButton').disabled = true;
-        document.getElementById('resetSimulationButton').disabled = true;
-        document.getElementById('move-tape-right').disabled = true;
-        document.getElementById('move-tape-left').disabled = true;
-        document.getElementById('tape-input').disabled = true;
-
-
+        disableButtons();
 
         //run animation
         //recalculate animation time
@@ -179,6 +198,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         //button manipulation
         document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
         document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('stepSimulationButton').disabled = true;
         document.getElementById("resetSimulationButton").disabled = false;
         document.getElementById('move-tape-left').disabled = false;
         document.getElementById('move-tape-right').disabled = false;
@@ -238,14 +258,9 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     //fix tape position if animation (for some reason) didnt work correctly
     fixTapePosition();
 
-    //re-enable run simulation button after simulation step finished (for single step)
+    //re-enable run simulation buttons after simulation step finished (for single step)
     if(!simIsRunning){
-        document.getElementById('runSimulationButton').disabled = false;
-        document.getElementById('stepSimulationButton').disabled = false;
-        document.getElementById('resetSimulationButton').disabled = false;
-        document.getElementById('move-tape-right').disabled = false;
-        document.getElementById('move-tape-left').disabled = false;
-        document.getElementById('tape-input').disabled = false;
+        enableButtons();
     }
 
 
@@ -386,6 +401,30 @@ function animateTapeMovement(move, animationTime){
         case "N":
             //no movement on neutral
     }
+}
+
+//////////////////////////////////////////////////////////////
+//// --------------------- Helpers ---------------------- ////
+//////////////////////////////////////////////////////////////
+
+//disables buttons during simulation
+function disableButtons(mode){
+    document.getElementById('stepSimulationButton').disabled = true;
+    document.getElementById('resetSimulationButton').disabled = true;
+    document.getElementById('move-tape-right').disabled = true;
+    document.getElementById('move-tape-left').disabled = true;
+    document.getElementById('tape-input').disabled = true;
+    if(mode === "all"){
+        document.getElementById('runSimulationButton').disabled = true;
+    }
+}
+function enableButtons(){
+    document.getElementById('runSimulationButton').disabled = false;
+    document.getElementById('stepSimulationButton').disabled = false;
+    document.getElementById('resetSimulationButton').disabled = false;
+    document.getElementById('move-tape-right').disabled = false;
+    document.getElementById('move-tape-left').disabled = false;
+    document.getElementById('tape-input').disabled = false;
 }
 
 //////////////////////////////////////////////////////////////

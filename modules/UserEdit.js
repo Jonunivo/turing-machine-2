@@ -132,7 +132,7 @@ function userEditNodeHandler(){
         cytoEditNode.style('border-width', 0);
         //tm object
         editNode.isStarting = false;
-        turingMachine.startstate = null;
+        turingMachine.startstate = undefined;
     }
 
     //isAccepting
@@ -205,7 +205,7 @@ function userDeleteNodeHandler(){
 
 
 //// ----------- Edge Edit
-cy.on('tap', 'edge', function(event){
+cy.on('cxttap', 'edge', function(event){
     ////Precalculations
     //save edge clicked on (global var)
     cytoEditEdge = event.target;

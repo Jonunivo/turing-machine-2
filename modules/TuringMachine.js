@@ -78,7 +78,7 @@ export class TuringMachine{
     //runs TM simulation
     runSimulation(){
         //start at starting state
-        let currentState = this.startstate;
+        console.log("currstate: ", currentState);
 
 
         while(currentState !== this.acceptstate && 
@@ -98,6 +98,7 @@ export class TuringMachine{
         }
         catch(error){
             document.getElementById('runSimulationButton').disabled = true;
+            document.getElementById('stepSimulationButton').disabled = true;
             document.getElementById('resetSimulationButton').disabled = false;
             document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
             alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
