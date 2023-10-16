@@ -1,5 +1,5 @@
 import {cy} from './Cytoscape.js';
-import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId} from './CytoscapeTape.js';
+import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition} from './CytoscapeTape.js';
 import { TuringMachine, turingMachine } from './TuringMachine.js';
 
 //// Global Variables
@@ -182,6 +182,8 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     animateTapeMovement(deltaValue[2], animationTime)
     //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+    //fix tape position if animation (for some reason) didnt work correctly
+    fixTapePosition();
 
     //re-enable run simulation button after simulation step finished (for single step)
     if(!simIsRunning){

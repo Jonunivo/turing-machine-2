@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { turingMachine } from './TuringMachine.js';
 
-export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, cyTapeClear, cyWriteOnTape};
+export {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, cyTapeClear, cyWriteOnTape, fixTapePosition};
 
 //------ global variables ------//
 //width & height of tape cell
@@ -399,6 +399,69 @@ function cyWriteCurrentPos(inputToken, animationTime){
     });
 
 }
+
+//not yet working correctly! (TO DO (?))
+function fixTapePosition(){
+    //get 8th elements position
+    let cursorid = getWriteNodeId();
+    console.log("POSITION: ", cyTape.getElementById(cursorid).position().x)
+    if(Math.abs(cyTape.getElementById(cursorid).position().x - 320) > 5){
+        console.log("FIX TAPE triggerd")
+        let minid = Number.POSITIVE_INFINITY;
+        let maxid = Number.NEGATIVE_INFINITY;
+        let tapeContent = [];
+        //get minid & maxid
+        cyTape.nodes().forEach(element =>{
+
+            let id = parseInt(element.id());
+            if(id > maxid){
+                maxid = id;
+            }
+            if(id < minid){
+                minid = id;
+            }
+        })
+        for(let i = minid; i<=maxid; i++){
+            tapeContent.push(cyTape.getElementById(i).style("label"));
+        }
+        console.log(minid, " ", cursorid, " ", maxid);
+        console.log(tapeContent);
+
+        //create new tape
+        cyTape.nodes().remove();
+        let color;
+
+        let j = 0;
+        for(let i = minid; i<=maxid; i++){
+            //coloring
+            if(tapeContent[j] !== ""){
+                color = "lightgrey"
+            }
+            else{
+                color = "darkgrey"
+            }
+            cyTape.add({
+                group: 'nodes',
+                data: {id: i},
+                position: { x: j*width, y: height/2+10 },
+                style: {
+                    'label': `${tapeContent[j]}`,
+                    'text-valign': "center",
+                    'text-halign': "center",
+                    'background-color': `${color}`,
+                }
+                
+            });
+            j++;
+        }
+        cyTape.nodes().lock();
+    }
+
+}
+
+
+
+
 
 //Helper to get id of middle node
 function getWriteNodeId(){
