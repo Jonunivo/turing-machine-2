@@ -16,15 +16,15 @@ function loadPresetOne(){
     empty();
     //Create States
     //right state
-    cyCreateNode(0, 'right', undefined, undefined, true, false, false)
+    cyCreateNode(0, 'right', 200, 200, true, false, false)
     turingMachine.createState(0, 'right', true, false, false);
     
     //carry state
-    cyCreateNode(nodePresetHelper(),'carry', undefined, undefined, false, false, false)
+    cyCreateNode(nodePresetHelper(),'carry', 350, 200, false, false, false)
     turingMachine.createState(1, 'carry', false, false, false);
 
     //done state
-    cyCreateNode(nodePresetHelper(),'done', undefined, undefined, false, true, false)
+    cyCreateNode(nodePresetHelper(),'done', 500, 200, false, true, false)
     turingMachine.createState(2, 'done', false, true, false);
 
     nodePresetHelper();

@@ -235,6 +235,11 @@ option {
     justify-content: center;
 }
 
+/* ---- Animation Toggle ---- */
+#animationToggleDiv{
+    display: flex;
+    justify-content: center;
+}
 
 
 /* ------- Modals ------*/

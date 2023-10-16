@@ -13,6 +13,8 @@ export {createDropdownMenues, nodePresetHelper, nodePresetReset };
 var nodeId = 0;
 //fromNode at Edge Creation (used to safe on which node the user clicked)
 var fromNode;
+//createNOde POsition
+var position;
 
 
 
@@ -20,7 +22,7 @@ var fromNode;
 //dblclick -> create node
 cy.on('dblclick', (event) => {
     //get doubleclick position
-    const position = event.position;
+    position = event.position;
 
     //
     const nodeModal = document.getElementById('nodeModal');
@@ -77,7 +79,7 @@ function userNodeInputHandler(){
     }
 
     //create cyto node
-    cyCreateNode(nodeId, stateName, undefined, undefined, isStartingState, isAcceptingState, isRejectingState);
+    cyCreateNode(nodeId, stateName, position.x, position.y, isStartingState, isAcceptingState, isRejectingState);
     
     //create node in TM
     turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);

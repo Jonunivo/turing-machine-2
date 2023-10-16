@@ -41,7 +41,7 @@ var cy = cytoscape({
 
 //// ----------- Node Creation
 function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
-    console.log("cyCreateNode with id", nodeId);
+    console.log("cyCreateNode with id", nodeId, " xPos: ", xPos, " yPos: ", yPos);
     
     //default values
     let label = nodeName;
@@ -75,9 +75,8 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
             'width': `${label.length*10 + 10}px`
 
         },
-        position: { x: xPos, y: yPos},
+        position: { x: parseInt(xPos), y: parseInt(yPos)},
     });
-    runLayout();
 }
 
 //// ----------- Edge Creation

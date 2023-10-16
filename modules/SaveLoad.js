@@ -1,4 +1,4 @@
-import { cyClearCanvas, cyCreateEdge, cyCreateNode } from "./Cytoscape.js";
+import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
@@ -6,10 +6,21 @@ import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 let tmProperties = []
 
 function saveTuringMachine(){
+    tmProperties = [];
     //convert states to JSON
     for(const state of turingMachine.states){
         tmProperties.push(JSON.stringify(state));
+        //state positioning (cyto)
+        tmProperties.push(cy.$(`#${state.id}`).position().x);
+        tmProperties.push(cy.$(`#${state.id}`).position().y);
     }
+
+
+
+
+
+
+
     //line break
     tmProperties.push('\n');
 
@@ -21,6 +32,7 @@ function saveTuringMachine(){
             value[1], value[2]]);
     }
 
+    tmProperties.push("\n");
     
     //User Prompt file name
     openModal()
@@ -35,6 +47,7 @@ function openModal(){
 }
 
 function saveFile(){
+
     //close the modal
     document.getElementById("saveModal").style.display = "none";
     //get user input
@@ -47,9 +60,9 @@ function saveFile(){
     console.log(document.getElementById("saveTape").checked);
     if(document.getElementById("saveTape").checked){
         //also save tape content
-        tmProperties.push("\n");
         tmProperties.push(turingMachine.tape);
     }
+    tmProperties.push("\n");
 
     //convert data to string
     const tmPropString = tmProperties.join('\n');
@@ -105,6 +118,10 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         turingMachine.createTuringMachineBasic();
         cyClearCanvas();
         nodePresetReset();
+
+
+
+
         //load states
         let i = 0;
         while(true){
@@ -122,18 +139,18 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                 const isAccepting = parsedData.isAccepting;
                 const isRejecting = parsedData.isRejecting;
                 turingMachine.createState(id, name, isStarting, isAccepting, isRejecting);
-                cyCreateNode(nodePresetHelper()-1, name, undefined, undefined, isStarting, isAccepting, isRejecting);
-
+                cyCreateNode(nodePresetHelper()-1, name, lines[i+1], lines[i+2], isStarting, isAccepting, isRejecting);
             } catch(error){
                 console.log('Error parsing JSON:', error.message);
                 alert("Failed to load .json file, try again");
                 location.reload();
                 return;
             }
-            i++;
+            i+=3;
         }
         i+=2;
         //load Transitions
+        
         while(true){
             const currentLine = lines[i];
             if(currentLine == "" || currentLine == undefined){
@@ -169,12 +186,12 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             }
             i++;
         }
+
+
         i+=2;
-
-
         //load Tape
         const tapeString = lines[i];
-        console.log(tapeString);
+        console.log("Tape: ",tapeString);
         if(tapeString !== "" && tapeString !== undefined){
             //convert to string[]
             const tape = tapeString.split(",");
@@ -182,12 +199,15 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             turingMachine.tape = tape;
             //cyto
             cyWriteOnTape(tapeString.replace(/,/g, ''));
+            i++;
         }
         else{
             //reset tape to empty
             cyWriteOnTape("");
         }
 
+
     }
+    
 });
 

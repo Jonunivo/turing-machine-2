@@ -102,7 +102,6 @@ function userEditNodeHandler(){
     var newName = document.getElementById("stateName").value;
     //cyto
     cytoEditNode.style('label', newName);
-    runLayout();
     //TM object (node)
     editNode.name = newName;
 
