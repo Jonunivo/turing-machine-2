@@ -50,6 +50,11 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     if(currentState === undefined){
         currentState = turingMachine.startstate;
     }
+    if(!document.getElementById('fastSimulation').checked){
+        console.log("fast simulation step");
+        fastSimulationStep();
+        return;
+    }
     ////disable buttons
     document.getElementById('stepSimulationButton').disabled = true;
     document.getElementById('resetSimulationButton').disabled = true;
@@ -92,7 +97,8 @@ function fastSimulation(){
         new Date().getTime() - startTime < timeLimit){
         
         console.log(currentState + " " + charOnTape);
-
+        
+        //CORE
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         charOnTape = turingMachine.readTape();
 
@@ -104,6 +110,17 @@ function fastSimulation(){
     //simulation finished
     console.log(turingMachine.tape);
     currentState = turingMachine.startstate;
+    tmTapetoCyto();
+
+}
+
+function fastSimulationStep(){
+    let charOnTape = turingMachine.readTape()
+    console.log(currentState + " " + charOnTape);
+    //get next state
+    currentState = turingMachine.simulationStep(currentState, charOnTape);
+
+    //cyto
     tmTapetoCyto();
 
 }

@@ -480,12 +480,11 @@ function fixTapePosition(){
 
 }
 
-//not yet quite correct
+//write turingMachine.tape to Cytoscape Tape (also handles left & right overflow)
 function tmTapetoCyto(){
     let numElements = 41
     console.log("TAPEPOS:", turingMachine.tapePosition);
     console.log("Tape A:", turingMachine.tape);
-
 
     rightOverflow = "";
     leftOverflow = "";
