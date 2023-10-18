@@ -1,13 +1,13 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
-import {turingMachine} from './TuringMachine.js';
 
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, disableSliders};
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck};
 
 
 //////////////////////////////////////////////////////////////
 //// -------------------- Cytoscape --------------------- ////
 //////////////////////////////////////////////////////////////
 //// ----------- Cytoscape object
+//Creates standard cytoscape object & defines global properties.
 var cy = cytoscape({
     container: document.getElementById('cytoscape'),
     style: [
@@ -32,7 +32,6 @@ var cy = cytoscape({
         }
         
     }],
-
     // disable panning & zooming
     zoomingEnabled: false,
     userPanningEnabled: false,
@@ -40,6 +39,18 @@ var cy = cytoscape({
 
 
 //// ----------- Node Creation
+
+/**
+ * Creates a Node in the cytoscape Object with the specified properties.
+ * 
+ * @param {number} nodeId - unique identifier of the node (same as in TM object)
+ * @param {string} nodeName - Name of node displayed on node
+ * @param {number} xPos - xCoord of node in window, if not specified, set to 200
+ * @param {number} yPos - yCoord of node in window, if not specified, set to 200
+ * @param {boolean} isStarting - used to specify style properties
+ * @param {boolean} isAccepting - used to specify style properties
+ * @param {boolean} isRejecting - used to specify style properties
+ */
 function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
     console.log("cyCreateNode with id", nodeId, " xPos: ", xPos, " yPos: ", yPos);
     
@@ -50,6 +61,7 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
     let borderWidth = 0;
     let borderColor = 'white';
 
+    //adjust style for Accepting/Starting/Rejecting nodes
     if(isStarting){
         borderWidth = 2;
         borderColor = 'black';
@@ -72,14 +84,22 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
             'label': `${label}`,
             "text-valign": "center",
             "text-halign": "center",
-            'width': `${label.length*10 + 10}px`
-
+            'width': `${label.length*10 + 10}px` //dynamically set width
         },
         position: { x: parseInt(xPos), y: parseInt(yPos)},
     });
 }
 
 //// ----------- Edge Creation
+
+/**
+ * Creates an Edge in the Cytoscape object
+ * 
+ * @param {number} fromNode ID of node Edge originates from
+ * @param {number} toNode ID of node Edge goes to
+ * @param {string} label Label of Edge
+ * @param {char} readToken Edge responsible for when this token is read (used in EdgeAnimation)
+ */
 function cyCreateEdge(fromNode, toNode, label, readToken){
     console.log("cyCreateEdge " + fromNode + " | " + toNode + " | " + label);
 
@@ -127,6 +147,9 @@ function mergeEdges(edge1, edge2){
 }
 
 //// ----------- Clear Canvas
+/**
+ * Clears Canvas (Reset Cytoscape object)
+ */
 function cyClearCanvas(){
     var cyNodes = cy.nodes();
     cyNodes.remove();
@@ -140,6 +163,10 @@ function cyClearCanvas(){
 //////////////////////////////////////////////////////////////
 
 //specifies node (&edge) layout
+/**
+ * Specifies a default layout of the nodes in the cytoscape object
+ * note: not used at the moment
+ */
 function runLayout(){
     var layoutOptions = {
         name: 'grid',
@@ -151,6 +178,10 @@ function runLayout(){
     var layout = cy.layout(layoutOptions);
     layout.run();
 }
+/**
+ * Refreshes cytoscape window (upon edit)
+ * note: not used at the moment
+ */
 function refresh(){
     var layoutOptions = {
         name:"grid",
@@ -162,6 +193,11 @@ function refresh(){
 //////////////////////////////////////////////////////////////
 //// -------------------- SuperNode --------------------- ////
 //////////////////////////////////////////////////////////////
+
+/**
+ * Experimental Area to try to create supernode
+ */
+
 cy.on('dbltap', 'node', function(event){
     var node = event.target;
     openNewSubWindow();
@@ -179,7 +215,14 @@ function openNewSubWindow(){
 //// --------------------- Helpers ---------------------- ////
 //////////////////////////////////////////////////////////////
 
-//Helper: create eventlistener if not yet existent (avoids duplication of eventlisteners)
+/**
+ * 
+ * Helper: that creates EventListeners, if not yet existent (avoids duplication of EventListeners)
+ * 
+ * @param {document Element} element - HTML element the EventListener is used on
+ * @param {string} eventType - specifies event Type (such as 'click')
+ * @param {function} listener - Function that is called when the eventlistener triggers
+ */
 function addEventListenerWithCheck(element, eventType, listener){
     const existingListeners = element.__eventListeners || {};
     if(!existingListeners[eventType]){
@@ -187,25 +230,10 @@ function addEventListenerWithCheck(element, eventType, listener){
         existingListeners[eventType] = listener;
     }
 }
-//Helper: Disables sliders (avoid creating multiple starting/accep/.. nodes)
-function disableSliders(){
-    if(turingMachine.startstate !== null && turingMachine.startstate !== undefined){
-        document.getElementById("stateStarting").disabled = true;
-    }
-    if(turingMachine.acceptstate !== null && turingMachine.acceptstate !== undefined){
-        document.getElementById("stateAccepting").disabled = true;
-    }
-    if(turingMachine.rejectstate !== null && turingMachine.rejectstate !== undefined){
-        document.getElementById("stateRejecting").disabled = true;
-    }
 
-    document.getElementById("stateStarting").checked = false;
-    document.getElementById("stateAccepting").checked = false;
-    document.getElementById("stateRejecting").checked = false;
-}
-
-
-//Helper: move all nodes back to inside of window (disallow user drag out of window)
+/**
+ * Helper: that moves all nodes back inside of window if user drags them out of it, or if window is resized
+ */
 function moveNodesIntoWindow(){
     let w = cy.width();
     let h = cy.height();

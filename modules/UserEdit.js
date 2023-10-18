@@ -1,6 +1,6 @@
-import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, disableSliders } from "./Cytoscape.js";
+import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
-import {createDropdownMenues} from "./UserInput.js";
+import {createDropdownMenues, disableSliders } from "./UserInput.js";
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////

@@ -1,7 +1,7 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, disableSliders } from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset };
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders };
 
 
 //////////////////////////////////////////////////////////////
@@ -253,6 +253,25 @@ function createDropdownMenues(dropdown){
     ////
 }
 
+
+/**
+ * Helper: that disables sliders in CreateNode Modal (avoids creating multiple starting, accepting, rejecting states)
+ */
+function disableSliders(){
+    if(turingMachine.startstate !== null && turingMachine.startstate !== undefined){
+        document.getElementById("stateStarting").disabled = true;
+    }
+    if(turingMachine.acceptstate !== null && turingMachine.acceptstate !== undefined){
+        document.getElementById("stateAccepting").disabled = true;
+    }
+    if(turingMachine.rejectstate !== null && turingMachine.rejectstate !== undefined){
+        document.getElementById("stateRejecting").disabled = true;
+    }
+
+    document.getElementById("stateStarting").checked = false;
+    document.getElementById("stateAccepting").checked = false;
+    document.getElementById("stateRejecting").checked = false;
+}
 
 
 

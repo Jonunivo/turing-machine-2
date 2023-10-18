@@ -13,7 +13,12 @@ let leftOverflow = '';
 //declares on certain parts if function is used in simulation mode or manually
 let simulation = true;
 
-//cytoscape object
+//////////////////////////////////////////////////////////////
+//// ----------------- cyTape object -------------------- ////
+//////////////////////////////////////////////////////////////
+
+//cytoscape Tape object
+//Creates standard cytoscape object & defines global properties.
 var cyTape = cytoscape({
     container: document.getElementById('cytoscape-tape'),
     style: [
@@ -35,13 +40,19 @@ var cyTape = cytoscape({
         }
         
     }],
-
     // disable panning & zooming
     zoomingEnabled: false,
     userPanningEnabled: false,
 });
 
-//create tape (17 Elements) (reset tape)
+//////////////////////////////////////////////////////////////
+//// ----------------- Tape creation -------------------- ////
+//////////////////////////////////////////////////////////////
+
+/**
+ * Creates/Resets Tape (with 41 elements [fullscreen 1080p]) all empty & darkgrey
+ * sideffect: Initializes turingMachine.tape to array of length 41 filled with ""
+ */
 function cyCreateTape(){
     let numElements = 41
 
@@ -67,9 +78,24 @@ function cyCreateTape(){
 }
 cyCreateTape();
 
-//moves tape to left (adds & removes nodes & does animation)
+
+//////////////////////////////////////////////////////////////
+//// ----------------- Tape movement -------------------- ////
+//////////////////////////////////////////////////////////////
+
+/**
+ * 
+ * Handles Tape Movement Left, covers:
+ *  - Handle LeftOverflow / RightOverflow
+ *  - Adds node to right end of tape
+ *  - Move Nodes animation
+ *  - Removes leftmost element
+ *  - adjusts turingMachine.tape (if used manually)
+ * 
+ * @param {number} animationTime - Animation Time in ms
+ */
 function cyMoveTapeLeft(animationTime){
-    //add node to right end
+    ////add node to right end
     //get coordinates & id dynamically
     let minxcoor = Number.POSITIVE_INFINITY;
     let lowestXElement = null;
@@ -173,6 +199,7 @@ function cyMoveTapeLeft(animationTime){
     console.log("moved left: new node: ", "xcoor:", Math.floor(xcoor+width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
+//Button manually moving tape to left
 document.getElementById("move-tape-left").addEventListener("click", function(){
     simulation = false;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
@@ -183,7 +210,17 @@ document.getElementById("move-tape-left").addEventListener("click", function(){
 
 
 
-//moves tape to right (adds & removes nodes & does animation)
+/**
+ * 
+ * Handles Tape Movement Right, covers:
+ *  - Handle LeftOverflow / RightOverflow
+ *  - Adds node to left end of tape
+ *  - Move Nodes animation
+ *  - Removes rightmost element
+ *  - adjusts turingMachine.tape (if used manually)
+ * 
+ * @param {number} animationTime - Animation Time in ms
+ */
 function cyMoveTapeRight(animationTime){
     //get coordinates & id dynamically
     let maxxcoor = 0;
@@ -288,6 +325,7 @@ function cyMoveTapeRight(animationTime){
     console.log("moved right: new node: ", "xcoor:", Math.ceil(xcoor - width), "ycoor: ", ycoor, "id: ", id);
     console.log("LOF:", leftOverflow, "ROF:", rightOverflow);
 }
+//Button manually moving tape to left
 document.getElementById("move-tape-right").addEventListener("click", function(){
     simulation = false;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
@@ -296,12 +334,26 @@ document.getElementById("move-tape-right").addEventListener("click", function(){
     simulation = true;
 });
 
-//animate write on tape & handles turingMachine object
+
+//////////////////////////////////////////////////////////////
+//// --------------- manipulate Tape -------------------- ////
+//////////////////////////////////////////////////////////////
+
+/**
+ * 
+ * does the following things:
+ *  - clear tape
+ *  - write input letter by letter onto tape starting from position 8(or to RightOverflow for longer input)
+ *  - adjust turingMachine.tape accordingly
+ * 
+ * @param {string} input - input that is written on tape
+ * @param {number} animationTime - animation Time in ms
+ */
 function cyWriteOnTape(input, animationTime){
     //clear tape
     cyTape.nodes().remove();
     cyCreateTape();
-    //write on visible tape starting from position 8
+    //write on visible tape starting from position 8 (cursor position)
     //get id of position 8 object
     let maxid = Number.NEGATIVE_INFINITY;
     let minid = Number.POSITIVE_INFINITY;
@@ -377,13 +429,21 @@ function cyWriteOnTape(input, animationTime){
     console.log("TM tapePosition: ", turingMachine.tapePosition, "char: ", turingMachine.readTape());
 
 }
+//Write on Tape button pressed
 document.getElementById("tape-input").addEventListener("click", function(){
     cyWriteOnTape(document.getElementById("tape-input-field").value, 
                     1000/document.getElementById('simulationSpeed').value
                 );
 });
 
-
+/**
+ * 
+ * Writes token on Tape at cursor position (position 8), 
+ * used during Simulation.
+ * 
+ * @param {char} inputToken - token to be written on cursorposition
+ * @param {number} animationTime - animation Time in ms
+ */
 function cyWriteCurrentPos(inputToken, animationTime){
     cyTape.nodes().lock();
     //get id of middle object
@@ -422,10 +482,107 @@ function cyWriteCurrentPos(inputToken, animationTime){
 
 }
 
-//fixes tape position (if animation didnt work correctly)
+/**
+ * Writes turingMachine.tape to Cytoscape Tape, also handles left & right overflow,
+ * used in FastSimulation
+ */
+function tmTapetoCyto(){
+    let numElements = 41
+
+    rightOverflow = "";
+    leftOverflow = "";
+
+    let shift = 0;
+
+    ////ensure tape position 8
+    //expand tm array to left if necessary
+    while(turingMachine.tapePosition < 8){
+        turingMachine.tape.unshift("");
+        turingMachine.tapePosition++;
+
+    }
+    //shift left if possible
+    let j = 0;
+    while(turingMachine.tapePosition > 8 && turingMachine.tape[0] === ""){
+        turingMachine.tape.shift();
+        turingMachine.tape.push("");
+        turingMachine.tapePosition--;
+    }
+    //account for leftoverflow:
+    if(turingMachine.tapePosition > 8){
+        //add to leftoverflow
+        shift = turingMachine.tapePosition-8
+        for(let k = 0; k<shift; k++){
+            leftOverflow += turingMachine.tape[k];
+        }
+    }
+
+
+    cyTape.nodes().remove();
+
+    let color;
+    for(let i = 0+shift; i<numElements+shift; i++){
+        if(turingMachine.tape[i] === ""){
+            color = "darkgrey";
+        }
+        else{
+            color = "lightgrey";
+        }
+        //catch index out of bounds
+        if(i >= turingMachine.tape.length){
+            cyTape.add({
+                group: 'nodes',
+                data: {id: i},
+                position: { x: (i-shift)*width, y: height/2+10 },
+                style: {
+                    'label': "",
+                    'text-valign': "center",
+                    'text-halign': "center",
+                    'background-color': `darkgrey`,
+                }
+                
+            });
+            
+        }
+        else{
+            //normal
+            cyTape.add({
+                group: 'nodes',
+                data: {id: i},
+                position: { x: (i-shift)*width, y: height/2+10 },
+                style: {
+                    'label': `${turingMachine.tape[i]}`,
+                    'text-valign': "center",
+                    'text-halign': "center",
+                    'background-color': `${color}`,
+                }
+                
+            });
+        }
+
+        j++;
+    }
+    //add remaining nodes to rightOverflow
+    while(j < turingMachine.tape.length){
+        rightOverflow += turingMachine.tape[j];
+        j++;
+    }
+    //lock node movement
+    cyTape.nodes().lock();
+}
+
+//////////////////////////////////////////////////////////////
+//// ---------------- misc / helpers -------------------- ////
+//////////////////////////////////////////////////////////////
+
+/**
+ * Fixes (rebuilds) Tape if TapeAnimation didn't work properly
+ * called after every Animation step.
+ */
 function fixTapePosition(){
     //get 8th elements position
     let cursorid = getWriteNodeId();
+    //fix tape if node too far out of position
     if(Math.abs(cyTape.getElementById(cursorid).position().x - 320) > 5){
         console.log("FIX TAPE triggered")
         let minid = Number.POSITIVE_INFINITY;
@@ -478,95 +635,16 @@ function fixTapePosition(){
 
 }
 
-//write turingMachine.tape to Cytoscape Tape (also handles left & right overflow)
-function tmTapetoCyto(){
-    let numElements = 41
-
-    rightOverflow = "";
-    leftOverflow = "";
-
-    let shift = 0;
-
-    ////ensure tape position 8
-    //expand tm array to left if necessary
-    while(turingMachine.tapePosition < 8){
-        turingMachine.tape.unshift("");
-        turingMachine.tapePosition++;
-
-    }
-    //shift left if possible
-    let j = 0;
-    while(turingMachine.tapePosition > 8 && turingMachine.tape[0] === ""){
-        turingMachine.tape.shift();
-        turingMachine.tape.push("");
-        turingMachine.tapePosition--;
-    }
-    //account for leftoverflow:
-    if(turingMachine.tapePosition > 8){
-        //add to leftoverflow
-        shift = turingMachine.tapePosition-8
-        for(let k = 0; k<shift; k++){
-            leftOverflow += turingMachine.tape[k];
-        }
-    }
-
-
-    cyTape.nodes().remove();
-
-    let color;
-    for(let i = 0+shift; i<numElements+shift; i++){
-        if(turingMachine.tape[i] === ""){
-            color = "darkgrey";
-        }
-        else{
-            color = "lightgrey";
-        }
-        //catch index out of bounds
-        if(i >= turingMachine.tape.length){
-            cyTape.add({
-                group: 'nodes',
-                data: {id: i},
-                position: { x: (i-shift)*width, y: height/2+10 },
-                style: {
-                    'label': `""`,
-                    'text-valign': "center",
-                    'text-halign': "center",
-                    'background-color': `darkgrey`,
-                }
-                
-            });
-            
-        }
-        else{
-            //normal
-            cyTape.add({
-                group: 'nodes',
-                data: {id: i},
-                position: { x: (i-shift)*width, y: height/2+10 },
-                style: {
-                    'label': `${turingMachine.tape[i]}`,
-                    'text-valign': "center",
-                    'text-halign': "center",
-                    'background-color': `${color}`,
-                }
-                
-            });
-        }
-
-        j++;
-    }
-    //add remaining nodes to rightOverflow
-    while(j < turingMachine.tape.length){
-        rightOverflow += turingMachine.tape[j];
-        j++;
-    }
-    //lock node movement
-    cyTape.nodes().lock();
-}
 
 
 
-//Helper to get id of middle node
+
+/**
+ * 
+ * Helper: that gets cyto NodeID of node at cursor position (position 8)
+ * 
+ * @returns - cyTape Node ID of node being at position 8 (write position)
+ */
 function getWriteNodeId(){
     let minid = Number.POSITIVE_INFINITY;
     cyTape.nodes().forEach(element => {
@@ -580,14 +658,21 @@ function getWriteNodeId(){
     return writeid;
 }
 
-//Helper to clear canvas (used in Presets.js)
+/**
+ * Helper: that clears Tape (delete & rebuild)
+ */
 function cyTapeClear(){
     cyTape.nodes().remove();
     cyCreateTape();
 }
 
-//Helper: disables MoveTapeRigth & MoveTapeLeft buttons until animation complete
-//user in manual moving of tape
+/**
+ * 
+ * Deactivates MoveTapeLeft & MoveTapeRight buttons during Tape movement animation,
+ * used when manually moving tape
+ * 
+ * @param {number} time - how long the buttons should be deactivated
+ */
 async function deactivateButtons(time){
     document.getElementById("move-tape-left").disabled = true;
     document.getElementById("move-tape-right").disabled = true;
