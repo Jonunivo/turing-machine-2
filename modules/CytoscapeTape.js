@@ -636,9 +636,6 @@ function fixTapePosition(){
 }
 
 
-
-
-
 /**
  * 
  * Helper: that gets cyto NodeID of node at cursor position (position 8)

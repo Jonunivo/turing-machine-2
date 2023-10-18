@@ -3,6 +3,10 @@ import { cyTapeClear } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js";
 import { nodePresetHelper, nodePresetReset } from "./UserInput.js";
 
+/**
+ * Empties canvas & tape & turingMachine object,
+ * called when loading preset
+ */
 function empty(){
     turingMachine.createTuringMachineBasic();
     nodePresetReset();
@@ -10,6 +14,11 @@ function empty(){
     cyTapeClear();
 }
 
+/**
+ * Loads Preset 1 (binary Increment)
+ *  - creates&adjusts TM object
+ *  - creates cyto nodes & edges
+ */
 function loadPresetOne(){
     //reset
     empty();
@@ -59,8 +68,9 @@ function loadPresetOne(){
 
 }
 
-
-//handle Dropdown menu & activate correct function when value changes
+/**
+ * Handles Dropdown menu & calls functions accordingly (upon change)
+ */
 var presetSelect = document.getElementById("presetSelect");
     
 presetSelect.addEventListener("change", function() {
