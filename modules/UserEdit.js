@@ -25,7 +25,6 @@ cy.on('cxttap', 'node', function(event){
     ////open Modal at click position
     //get click position
     const position = event.position;
-    console.log(position);
 
     //
     const nodeModal = document.getElementById('nodeModal');
@@ -357,7 +356,6 @@ function userEditEdgeHandler(){
     const newEdgeKey = [newfromNode, readToken];
     const newEdgeValue = [newtoNode, writeToken, tapeMovement];
     turingMachine.delta.set(newEdgeKey, newEdgeValue);
-    console.log(turingMachine.delta);
 
     //Cyto
     /*

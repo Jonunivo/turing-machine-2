@@ -11,7 +11,6 @@ function empty(){
 }
 
 function loadPresetOne(){
-    console.log("load preset 1 clicked");
     //reset
     empty();
     //Create States

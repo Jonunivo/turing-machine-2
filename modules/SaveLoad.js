@@ -56,8 +56,7 @@ function saveFile(){
         //user cancelled prompt
         return;
     }
-    console.log(document.getElementById("filenameInput").value);
-    console.log(document.getElementById("saveTape").checked);
+
     if(document.getElementById("saveTape").checked){
         //also save tape content
         tmProperties.push(turingMachine.tape);

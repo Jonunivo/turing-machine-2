@@ -49,7 +49,6 @@ export class TuringMachine{
 
         ////logging
         console.log("---- TM OBJECT ----")
-        console.log("State added")
 
         //set startstate, acceptstate, rejectstate if needed
         if(isStarting){
@@ -107,9 +106,9 @@ export class TuringMachine{
         }
         ////logging
         console.log("//--------TM CORE-------------")
-        console.log(`at State ${state.id} reading ${charOnTape}`);
+        console.log(`at State ${state.name} reading ${charOnTape}`);
         console.log(`Tape: ${this.tape}`);
-        console.log(`next State: ${deltaValue[0].id}`);
+        console.log(`next State: ${deltaValue[0].name}`);
         ////
 
         //write on tape if needed
@@ -120,7 +119,7 @@ export class TuringMachine{
         //adjust tapePosition if needed
         switch(deltaValue[2]){
             case "L":
-                console.log("Move Curso Left");
+                console.log("Move Cursor Left");
                 //expand tape to left if needed
                 if(this.tapePosition === 0){
                     console.log("expanding tape to left");
@@ -182,8 +181,7 @@ export class TuringMachine{
                 return key;
             }
         }
-        console.log("JSON: ", JSON.stringify(content))
-        throw new Error("Key not found in Delta");
+        throw new Error("Key not found in Delta", "Json: ", JSON.stringify(content));
     }
 
     //returns State with given id

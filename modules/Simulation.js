@@ -73,9 +73,6 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     ////disable buttons
     disableButtons("all");
 
-
-    console.log("readTape: ", turingMachine.readTape());
-
     animateSimulationStep(turingMachine, currentState, turingMachine.readTape());
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     currentState = turingMachine.simulationStep(currentState, turingMachine.readTape());
@@ -114,8 +111,6 @@ function fastSimulation(){
         currentState !== turingMachine.rejectstate &&
         new Date().getTime() - startTime < timeLimit){
         
-        console.log(currentState + " " + charOnTape);
-        
         //CORE
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         charOnTape = turingMachine.readTape();
@@ -126,7 +121,6 @@ function fastSimulation(){
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
     }
     //simulation finished
-    console.log(turingMachine.tape);
     currentState = turingMachine.startstate;
     tmTapetoCyto();
 
@@ -297,8 +291,7 @@ function animateNode(tmState, animationTime){
                 {
                     duration: animationTime,
                     complete: function(){
-                        console.log("here");
-                        notify();
+                        //notify();
                     }
                 }
             );
@@ -371,7 +364,7 @@ function animateEdge(tmState, charOnTape, animationTime){
             {
                 duration: animationTime,
                 complete: function(){
-                    console.log("edge animation complete")
+                    //console.log("edge animation complete")
                 }
             }
             );

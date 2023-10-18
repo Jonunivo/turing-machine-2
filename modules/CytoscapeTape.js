@@ -116,7 +116,7 @@ function cyMoveTapeLeft(animationTime){
 
     let color;
 
-    if(readToken === " "){
+    if(readToken === " " || readToken === ""){
         readToken = "";
         color = "darkgrey";
     }
@@ -315,7 +315,7 @@ function cyWriteOnTape(input, animationTime){
         }
     })
     let writeid = minid + 8;
-    console.log("minid", minid, "writeid", writeid, "maxid", maxid);
+
     //write on tape until maxid
     let currid = writeid;
     let i = 0;
@@ -445,8 +445,6 @@ function fixTapePosition(){
         for(let i = minid; i<=maxid; i++){
             tapeContent.push(cyTape.getElementById(i).style("label"));
         }
-        console.log(minid, " ", cursorid, " ", maxid);
-        console.log(tapeContent);
 
         //create new tape
         cyTape.nodes().remove();
@@ -483,8 +481,6 @@ function fixTapePosition(){
 //write turingMachine.tape to Cytoscape Tape (also handles left & right overflow)
 function tmTapetoCyto(){
     let numElements = 41
-    console.log("TAPEPOS:", turingMachine.tapePosition);
-    console.log("Tape A:", turingMachine.tape);
 
     rightOverflow = "";
     leftOverflow = "";
@@ -514,14 +510,10 @@ function tmTapetoCyto(){
         }
     }
 
-    console.log("Tape B:", turingMachine.tape);
-    console.log("TAPEPOS:", turingMachine.tapePosition);
-
 
     cyTape.nodes().remove();
 
     let color;
-    console.log("SHIFT: ", shift);
     for(let i = 0+shift; i<numElements+shift; i++){
         if(turingMachine.tape[i] === ""){
             color = "darkgrey";

@@ -209,14 +209,11 @@ function disableSliders(){
 function moveNodesIntoWindow(){
     let w = cy.width();
     let h = cy.height();
-    console.log(cy.width(), " || ", cy.height());
     cy.nodes().forEach(node => {
         if(node.position().x > w-20){
-            console.log("CATCH", node.position().x, " ", w-20);
             node.position().x = w-50;
         }
         if(node.position().x < 0+20){ 
-            console.log("CATCH2", node.position().x, " ", 0+20);
             node.position().x = 0+50;
         }
         if(node.position().y > h-20){
