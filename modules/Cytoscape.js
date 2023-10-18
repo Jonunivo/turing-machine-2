@@ -160,6 +160,22 @@ function refresh(){
 }
 
 //////////////////////////////////////////////////////////////
+//// -------------------- SuperNode --------------------- ////
+//////////////////////////////////////////////////////////////
+cy.on('dbltap', 'node', function(event){
+    var node = event.target;
+    openNewSubWindow();
+})
+
+document.getElementById("subWindowOpener").addEventListener('click', openNewSubWindow);
+
+function openNewSubWindow(){
+    var newWindow = window.open('sub_window.html', '_blank', 'width=800, height=600');
+}
+
+
+
+//////////////////////////////////////////////////////////////
 //// --------------------- Helpers ---------------------- ////
 //////////////////////////////////////////////////////////////
 

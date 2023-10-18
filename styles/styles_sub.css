@@ -1,0 +1,18 @@
+/* ----- CytoScape ----- */
+#cytoscape_sub {
+
+    width: 750px;
+
+    
+    height: 550px;
+    position: absolute;
+
+
+    border: dotted 1px black;
+
+}
+
+footer {
+    position: absolute;
+    top: 600px;
+}
