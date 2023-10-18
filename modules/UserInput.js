@@ -16,10 +16,16 @@ var fromNode;
 //createNode Position
 var position;
 
-
-
 //// ----------- Node Creation
-//dblclick -> create node
+/**Node Creation works as follows:
+ * User doubleclick on canvas -> Open Create Node Modal ->
+ *      (1) User submit modal -> userNodeInputHandler() -> hide Modal
+ *      (2) User cancels modal -> hide Modal
+ */
+
+
+//Doubleclick on cyto canvas -> Create Node
+//Opens Create Node Modal
 cy.on('dblclick', (event) => {
     //get doubleclick position
     position = event.position;
@@ -47,13 +53,11 @@ cy.on('dblclick', (event) => {
     //disable sliders
     disableSliders();
 
-
-    //remove delete node button
+    //remove delete node button (if exists)
     let deleteButton = document.getElementById("nodeDeleteButton");
     if(deleteButton){
         document.getElementById("deleteNodeDiv").removeChild(deleteButton);
     }
-
 
     //display modal at doubleclick position
     nodeModal.style.paddingLeft = `${position.x + leftValue}px`
@@ -62,7 +66,12 @@ cy.on('dblclick', (event) => {
 })
 
 
-
+/**
+ * Reads user input from NodeModal & creates Node user requested (Cytoscape & TM object) & closes modal
+ * ensures NodeId is the same for cyto nodes as for TM nodes.
+ * catch: User tries to create State that is Accepting & Rejecting
+ * catch: Name of state already exists
+ */
 function userNodeInputHandler(){
     //Close the modal
     nodeModal.style.display = 'none';
@@ -101,7 +110,7 @@ function userNodeInputHandler(){
     console.log("tm now: ", turingMachine);
 
 }
-//Cancel button (node) pressed
+//User presses cancel button in NodeModal -> hide nodeModal
 document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
@@ -115,9 +124,17 @@ function nodePresetReset(){
     nodeId = 0;
 }
 
-
 //// ----------- Edge Creation
-//click on node to create edge from this node
+/**
+ * Edge Creation works as follows:
+ * User clicks on node -> Open Create Edge Modal ->
+ *      (1) User submit modal -> userEdgeInputHandler() -> hide Modal
+ *      (2) User cancels modal -> hide Modal
+ */
+
+
+//click on cyto node -> Create Edge from this node
+//Opens Create Edge Modal
 cy.on('tap', 'node', (event) => {
     ////open modal
     //save click position
@@ -167,14 +184,15 @@ cy.on('tap', 'node', (event) => {
     //create DropDownMenu for ToNode
     createDropdownMenues(document.getElementById("toState"))
 
-
     //save node clicked on
     const node = event.target;
     fromNode = turingMachine.getStatebyId(node.id());
 
 });
 
-//user submit edge inputs
+/**
+ * Reads user input from EdgeModal & creates Edge user requested (Cytoscape & TM object) & closes modal
+ */
 function userEdgeInputHandler(){
     //Close the modal
     edgeModal.style.display = 'none';
@@ -219,9 +237,26 @@ function userEdgeInputHandler(){
     let fromState = turingMachine.getStatebyId(fromNode.id);
     let toState = turingMachine.getStatebyId(toNode.id);
     turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
-    console.log(turingMachine);
-    //-- TO DO -- adjust Alphabet of TM if user enters new token
 
+    //adjust Alphabets of TM if user enters new token (write)
+    if(turingMachine.sigma.has(writeLabel)){
+        //sigma already has Label, do nothing
+    }
+    else if(writeLabel !== undefined && writeLabel !== ""){
+        turingMachine.sigma.add(writeLabel);
+        turingMachine.gamma.add(writeLabel);
+    }
+    //adjust Alphabets of TM if user enters new token (read)
+    if(turingMachine.sigma.has(readLabel)){
+        //sigma already has Label, do nothing
+    }
+    else if(readLabel !== undefined && readLabel !== ""){
+        turingMachine.sigma.add(readLabel);
+        turingMachine.gamma.add(readLabel);
+    }
+
+    //logging
+    console.log(turingMachine);
 }
 
 //Cancel button (edge) pressed
@@ -230,7 +265,17 @@ document.getElementById("cancelButton2").addEventListener('click', function(){
     edgeModal.style.display = 'none';
 })
 
-//Helper: Creates dropdown menus dynamically
+
+
+//////////////////////////////////////////////////////////////
+//// --------------------- Helpers ---------------------- ////
+//////////////////////////////////////////////////////////////
+/**
+ * 
+ * Helper: Creates the dropdown menu for EdgeModal with all nodes as options
+ * 
+ * @param {Object} dropdown - the dropdown html object in question
+ */
 function createDropdownMenues(dropdown){
     //remove all dropdown elements created earlier
     while(dropdown.options.length > 0){
@@ -247,9 +292,6 @@ function createDropdownMenues(dropdown){
         optionElement.text = option;
         dropdown.add(optionElement);
     }
-
-
-
     ////
 }
 
@@ -272,6 +314,5 @@ function disableSliders(){
     document.getElementById("stateAccepting").checked = false;
     document.getElementById("stateRejecting").checked = false;
 }
-
 
 

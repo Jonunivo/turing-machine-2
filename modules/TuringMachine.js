@@ -36,7 +36,8 @@ export class TuringMachine{
      * creates default turingmachine object (also used to reset TM object)
      */
     createTuringMachineBasic(){
-        turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
+        turingMachine = new TuringMachine(new Set(), new Set(), new Set(""), new Map(), undefined, undefined, undefined, null, 0);
+        turingMachine.gamma.add("");
     }
 
     /**
@@ -268,7 +269,7 @@ export class TuringMachine{
 //global variable
     //Basic TuringMachine object used for Creation & Simulation (imported by many other modules!)
     var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
-
+    turingMachine.gamma.add("");
 /*
 //create a simple TM to test the code: binary increment
 //Alphabets

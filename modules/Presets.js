@@ -66,6 +66,14 @@ function loadPresetOne(){
     cyCreateEdge(1, 2, cyLabel, '');
     turingMachine.createTransition(turingMachine.getStatebyId(1), '', turingMachine.getStatebyId(2), '1', 'R')
 
+
+    //Create alphabet
+    turingMachine.sigma.add(0);
+    turingMachine.sigma.add(1);
+    turingMachine.gamma.add(0);
+    turingMachine.gamma.add(1);
+
+
 }
 
 /**

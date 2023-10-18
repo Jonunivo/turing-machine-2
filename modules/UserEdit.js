@@ -16,6 +16,15 @@ var editEdgeKey
 var editEdgeContent;
 
 //// ----------- Node Edit
+/**Node Edit works as follows:
+ * User right click on node -> Open Edit Node Modal ->
+ *      (1) User submit modal -> userEditNodeHandler() -> hide Modal
+ *      (2) User delete Node -> userDeleteNodeHandler() -> hide Modal
+ *      (3) User cancels modal -> hide Modal
+ */
+
+
+//Right click on Node to Edit node (opens Edit Node Modal)
 cy.on('cxttap', 'node', function(event){
 
     //save node clicked on (global vars)
@@ -93,6 +102,10 @@ cy.on('cxttap', 'node', function(event){
 
 })
 
+/**
+ * Handles the User editing a node (TM object & cyto node) & closes Modal
+ * note: simmilar to userNodeInputHandler but more sophisticated
+ */
 function userEditNodeHandler(){
     //close modal
     nodeModal.style.display = 'none';
@@ -173,6 +186,10 @@ function userEditNodeHandler(){
     }
 }
 
+/**
+ * Handles the User deleting a node (TM object & cyto node) & closes Modal
+ * 
+ */
 function userDeleteNodeHandler(){
     //close modal
     nodeModal.style.display = 'none';
@@ -204,6 +221,14 @@ function userDeleteNodeHandler(){
 
 
 //// ----------- Edge Edit
+/**Edge Edit works as follows:
+ * User right click on edge -> Open Edit Edge Modal ->
+ *      (1) User submit modal -> userEditEdgeHandler() -> hide Modal
+ *      (2) User delete Node -> userDeleteEdgeHandler() -> hide Modal
+ *      (3) User cancels modal -> hide Modal
+ */
+
+//Right click on Node to Edit edge (opens Edit Edge Modal)
 cy.on('cxttap', 'edge', function(event){
     ////Precalculations
     //save edge clicked on (global var)
@@ -259,11 +284,10 @@ cy.on('cxttap', 'edge', function(event){
 
     addEventListenerWithCheck(document.getElementById("edgeEditButton"), "click", userEditEdgeHandler);
 });
-////user submit node inputs (Event Listener)
-/*document.getElementById("edgeEditButton").addEventListener('click', function(){
-    userEditEdgeHandler();
-})*/
 
+/**
+ * Helper: that retrieves the Current Edge Properties to be displayed in Edge Modal
+ */
 function getCurrentEdgeProperties(){
     //from State
     //Create Option to Change FromState (if not yet existing)
@@ -308,6 +332,10 @@ function getCurrentEdgeProperties(){
     }
 }
 
+/**
+ * Handles the User editing an edge (TM object & cyto node) & closes Modal
+ * note: simmilar to userEdgeInputHandler but more sophisticated
+ */
 function userEditEdgeHandler(){
     //close modal
     edgeModal.style.display = 'none';
@@ -358,22 +386,18 @@ function userEditEdgeHandler(){
     turingMachine.delta.set(newEdgeKey, newEdgeValue);
 
     //Cyto
-    /*
-    cytoEditEdge.data('source', newfromNode.id);
-    cytoEditEdge.data('target', newtoNode.id);
-    cytoEditEdge.data('readToken', readToken);
-    cytoEditEdge.style('label', cyLabel);
-*/
+
     //remove
     cy.remove(cytoEditEdge);
     //create new
     cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
 
-
-    //refresh();
-    //runLayout();
 }
 
+/**
+ * Handles the User deleting an edge (TM object & cyto node) & closes Modal
+ * 
+ */
 function userDeleteEdgeHandler(){
     //close modal
     edgeModal.style.display = 'none';
