@@ -92,13 +92,7 @@
         </div>
 
 
-
-
-
-
-        
-
-
+        <!-------- Modals -------->
 
         <!-- Save Modal -->
         <div id="saveModal" class="modal">
@@ -121,7 +115,7 @@
 
 
 
-        <!-- Node Creation -->
+        <!-- Node Creation Modal -->
         <div id="nodeModal" class="modal">
             <div id="nodeModalContent" class="modal-content">
                 <h3>Node Properties</h3>
@@ -152,7 +146,8 @@
                 </div>
             </div>
         </div>
-        <!-- Edge Creation -->
+
+        <!-- Edge Creation Modal -->
         <div id="edgeModal" class="modal">
             <div id="edgeModalContent" class="modal-content">
                 <h3>Edge Properties</h3>
@@ -187,8 +182,8 @@
         </div>
 
 
-        <footer>
 
+        <footer>
             Note: this is a developer build, some things might not yet be working as intended
             <br>
             <a href="prototype/">Prototype</a>
@@ -199,7 +194,7 @@
 
         <!--- links to the scripts -->
 
-        <!-- function directly used in index.html -->
+        <!-- functions directly used in index.html -->
         <script>
             // Disable the default context menu on the entire document (right click)
             document.addEventListener('contextmenu', function(event) {
@@ -233,8 +228,6 @@
                     document.getElementById("stateName").value = output;
                 }
             }
-
-        
         </script>
         
         <!-- modules -->
@@ -248,13 +241,10 @@
         <script type="module" src="./modules/UserInput.js"></script>
         <script type="module" src="./modules/UserEdit.js"></script>
 
-
-
-        <script type="module" src="./modules/Presets.js"></script>
         <script type="module" src="./modules/Simulation.js"></script>
 
+        <script type="module" src="./modules/Presets.js"></script>
         <script type="module" src="./modules/SaveLoad.js"></script>
-
 
     </body>
 

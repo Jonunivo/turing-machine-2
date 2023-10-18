@@ -1,8 +1,6 @@
 import {State} from './State.js';
 export {turingMachine};
 
-
-
 export class TuringMachine{
     /**
      * Constructs a TuringMachine object with the provided attributes.
@@ -30,19 +28,30 @@ export class TuringMachine{
         this.tapePosition = tapePosition;
     }
 
-   
-
     //////////////////////////////////////////////////////////////
     //// -------------------- Creation --------------------- /////
     //////////////////////////////////////////////////////////////
 
-    //creates default turingmachine object (also used to reset TM object)
+    /**
+     * creates default turingmachine object (also used to reset TM object)
+     */
     createTuringMachineBasic(){
         turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
     }
 
-    //adds state to TM object
+    /**
+     * 
+     * Constructs state with given attributes & adds it to TM object.
+     * Sets startstate, acceptstate, rejectstate if needed.
+     * 
+     * @param {number} id - ID of State
+     * @param {string} name - Name of State
+     * @param {boolean} isStarting - specifies if state is startstate
+     * @param {boolean} isAccepting - specifies if state is accepttate
+     * @param {boolean} isRejecting - specifies if state is rejecttate
+     */
     createState(id, name = "", isStarting = false, isAccepting = false, isRejecting = false){
+        //construct state
         let newState = new State(id, name, isStarting, isAccepting, isRejecting)
         //add to TM object
         this.states.add(newState);
@@ -66,6 +75,15 @@ export class TuringMachine{
     }
 
     //adds transition to TM object
+    /**
+     * Adds Transition to TM object
+     * 
+     * @param {State} fromState - State Transition originates from
+     * @param {char} label - Character that is read
+     * @param {State} toState - State Transition points to
+     * @param {char} writeLabel - Character to write on Tape ("" means don't write)
+     * @param {*} tapeMovement - Tape Movement
+     */
     createTransition(fromState, label, toState, writeLabel, tapeMovement){
         this.delta.set([fromState, label], [toState, writeLabel, tapeMovement]);
     }
@@ -75,6 +93,11 @@ export class TuringMachine{
     //////////////////////////////////////////////////////////////
 
     //runs TM simulation
+    /**
+     * Runs Simulation in TM object until acceptstate or rejectstate reached.
+     * Called by fastsimulation
+     * Calls simulationResult() at the end handle end of simulation
+     */
     runSimulation(){
         //start at starting state
         console.log("currstate: ", currentState);
@@ -89,6 +112,15 @@ export class TuringMachine{
         this.simulationResult(currentState);
     }
 
+    /**
+     * Runs single Simulation Step on TM object.
+     * Catches no Transition for this state & charOnTape
+     * Adjusts Tape if needed 
+     * 
+     * @param {State} state - State the simulation is at Start of step
+     * @param {char} charOnTape - Char on Tape
+     * @returns {State} nextState - Returns the next State of the Simulation
+     */
     simulationStep(state, charOnTape){
         let deltaValue;
         //find corresponding transition in delta
@@ -143,11 +175,16 @@ export class TuringMachine{
             default:
                 throw new Error("Could not interpret movement")
         }
-        //return next state
 
+        //return next state
         return deltaValue[0];
     }
 
+    /**
+     * Handles everything when Simulation reaches Accept or Rejectstate
+     * 
+     * @param {State} lastState - State Simulation finished on
+     */
     //handles simulation result
     simulationResult(lastState){
         ////logging
@@ -166,7 +203,11 @@ export class TuringMachine{
         }
     }
 
-    //reads the tape at the current position of the Lese-/Schreibkopf
+    /**
+     * Returns Character at tape[tapePosition] of TM object
+     * 
+     * @returns Character at tapePosition
+     */
     readTape(){
         return this.tape[this.tapePosition];
     }
@@ -174,7 +215,13 @@ export class TuringMachine{
     //////////////////////////////////////////////////////////////
     //// -------------------- Helpers ---------------------- /////
     //////////////////////////////////////////////////////////////
-    //returns key of delta when entered as a string
+
+    /**
+     * Helper: Returns key of delta when specified key is entered as "[state, charOnTape]"
+     * 
+     * @param {string} content - The Array that is to be recognized as a Key
+     * @returns key of this.delta.keys with [state, charOnTape]
+     */
     getKeyByContent(content){
         for(const key of this.delta.keys()){
             if(JSON.stringify(key) === JSON.stringify(content)){
@@ -184,7 +231,12 @@ export class TuringMachine{
         throw new Error("Key not found in Delta", "Json: ", JSON.stringify(content));
     }
 
-    //returns State with given id
+    /**
+     * Helper: Returns State with id @param id from turingMachine.states
+     * 
+     * @param {number} id - id of requested State
+     * @returns {State} with given id
+     */
     getStatebyId(id){
         for(const state of this.states){
             if(parseInt(state.id) === parseInt(id)){
@@ -194,7 +246,14 @@ export class TuringMachine{
         throw new Error(`There is no state with Id ${id}`)
     }
 
-    //returns State with given name
+    /**
+     * Helper: Returns State with id @param name from turingMachine.states
+     * note: The program ensures users being unable to create multiple states with the same name.
+     *          should this still happen however, the first state with this name is returned.
+     * 
+     * @param {number} name - name of requested State
+     * @returns {State} with given id
+     */
     getStatebyName(name){
         for(const state of this.states){
             if(state.name === name){
@@ -206,8 +265,8 @@ export class TuringMachine{
 
 }
 
- //------ global variables ------//
-    //Basic TuringMachine object used for Creation & Simulation (imported by man other modules!)
+//global variable
+    //Basic TuringMachine object used for Creation & Simulation (imported by many other modules!)
     var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
 
 /*
