@@ -1,4 +1,4 @@
-//States
+//State Object
 export class State{
     /**
      * Constructs a State object with the provided attributes.

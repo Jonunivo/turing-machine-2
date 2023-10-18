@@ -1,4 +1,4 @@
-import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, disableSliders } from "./Cytoscape.js";
+import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
 export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders };
@@ -13,7 +13,7 @@ export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders 
 var nodeId = 0;
 //fromNode at Edge Creation (used to safe on which node the user clicked)
 var fromNode;
-//createNOde POsition
+//createNode Position
 var position;
 
 

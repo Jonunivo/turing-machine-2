@@ -3,8 +3,25 @@ import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 
+//global Variables
+//Array of TM properties to be saved
 let tmProperties = []
 
+//////////////////////////////////////////////////////////////
+//// --------------------- Saving ----------------------- ////
+//////////////////////////////////////////////////////////////
+/**
+ * Saving works as follows:
+ * User presses SaveButton -> saveTuringMachine() -> Modal open
+ * -> User makes Modal input
+ * (1) presses Save in Modal -> saveFile() & close Modal
+ * (2) User presses Cancel -> close Modal
+ */
+
+/**
+ * Puts States & Transitions of TM into imProperties array & opens SaveModal
+ * called when user presses "Save TM"
+ */
 function saveTuringMachine(){
     tmProperties = [];
     //convert states to JSON
@@ -14,12 +31,6 @@ function saveTuringMachine(){
         tmProperties.push(cy.$(`#${state.id}`).position().x);
         tmProperties.push(cy.$(`#${state.id}`).position().y);
     }
-
-
-
-
-
-
 
     //line break
     tmProperties.push('\n');
@@ -34,18 +45,21 @@ function saveTuringMachine(){
 
     tmProperties.push("\n");
     
-    //User Prompt file name
-    openModal()
-
-    
+    //Open Save File Modal
+    document.getElementById("saveModal").style.display = "block";
 }
+//EventListener for SaveButton
 document.getElementById("saveButton").addEventListener("click", saveTuringMachine);
 
-function openModal(){
-    const modal = document.getElementById("saveModal");
-    modal.style.display = "block";
-}
 
+/**
+ * 
+ * Reads User Modal input & saves Tape if requested
+ * Handles all the file creation & download part
+ * 
+ * @returns - aborts when user doesn't provide a filename (cancelled saving file prompt);
+ *              otherwise returns nothing.
+ */
 function saveFile(){
 
     //close the modal
@@ -92,9 +106,18 @@ document.getElementById("cancelButton3").addEventListener('click', function(){
 })
 
 
+//////////////////////////////////////////////////////////////
+//// -------------------- Loading ----------------------- ////
+//////////////////////////////////////////////////////////////
 
-
-//load TM
+/**
+ * Handles the whole loading process from Prompting the user to submit file until creating all the
+ * necessary cytoscape objects & handle turingMachine object specifically:
+ *  - Prompt User to input file
+ *  - Resets TM & canvas
+ *  - Load States & Transitions at position specified in savefile
+ *  - load Tape content (if provided)
+ */
 document.getElementById('fileInput').addEventListener('change', (event) => {
     const fileList = event.target.files;
     if(fileList.length != 1){
@@ -106,7 +129,7 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
     const reader = new FileReader();
     reader.readAsText(file);
 
-    //read file content
+    ////read file content
     reader.onload = (event) => {
         const fileContent = event.target.result;
         //split into lines
@@ -118,10 +141,9 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         cyClearCanvas();
         nodePresetReset();
 
-
-
-
+        //
         //load states
+        //
         let i = 0;
         while(true){
             const currentLine = lines[i];
@@ -148,8 +170,10 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             i+=3;
         }
         i+=2;
+
+        //
         //load Transitions
-        
+        //
         while(true){
             const currentLine = lines[i];
             if(currentLine == "" || currentLine == undefined){
@@ -185,10 +209,11 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             }
             i++;
         }
-
-
         i+=2;
+
+        //
         //load Tape
+        //
         const tapeString = lines[i];
         console.log("Tape: ",tapeString);
         if(tapeString !== "" && tapeString !== undefined){
@@ -204,9 +229,6 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             //reset tape to empty
             cyWriteOnTape("");
         }
-
-
     }
-    
 });
 
