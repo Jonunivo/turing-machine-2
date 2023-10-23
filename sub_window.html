@@ -13,6 +13,17 @@
     <body>
         <!-- Cytoscape window -->
         <div id="cytoscape_sub"></div>
+        <div>
+            <input type="text" id="setTitle">
+            <button onclick="updateMainWindowTitle()">Update Main Window Title</button>
+            <script>
+                function updateMainWindowTitle() {
+                    const textInput = document.getElementById('setTitle').value;
+                    window.opener.document.title = textInput;
+                    window.close();
+                }
+            </script>
+        </div>
 
         <footer>
 
