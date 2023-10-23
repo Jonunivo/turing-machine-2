@@ -143,6 +143,10 @@ function fastSimulation(){
     if(new Date().getTime() - startTime >= timeLimit){
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
     }
+    else if(currentState == turingMachine.acceptstate ||
+        currentState == turingMachine.rejectstate){
+            turingMachine.simulationResult(currentState);
+        }
     //simulation finished
     currentState = turingMachine.startstate;
     tmTapetoCyto();

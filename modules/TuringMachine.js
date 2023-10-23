@@ -199,10 +199,13 @@ export class TuringMachine{
         console.log(`Tape: ${this.tape}`);
         ////
         if(lastState == this.acceptstate){
-            console.log("accepting")
+            console.log("Simulation finished: Input Accepted!")
+            //alert("Simulation finished: Input Accepted!")
         }
         else if(lastState == this.rejectstate){
-            console.log("rejecting");
+            console.log("Simulation finished: Input Rejected!");
+            //alert("Simulation finished: Input Rejected!")
+
         }
         else{
             throw new Error("invalid ending of simulation, check TM build")
