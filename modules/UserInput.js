@@ -115,9 +115,16 @@ document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
 
-//Helper functions to adjust global variable nodeId (used in Presets.js)
+//Helper functions to adjust global variable nodeId (used in Presets.js & SaveLoad.js)
+//sets nodeId to maxId of TM states + 1
 function nodePresetHelper(){
-    nodeId++;
+    let maxid = 0;
+    for(let node of turingMachine.states){
+        if(node.id > maxid){
+            maxid = node.id;
+        }
+    }
+    nodeId = maxid + 1;
     return nodeId;
 }
 function nodePresetReset(){

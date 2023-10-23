@@ -9,6 +9,9 @@ let simIsRunning = false;
 let currentState;
 // wait-notify
 let isReady = false;
+// original color
+let originalColorNode = "grey";
+let originalColorEdge = "grey";
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Action ------------------- ////
@@ -275,10 +278,11 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         return;
     }
     
-    //// animate node
-    animateNode(tmState, animationTime);
+    //// animate node IN
+    //animateNode(tmState, animationTime);
+    animateNodeIn(tmState, animationTime);
     //wait for simulation step to finish
-    await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
+    await new Promise(resolve => setTimeout(resolve, animationTime+10));
 
 
     //// animate tape read
@@ -287,10 +291,15 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
 
 
-    //// animate edge
-    animateEdge(tmState, charOnTape, animationTime);
+    //// animate edge IN
+   // animateEdge(tmState, charOnTape, animationTime);
+   // animateEdge(tmState, charOnTape, animationTime);
+    animateEdgeIn(tmState, charOnTape, animationTime);
+
+
+
     //wait for simulation step to finish
-    await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
+    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
 
 
     //// animate tape write
@@ -304,6 +313,14 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
     //fix tape position if animation (for some reason) didnt work correctly
     fixTapePosition();
+
+    //// animate node OUT & edge OUT
+    animateNodeOut(tmState, animationTime);
+    animateEdgeOut(tmState, charOnTape, animationTime);
+    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+
+
+
 
     //re-enable run simulation buttons after simulation step finished (for single step)
     if(!simIsRunning){
@@ -323,6 +340,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
  * @param {State} tmState - Node to run animation on
  * @param {number} animationTime - animationTime in ms
  */
+
 function animateNode(tmState, animationTime){
     //get cyto node
     let cyCurrentNode = cy.getElementById(tmState.id);
@@ -354,6 +372,42 @@ function animateNode(tmState, animationTime){
             );
         }
     });
+}
+
+
+function animateNodeIn(tmState, animationTime){
+
+    //get cyto node
+    let cyCurrentNode = cy.getElementById(tmState.id);
+    //get node origianl color
+    originalColorNode = cyCurrentNode.style("background-color");
+    //animate (fade in)
+    cyCurrentNode.animate({
+        style: {
+            "background-color": "red",
+        },
+
+    },
+    {
+        duration: animationTime,
+    })
+}
+
+function animateNodeOut(tmState, animationTime){
+    //get cyto node
+    let cyCurrentNode = cy.getElementById(tmState.id);
+
+    cyCurrentNode.animate(
+        {
+            style: {
+            "background-color": `${originalColorNode}`,
+            },
+        },
+        {
+            duration: animationTime,
+
+        }
+    );
 }
 
 /**
@@ -402,7 +456,8 @@ function animateTapeRead(animationTime){
  * @param {char} charOnTape - charOnTape for this animation step
  * @param {number} animationTime - animationTime in ms
  */
-
+//replaced by animateEdgeIn & animateEdgeOut
+/*
 function animateEdge(tmState, charOnTape, animationTime){
     //find corresponding edge
     let edgeToAnimate = null;
@@ -447,6 +502,57 @@ function animateEdge(tmState, charOnTape, animationTime){
     }
 
 }
+*/
+
+function animateEdgeIn(tmState, charOnTape, animationTime){
+    //find corresponding edge
+    let edgeToAnimate = null;
+    const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
+    outgoingEdges.forEach(edge => {
+        if(edge.data().readToken === charOnTape){
+            edgeToAnimate = edge;
+        }
+    })
+
+    //Animation
+    //fade-in
+    if(edgeToAnimate != null){
+        originalColorEdge = edgeToAnimate.style("line-color");
+        edgeToAnimate.animate({
+            style: {
+                "line-color": "red",
+            },
+            },
+            {
+            duration: animationTime,
+            })
+    }
+}
+
+function animateEdgeOut(tmState, charOnTape, animationTime){
+    //find corresponding edge
+    let edgeToAnimate = null;
+    const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
+    outgoingEdges.forEach(edge => {
+        if(edge.data().readToken === charOnTape){
+            edgeToAnimate = edge;
+        }
+    })
+
+    //Animation
+    //fade-in
+    if(edgeToAnimate != null){
+        edgeToAnimate.animate({
+            style: {
+                "line-color": `${originalColorEdge}`,
+            },
+            },
+            {
+            duration: animationTime,
+            })
+    }
+}
+
 
 /**
  * 

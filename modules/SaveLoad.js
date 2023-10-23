@@ -219,6 +219,9 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         }
         i+=2;
 
+        //update nodeId variable
+        nodePresetHelper();
+
         //
         //load Tape
         //
