@@ -133,6 +133,11 @@ export class TuringMachine{
             document.getElementById('stepSimulationButton').disabled = true;
             document.getElementById('resetSimulationButton').disabled = false;
             document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
+            document.getElementById('move-tape-left').disabled = false;
+            document.getElementById('move-tape-right').disabled = false;
+            document.getElementById('tape-input').disabled = false;
+
+
             alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
 
             return null;
@@ -257,6 +262,7 @@ export class TuringMachine{
      */
     getStatebyName(name){
         for(const state of this.states){
+            console.log("TM: ,", state.name, ", search: ,", name, ",")
             if(state.name === name){
                 return state;
             }

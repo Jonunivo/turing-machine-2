@@ -356,11 +356,15 @@ function userEditEdgeHandler(){
     //TapeMovement
     let tapeMovementValue = document.getElementById('tapeMovement').value;
     let tapeMovement = "N"
+    let labelMove = "↓";
     if(parseInt(tapeMovementValue) === -1){
         tapeMovement = "L";
+        labelMove = "←";
+
     }
     else if(parseInt(tapeMovementValue) === 1){
         tapeMovement = "R";
+        labelMove = "→";
     }
 
     //writeToken
@@ -368,10 +372,10 @@ function userEditEdgeHandler(){
     let writeToken = "";
     if(document.getElementById('writeLabel').value !== ''){
         writeToken = document.getElementById('writeLabel').value;
-        cyLabel = "R: " + readToken + " W: " + writeToken + " | " + tapeMovement;
+        cyLabel = "R: " + readToken + " W: " + writeToken + " | " + labelMove;
     }
     else{
-        cyLabel = "R: " + readToken + " | " + tapeMovement;
+        cyLabel = "R: " + readToken + " | " + labelMove;
     }
 
 

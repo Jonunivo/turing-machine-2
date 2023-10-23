@@ -160,7 +160,7 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                 const isAccepting = parsedData.isAccepting;
                 const isRejecting = parsedData.isRejecting;
                 turingMachine.createState(id, name, isStarting, isAccepting, isRejecting);
-                cyCreateNode(nodePresetHelper()-1, name, lines[i+1], lines[i+2], isStarting, isAccepting, isRejecting);
+                cyCreateNode(id, name, lines[i+1], lines[i+2], isStarting, isAccepting, isRejecting);
             } catch(error){
                 console.log('Error parsing JSON:', error.message);
                 alert("Failed to load .json file, try again");
@@ -193,11 +193,19 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                 //cyto
                     //determine label
                     let cyLabel = "";
+                    let labelMove = "↓";
+                    if(move === "L"){
+                        labelMove = "←";
+                    }
+                    if(move === "R"){
+                        labelMove = "→"
+                    }
+
                     if(writeChar !== ''){
-                        cyLabel = "R: " + readChar + " W: " + writeChar + " | " + move;
+                        cyLabel = "R: " + readChar + " W: " + writeChar + " | " + labelMove;
                     }
                     else{
-                        cyLabel = "R: " + readChar + " | " + move;
+                        cyLabel = "R: " + readChar + " | " + labelMove;
                     }
                 cyCreateEdge(edgeProperties[0], edgeProperties[6], cyLabel, readChar);
             }

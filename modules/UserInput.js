@@ -201,7 +201,7 @@ function userEdgeInputHandler(){
 
     //toNode 
     let dropdown = document.getElementById("toState")
-    let toNode = turingMachine.getStatebyName(dropdown.value);
+    let toNode = turingMachine.getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
     let toNodeId = toNode.id;
 
     //readLabel
@@ -209,25 +209,29 @@ function userEdgeInputHandler(){
     //tapeMovement
     let tapeMovementValue = document.getElementById('tapeMovement').value;
     let tapeMovement = "N"
+    let labelMove = "↓";
     if(parseInt(tapeMovementValue) === -1){
         tapeMovement = "L";
+        labelMove = "←"
     }
     else if(parseInt(tapeMovementValue) === 1){
         tapeMovement = "R";
+        labelMove = "→"
     }
     else{
         tapeMovement = "N";
     }
     //writeLabel
     let cyLabel = "";
+
     let writeLabel;
     if(document.getElementById('writeLabel').value !== ''){
         writeLabel = document.getElementById('writeLabel').value;
-        cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + tapeMovement;
+        cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + labelMove;
     }
     else{
         writeLabel = undefined;
-        cyLabel = "R: " + readLabel + " | " + tapeMovement;
+        cyLabel = "R: " + readLabel + " | " + labelMove;
     }
 
     //create Edge Cytoscape
@@ -287,32 +291,53 @@ function createDropdownMenues(dropdown){
         options.push(state.name);
     }
     //create HTML elements from options
-    for(const option of options){
+    for(let option of options){
         const optionElement = document.createElement('option');
+        option = option.replace(/ /g, "﹍");
+        const textNode = document.createTextNode(option);
+        optionElement.appendChild(textNode);
+        /*
         optionElement.text = option;
-        dropdown.add(optionElement);
+        */
+        console.log(",",textNode.nodeValue,",", option, ",");
+        
+        dropdown.appendChild(optionElement);
     }
     ////
 }
 
 
 /**
- * Helper: that disables sliders in CreateNode Modal (avoids creating multiple starting, accepting, rejecting states)
+ * Helper: that disables sliders in CreateNode/EditNode Modal (avoids creating multiple starting, accepting, rejecting states)
  */
 function disableSliders(){
+    console.log("disable Sliders");
+    //starting
     if(turingMachine.startstate !== null && turingMachine.startstate !== undefined){
         document.getElementById("stateStarting").disabled = true;
     }
+    else{
+        document.getElementById("stateStarting").disabled = false;
+    }
+    //accepting
     if(turingMachine.acceptstate !== null && turingMachine.acceptstate !== undefined){
         document.getElementById("stateAccepting").disabled = true;
     }
+    else{
+        document.getElementById("stateAccepting").disabled = false;
+    }
+    //rejecting
     if(turingMachine.rejectstate !== null && turingMachine.rejectstate !== undefined){
         document.getElementById("stateRejecting").disabled = true;
     }
-
+    else{
+        document.getElementById("stateRejecting").disabled = false;
+    }
+    
     document.getElementById("stateStarting").checked = false;
     document.getElementById("stateAccepting").checked = false;
     document.getElementById("stateRejecting").checked = false;
+    
 }
 
 

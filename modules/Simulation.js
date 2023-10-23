@@ -457,8 +457,9 @@ function animateEdge(tmState, charOnTape, animationTime){
  */
 function animateTapeWrite(writeToken, animationTime){
     //only write when token isn't empty
-    if(writeToken !== ""){
+    if(writeToken !== "" && writeToken !== undefined){
         cyWriteCurrentPos(writeToken, animationTime);
+        console.log("WRITE", writeToken);
     }
 }
 

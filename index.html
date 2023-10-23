@@ -227,6 +227,10 @@
                     let output = input.slice(0,size);
                     document.getElementById("stateName").value = output;
                 }
+                //replace space with ﹍
+                output = input.replace(/ /g, '\uFE4D');
+                document.getElementById("stateName").value = output;
+
             }
         </script>
         
