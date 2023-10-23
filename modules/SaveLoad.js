@@ -193,12 +193,12 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                 //cyto
                     //determine label
                     let cyLabel = "";
-                    let labelMove = "↓";
+                    let labelMove = "⯀";
                     if(move === "L"){
-                        labelMove = "←";
+                        labelMove = "⮜";
                     }
                     if(move === "R"){
-                        labelMove = "→"
+                        labelMove = "➤"
                     }
 
                     if(writeChar !== ''){

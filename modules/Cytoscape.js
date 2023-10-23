@@ -113,7 +113,7 @@ function cyCreateEdge(fromNode, toNode, label, readToken){
         },
         style: {
             'label': `${label}`,
-            'font-size': '10px',
+            'font-size': '12px',
             "text-margin-y": "-5px",
 
           }

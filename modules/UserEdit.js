@@ -356,15 +356,15 @@ function userEditEdgeHandler(){
     //TapeMovement
     let tapeMovementValue = document.getElementById('tapeMovement').value;
     let tapeMovement = "N"
-    let labelMove = "↓";
+    let labelMove = "⯀";
     if(parseInt(tapeMovementValue) === -1){
         tapeMovement = "L";
-        labelMove = "←";
+        labelMove = "⮜";
 
     }
     else if(parseInt(tapeMovementValue) === 1){
         tapeMovement = "R";
-        labelMove = "→";
+        labelMove = "➤";
     }
 
     //writeToken

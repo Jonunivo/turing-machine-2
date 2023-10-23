@@ -40,29 +40,29 @@ function loadPresetOne(){
     //Create Transitions
     //// from right
     //0->0 & move left when reading 0
-    let cyLabel = "R: " + '0' + " | " + "→";
+    let cyLabel = "R: " + '0' + " | " + "➤";
     cyCreateEdge(0, 0, cyLabel, '0');
     turingMachine.createTransition(turingMachine.getStatebyId(0), '0', turingMachine.getStatebyId(0), '', 'R')
     //0->0 & move left when reading 1
-    cyLabel = "R: " + '1' + " | " + "→";
+    cyLabel = "R: " + '1' + " | " + "➤";
     cyCreateEdge(0, 0, cyLabel, '1');
     turingMachine.createTransition(turingMachine.getStatebyId(0), '1', turingMachine.getStatebyId(0), '', 'R')
     //0->1 & move right when reading ""
-    cyLabel = "R: " + '' + " | " + "←";
+    cyLabel = "R: " + '' + " | " + "⮜";
     cyCreateEdge(0, 1, cyLabel, '');
     turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(1), '', 'L')
     
     ////from carry
     //1 -> 0, R
-    cyLabel = "R: " + '1' + " W: " + '0' + " | " + "←";
+    cyLabel = "R: " + '1' + "W: " + '0' + " | " + "⮜";
     cyCreateEdge(1, 1, cyLabel, '1');
     turingMachine.createTransition(turingMachine.getStatebyId(1), '1', turingMachine.getStatebyId(1), '0', 'L')
     //0 -> 1, L
-    cyLabel = "R: " + '0' + " W: " + '1' + " | " + "→";
+    cyLabel = "R: " + '0' + "W: " + '1' + " | " + "➤";
     cyCreateEdge(1, 2, cyLabel, '0');
     turingMachine.createTransition(turingMachine.getStatebyId(1), '0', turingMachine.getStatebyId(2), '1', 'R')
     //"" -> 1, L
-    cyLabel = "R: " + '' + " W: " + '1' + " | " + "→";
+    cyLabel = "R: " + '' + "W: " + '1' + " | " + "➤";
     cyCreateEdge(1, 2, cyLabel, '');
     turingMachine.createTransition(turingMachine.getStatebyId(1), '', turingMachine.getStatebyId(2), '1', 'R')
 
