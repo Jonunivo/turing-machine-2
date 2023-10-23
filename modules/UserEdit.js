@@ -1,4 +1,4 @@
-import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck} from "./Cytoscape.js";
+import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders } from "./UserInput.js";
 
@@ -67,6 +67,7 @@ cy.on('cxttap', 'node', function(event){
         var newButton = document.createElement("button");
         newButton.id = "nodeDeleteButton";
         newButton.innerText = "Delete Node";
+        newButton.className = "red-button";
         document.getElementById("deleteNodeDiv").appendChild(newButton);
         addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
     }
@@ -114,8 +115,12 @@ function userEditNodeHandler(){
     var newName = document.getElementById("stateName").value;
     //cyto
     cytoEditNode.style('label', newName);
+    cytoEditNode.style('width', `${newName.length*10 + 10}px`)
+    refresh()
     //TM object (node)
     editNode.name = newName;
+
+
 
     ////Starting/Accepting/Rejecting property
     var isStarting = document.getElementById("stateStarting").checked;
@@ -184,6 +189,7 @@ function userEditNodeHandler(){
         editNode.isRejecting = false;
         turingMachine.rejectstate = null;
     }
+
 }
 
 /**
@@ -269,6 +275,7 @@ cy.on('cxttap', 'edge', function(event){
         var newButton = document.createElement("button");
         newButton.id = "edgeDeleteButton";
         newButton.innerText = "Delete Edge";
+        newButton.className = "red-button";
         document.getElementById("deleteEdgeDiv").appendChild(newButton);
         //event listener
         addEventListenerWithCheck(newButton, 'click', userDeleteEdgeHandler)
@@ -370,7 +377,8 @@ function userEditEdgeHandler(){
     //writeToken
     let cyLabel = "";
     let writeToken = "";
-    if(document.getElementById('writeLabel').value !== ''){
+    if(document.getElementById('writeLabel').value !== '' && 
+    document.getElementById('writeLabel').value !== undefined){
         writeToken = document.getElementById('writeLabel').value;
         cyLabel = "R: " + readToken + " W: " + writeToken + " | " + labelMove;
     }

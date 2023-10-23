@@ -15,6 +15,8 @@ var nodeId = 0;
 var fromNode;
 //createNode Position
 var position;
+//eventlistener already exists?
+var eventListenerActive = true;
 
 //// ----------- Node Creation
 /**Node Creation works as follows:
@@ -63,7 +65,29 @@ cy.on('dblclick', (event) => {
     nodeModal.style.paddingLeft = `${position.x + leftValue}px`
     nodeModal.style.paddingTop = `${position.y + topValue}px`;
     nodeModal.style.display = 'block';
-})
+
+
+    //enter to confirm node creation (TO DO)
+    /*
+    document.addEventListener('keydown', function(event){
+        enterToConfirm(event, 'nodeButton');
+    });
+    eventListenerActive = true;
+    */
+
+
+
+});
+
+//Helper: handles Enter to Confirm node creation
+function enterToConfirm(event, id){
+    if (event.key === 'Enter' && eventListenerActive) {
+        let button = document.getElementById(id);
+        button.click();
+        // Remove the event listener
+        eventListenerActive = false;
+      }
+}
 
 
 /**
@@ -114,6 +138,8 @@ function userNodeInputHandler(){
 document.getElementById("cancelButton").addEventListener('click', function(){
     nodeModal.style.display = 'none';
 })
+
+
 
 //Helper functions to adjust global variable nodeId (used in Presets.js & SaveLoad.js)
 //sets nodeId to maxId of TM states + 1
@@ -194,6 +220,14 @@ cy.on('tap', 'node', (event) => {
     //save node clicked on
     const node = event.target;
     fromNode = turingMachine.getStatebyId(node.id());
+
+    //enter to confirm node creation (TO DO)
+    /*
+    document.addEventListener('keydown', function(event){
+        enterToConfirm(event, 'edgeButton');
+    });
+    eventListenerActive = true;
+    */
 
 });
 

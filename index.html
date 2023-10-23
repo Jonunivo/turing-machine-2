@@ -118,7 +118,12 @@
         <!-- Node Creation Modal -->
         <div id="nodeModal" class="modal">
             <div id="nodeModalContent" class="modal-content">
+                <div class="cancel-button-div">
+                    <button id="cancelButton" class ="cancel-button" type="button">x</button>
+                </div>
+
                 <h3>Node Properties</h3>
+
                 <label for="stateName" >Node Name:</label>
                 <input type="text" id="stateName" oninput="limitNameSize(8)">
                 <div class="checkbox-div">
@@ -139,17 +144,18 @@
                     <button id="nodeButton" type="button">Create Node</button>
                 </div>
                 <div id="deleteNodeDiv">
-                    <!-- cytoscape.js will insert a delete button here -->
+                    <!-- UserEdit.js  will insert a delete button here -->
                 </div>
-                <div class="cancel-button-div">
-                    <button id="cancelButton" type="button">cancel</button>
-                </div>
+
             </div>
         </div>
 
         <!-- Edge Creation Modal -->
         <div id="edgeModal" class="modal">
             <div id="edgeModalContent" class="modal-content">
+                <div class="cancel-button-div">
+                    <button id="cancelButton2" class="cancel-button" type="button">x</button>
+                </div>
                 <h3>Edge Properties</h3>
                 <div id="fromStateDiv"></div>
                 <label for="toState">To State:</label>
@@ -175,9 +181,7 @@
                 <div id="deleteEdgeDiv">
                     <!-- cytoscape.js will insert a delete button here -->
                 </div>
-                <div class="cancel-button-div">
-                    <button id="cancelButton2" type="button">cancel</button>
-                </div>
+
             </div>
         </div>
 
@@ -223,14 +227,17 @@
             //limit node name size to size
             function limitNameSize(size){
                 let input = document.getElementById("stateName").value;
+                let output = "";
                 if(input.length > size){
-                    let output = input.slice(0,size);
+                    //limit name size
+                    output = input.slice(0,size);
                     document.getElementById("stateName").value = output;
                 }
-                //replace space with ﹍
-                output = input.replace(/ /g, '\uFE4D');
-                document.getElementById("stateName").value = output;
-
+                else{
+                    //replace space with ﹍
+                    output = input.replace(/ /g, '\uFE4D');
+                    document.getElementById("stateName").value = output;
+                }
             }
         </script>
         

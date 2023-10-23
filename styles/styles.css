@@ -145,6 +145,42 @@ button{
     border: 2px solid rgb(255, 173, 173);
     cursor: not-allowed;
 }
+/*red-buttons */
+.red-button{
+    color: white;
+    background-color: #df5656;
+    border: 2px solid #ca4d4d;
+}
+.red-button:hover{
+    background-color: #ca4d4d;
+    border: 2px solid #ca4d4d;
+}
+.red-button:disabled{
+    color: rgba(206, 118, 118, 0.815);
+    background-color: rgb(238, 238, 238);
+    border: 2px solid rgb(255, 173, 173);
+    cursor: not-allowed;
+}
+
+/*cancel button*/
+.cancel-button{
+    vertical-align: center;
+    width: 50px;
+    background: transparent;
+    font-size: 24px; 
+    color: #ccc; 
+    cursor: pointer;
+    border: none;
+}
+
+.cancel-button:hover {
+    color: darkgray; /* Darker grey on hover */
+}
+
+.cancel-button-div {
+    text-align: right;
+}
+
 
 /*Step/Reset Simulation Buttons*/
 #stepSimulationButton, #resetSimulationButton{
@@ -250,7 +286,7 @@ option {
 .modal-content {
     background-color: white;
     width: 300px;
-    padding: 20px;
+    padding: 5px 5px 20px 20px;
     border-radius: 5px;
     text-align: center;
 }
