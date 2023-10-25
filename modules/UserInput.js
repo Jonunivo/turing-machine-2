@@ -1,4 +1,4 @@
-import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck} from "./Cytoscape.js";
+import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
 export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, nodeEdgeCreationCount, nodeEdgeCreationCountReset };
@@ -52,7 +52,7 @@ cy.on('click', (event) => {
         var nodeEditButton = document.getElementById("nodeEditButton");
         var nodeButton = document.createElement("button");
         nodeButton.id = "nodeButton";
-        nodeButton.innerText = "Create Node";
+        nodeButton.innerText = "Zustand erstellen";
         if(nodeEditButton){
             // Replace the existing button with the new button
             nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
@@ -142,8 +142,13 @@ function userNodeInputHandler(){
     console.log("new State with id: ", nodeId-1);
     console.log("tm now: ", turingMachine);
 
+    //Grabify nodes
+    cyGrabifyNodes();
+    
     //AB test
     numCreatedNodes++;
+
+
 
 }
 //User presses cancel button in NodeModal -> hide nodeModal
@@ -191,7 +196,7 @@ cy.on('mousedown', 'node', (event) =>{
 //click on cyto node (in edit mode) -> Create Edge from this node
 //Opens Create Edge Modal
 cy.on('mouseup', 'node', (event) =>{
-
+    dragToNode = event.target;
     //stop dragging timer
     waitForDragging = Date.now() - waitForDragging;
     //trying to create loop edge?
@@ -201,10 +206,14 @@ cy.on('mouseup', 'node', (event) =>{
             //create loop node
             console.log("loop edge");
             dragCreateEdge(event);
+            console.log("called1")
         }
     }
     else{
         //create normal edge
+        console.log("called2")
+        console.log(dragFromNode, " ", dragToNode);
+
         dragCreateEdge(event);
     }
 });
@@ -384,7 +393,8 @@ function userEdgeInputHandler(){
 
 //Cancel button (edge) pressed
 document.getElementById("cancelButton2").addEventListener('click', function(){
-
+    dragFromNode = null;
+    dragToNode = null;
     edgeModal.style.display = 'none';
 })
 
@@ -418,7 +428,6 @@ function createDropdownMenues(dropdown){
         /*
         optionElement.text = option;
         */
-        console.log(",",textNode.nodeValue,",", option, ",");
         
         dropdown.appendChild(optionElement);
     }

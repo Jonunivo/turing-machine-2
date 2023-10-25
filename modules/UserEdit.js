@@ -1,4 +1,4 @@
-import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh} from "./Cytoscape.js";
+import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders } from "./UserInput.js";
 
@@ -215,6 +215,9 @@ function userEditNodeHandler(){
         turingMachine.rejectstate = null;
     }
 
+    //Grabify nodes
+    cyGrabifyNodes();
+
     //AB test
     numEditedNodes++;
 
@@ -251,6 +254,9 @@ function userDeleteNodeHandler(){
         }
     }
     turingMachine.delta = updatedDelta;
+
+    //Grabify nodes
+    cyGrabifyNodes();
 }
 
 
@@ -322,6 +328,9 @@ cy.on('click', 'edge', function(event){
         getCurrentEdgeProperties();
 
         addEventListenerWithCheck(document.getElementById("edgeEditButton"), "click", userEditEdgeHandler);
+
+        //Grabify nodes
+        cyGrabifyNodes();
     }
 
 });

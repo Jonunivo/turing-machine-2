@@ -1,6 +1,6 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow};
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow, cyGrabifyNodes};
 
 
 //////////////////////////////////////////////////////////////
