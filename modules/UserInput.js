@@ -48,7 +48,7 @@ cy.on('dblclick', (event) => {
     var nodeEditButton = document.getElementById("nodeEditButton");
     var nodeButton = document.createElement("button");
     nodeButton.id = "nodeButton";
-    nodeButton.innerText = "Create Node";
+    nodeButton.innerText = "Zustand erstellen";
     if(nodeEditButton){
         // Replace the existing button with the new button
         nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
