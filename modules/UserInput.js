@@ -20,65 +20,71 @@ var eventListenerActive = true;
 //AB Test variables
 var numCreatedNodes = 0;
 var numCreatedEdges = 0;
+//editMode
+const editMode = document.getElementById("editMode");
 
 //// ----------- Node Creation
 /**Node Creation works as follows:
- * User doubleclick on canvas -> Open Create Node Modal ->
+ * User click on canvas -> Open Create Node Modal ->
  *      (1) User submit modal -> userNodeInputHandler() -> hide Modal
  *      (2) User cancels modal -> hide Modal
  */
 
 
-//Doubleclick on cyto canvas -> Create Node
+//Click on cyto canvas (in edit mode) -> Create Node
 //Opens Create Node Modal
-cy.on('dblclick', (event) => {
-    //get doubleclick position
-    position = event.position;
+cy.on('click', (event) => {
+    //only allow in editMode (& click on canvas)
+    if(editMode.checked && event.target === cy){
+        //get click position
+        position = event.position;
 
-    //
-    const nodeModal = document.getElementById('nodeModal');
-    const modal = document.querySelector('.modal-content');
+        //
+        const nodeModal = document.getElementById('nodeModal');
+        const modal = document.querySelector('.modal-content');
 
-    //get cytoscape window position
-    const cytoWindow = document.querySelector('#cytoscape');
-    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
-    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+        //get cytoscape window position
+        const cytoWindow = document.querySelector('#cytoscape');
+        const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+        const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
 
-    ////change button from "edit node" to "create node"
-    var nodeEditButton = document.getElementById("nodeEditButton");
-    var nodeButton = document.createElement("button");
-    nodeButton.id = "nodeButton";
-    nodeButton.innerText = "Create Node";
-    if(nodeEditButton){
-        // Replace the existing button with the new button
-        nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
+        ////change button from "edit node" to "create node"
+        var nodeEditButton = document.getElementById("nodeEditButton");
+        var nodeButton = document.createElement("button");
+        nodeButton.id = "nodeButton";
+        nodeButton.innerText = "Create Node";
+        if(nodeEditButton){
+            // Replace the existing button with the new button
+            nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
+        }
+        addEventListenerWithCheck(document.getElementById('nodeButton'), 'click', userNodeInputHandler)
+
+        //disable sliders
+        disableSliders();
+
+        //remove delete node button (if exists)
+        let deleteButton = document.getElementById("nodeDeleteButton");
+        if(deleteButton){
+            document.getElementById("deleteNodeDiv").removeChild(deleteButton);
+        }
+
+        //display modal at doubleclick position
+        nodeModal.style.paddingLeft = `${position.x + leftValue}px`
+        nodeModal.style.paddingTop = `${position.y + topValue}px`;
+        nodeModal.style.display = 'block';
+
+
+        //enter to confirm node creation (TO DO)
+        /*
+        document.addEventListener('keydown', function(event){
+            enterToConfirm(event, 'nodeButton');
+        });
+        eventListenerActive = true;
+        */
+
+
+
     }
-    addEventListenerWithCheck(document.getElementById('nodeButton'), 'click', userNodeInputHandler)
-
-    //disable sliders
-    disableSliders();
-
-    //remove delete node button (if exists)
-    let deleteButton = document.getElementById("nodeDeleteButton");
-    if(deleteButton){
-        document.getElementById("deleteNodeDiv").removeChild(deleteButton);
-    }
-
-    //display modal at doubleclick position
-    nodeModal.style.paddingLeft = `${position.x + leftValue}px`
-    nodeModal.style.paddingTop = `${position.y + topValue}px`;
-    nodeModal.style.display = 'block';
-
-
-    //enter to confirm node creation (TO DO)
-    /*
-    document.addEventListener('keydown', function(event){
-        enterToConfirm(event, 'nodeButton');
-    });
-    eventListenerActive = true;
-    */
-
-
 
 });
 
@@ -171,71 +177,130 @@ function nodePresetReset(){
  *      (2) User cancels modal -> hide Modal
  */
 
+let dragFromNode = null;
+let dragToNode = null;
+let waitForDragging = 0;
+//get drag from node
+cy.on('mousedown', 'node', (event) =>{
+    dragFromNode = event.target;
+    console.log("DRAGGING_FROM", dragFromNode);
+    //start dragging timer
+    waitForDragging = Date.now();
+})
 
-//click on cyto node -> Create Edge from this node
+//click on cyto node (in edit mode) -> Create Edge from this node
 //Opens Create Edge Modal
-cy.on('tap', 'node', (event) => {
-    ////open modal
-    //save click position
-    const position = event.position;
+cy.on('mouseup', 'node', (event) =>{
 
-    //
-    const edgeModal = document.getElementById('edgeModal');
-    const modal = document.querySelector('.modal-content');
-
-    //get cytoscape window position
-    const cytoWindow = document.querySelector('#cytoscape');
-    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
-    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
-
-    ////change button from "edit node" to "create node" (if necessary)
-    var edgeEditButton = document.getElementById("edgeEditButton");
-    var edgeButton = document.createElement("button");
-    edgeButton.id = "edgeButton";
-    edgeButton.innerText = "Create Edge";
-    if(edgeEditButton){
-        //replace if needed
-        edgeEditButton.parentNode.replaceChild(edgeButton, edgeEditButton);
+    //stop dragging timer
+    waitForDragging = Date.now() - waitForDragging;
+    //trying to create loop edge?
+    if(dragFromNode === dragToNode){
+        //user held mouse button for at least 300ms
+        if(waitForDragging > 300){
+            //create loop node
+            console.log("loop edge");
+            dragCreateEdge(event);
+        }
     }
-    //user submit node inputs (Event Listener)
-    addEventListenerWithCheck(document.getElementById("edgeButton"), 'click', userEdgeInputHandler)
-
-    //remove delete edge button (if exists)
-    const deleteButton = document.getElementById("edgeDeleteButton");
-    if(deleteButton){
-        document.getElementById("deleteEdgeDiv").removeChild(deleteButton);
+    else{
+        //create normal edge
+        dragCreateEdge(event);
     }
-    //remove fromnode field (if exists)
-    const fromNode1 = document.getElementById("fromState");
-    const fromNode2 = document.getElementById("fromStateLabel");
-    if(fromNode1){
-        document.getElementById("fromStateDiv").removeChild(fromNode1);
-    }
-    if(fromNode2){
-        document.getElementById("fromStateDiv").removeChild(fromNode2);
-    }
-
-    //display modal at click position
-    edgeModal.style.paddingLeft = `${position.x + leftValue}px`
-    edgeModal.style.paddingTop = `${position.y + topValue}px`;
-    edgeModal.style.display = 'block';
-
-    //create DropDownMenu for ToNode
-    createDropdownMenues(document.getElementById("toState"))
-
-    //save node clicked on
-    const node = event.target;
-    fromNode = turingMachine.getStatebyId(node.id());
-
-    //enter to confirm node creation (TO DO)
-    /*
-    document.addEventListener('keydown', function(event){
-        enterToConfirm(event, 'edgeButton');
-    });
-    eventListenerActive = true;
-    */
-
 });
+
+function dragCreateEdge(event){
+    if(editMode.checked){
+        //save from node (TM) (to global var)
+        fromNode = turingMachine.getStatebyId(dragFromNode.id());
+        dragToNode = event.target;
+
+        console.log("DRAGGING_TO", dragToNode);
+
+        ////open modal
+        //save click position
+        const position = event.position;
+
+        //
+        const edgeModal = document.getElementById('edgeModal');
+        const modal = document.querySelector('.modal-content');
+
+        //get cytoscape window position
+        const cytoWindow = document.querySelector('#cytoscape');
+        const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+        const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
+        ////Create Option to Change FromState (if not yet existing)
+        const fromState = document.getElementById("fromState")
+        if(!fromState){
+            //if not: create it!
+            const labelElement = document.createElement("label");
+            labelElement.id = "fromStateLabel"
+            labelElement.setAttribute("for", "fromState");
+            labelElement.textContent = "Von: "
+            const selectElement = document.createElement("select")
+            selectElement.id = "fromState";
+            //add to div
+            document.getElementById("fromStateDiv").appendChild(labelElement);
+            document.getElementById("fromStateDiv").appendChild(selectElement);
+        }
+        //create dropdown menu of existing states
+        createDropdownMenues(document.getElementById("fromState"))
+        document.getElementById("fromState").value = fromNode.name;
+
+        ////Create Option to Change ToState
+        createDropdownMenues(document.getElementById("toState"))
+        var toNode = turingMachine.getStatebyId(dragToNode.id());
+        document.getElementById("toState").value = toNode.name;
+
+
+
+        ////change button from "edit node" to "create node" (if necessary)
+        var edgeEditButton = document.getElementById("edgeEditButton");
+        var edgeButton = document.createElement("button");
+        edgeButton.id = "edgeButton";
+        edgeButton.innerText = "Create Edge";
+        if(edgeEditButton){
+            //replace if needed
+            edgeEditButton.parentNode.replaceChild(edgeButton, edgeEditButton);
+        }
+
+        //user submit edge inputs (Event Listener)
+        addEventListenerWithCheck(document.getElementById("edgeButton"), 'click', userEdgeInputHandler)
+
+        //remove delete edge button (if exists)
+        const deleteButton = document.getElementById("edgeDeleteButton");
+        if(deleteButton){
+            document.getElementById("deleteEdgeDiv").removeChild(deleteButton);
+        }
+
+        //display modal at click position
+        edgeModal.style.paddingLeft = `${position.x + leftValue}px`
+        edgeModal.style.paddingTop = `${position.y + topValue}px`;
+        edgeModal.style.display = 'block';
+
+
+        //slider input show symbol
+        const slider = document.getElementById("tapeMovement");
+        const sliderValue = document.getElementById("slider-value");
+        const value = parseFloat(slider.value);
+        sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
+        sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
+        
+        //create dropdown menu so user might still adjust from/to state
+
+        //enter to confirm node creation (TO DO)
+        /*
+        document.addEventListener('keydown', function(event){
+            enterToConfirm(event, 'edgeButton');
+        });
+        eventListenerActive = true;
+        */
+    }
+}
+
+
+
 
 /**
  * Reads user input from EdgeModal & creates Edge user requested (Cytoscape & TM object) & closes modal
@@ -245,6 +310,12 @@ function userEdgeInputHandler(){
     edgeModal.style.display = 'none';
 
     //// read user input
+
+    //fromNode
+    let dropdownfrom = document.getElementById("fromState");
+    let fromNode = turingMachine.getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let fromNodeId = fromNode.id;
+
 
     //toNode 
     let dropdown = document.getElementById("toState")
@@ -280,11 +351,11 @@ function userEdgeInputHandler(){
     }
 
     //create Edge Cytoscape
-    cyCreateEdge(`${fromNode.id}`, `${toNodeId}`, cyLabel, readLabel);
+    cyCreateEdge(`${fromNodeId}`, `${toNodeId}`, cyLabel, readLabel);
 
     //create edge in TM
-    let fromState = turingMachine.getStatebyId(fromNode.id);
-    let toState = turingMachine.getStatebyId(toNode.id);
+    let fromState = turingMachine.getStatebyId(fromNodeId);
+    let toState = turingMachine.getStatebyId(toNodeId);
     turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
 
     //adjust Alphabets of TM if user enters new token (write)

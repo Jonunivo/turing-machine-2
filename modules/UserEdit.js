@@ -18,6 +18,8 @@ var editEdgeContent;
 //AB test
 var numEditedNodes = 0;
 var numEditedEdges = 0;
+//editMode
+const editMode = document.getElementById("editMode");
 
 //// ----------- Node Edit
 /**Node Edit works as follows:
@@ -26,11 +28,21 @@ var numEditedEdges = 0;
  *      (2) User delete Node -> userDeleteNodeHandler() -> hide Modal
  *      (3) User cancels modal -> hide Modal
  */
-
-
-//Right click on Node to Edit node (opens Edit Node Modal)
-cy.on('cxttap', 'node', function(event){
-
+let clickTime = 0;
+//mousedown on node
+cy.on('mousedown', 'node', (event) =>{
+    clickTime = Date.now();
+})
+//mouseup on node ("click")
+cy.on('mouseup', 'node', (event) =>{
+    clickTime = Date.now() - clickTime;
+    //in edit mode & clicked not longer than 200ms (otherwise it is a loop edge creation)
+    if(editMode.checked && clickTime < 200){
+        console.log("clicked on node");
+        clickEditNode(event);
+    }
+})
+function clickEditNode(event){
     //save node clicked on (global vars)
     cytoEditNode = event.target;
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
@@ -104,8 +116,17 @@ cy.on('cxttap', 'node', function(event){
     document.getElementById('nodeEditButton').addEventListener('click', function(){
         userEditNodeHandler();
     })
+}
 
+//Right click on Node to Edit node (opens Edit Node Modal)
+/*
+cy.on('click', 'node', function(event){
+    //only if in edit mode
+    if(editMode.checked && clickTime < 200){
+        
+    }
 })
+*/
 
 /**
  * Handles the User editing a node (TM object & cyto node) & closes Modal
@@ -242,62 +263,67 @@ function userDeleteNodeHandler(){
  */
 
 //Right click on Node to Edit edge (opens Edit Edge Modal)
-cy.on('cxttap', 'edge', function(event){
-    ////Precalculations
-    //save edge clicked on (global var)
-    cytoEditEdge = event.target;
 
-    //get edge TM object (delta)
-    let fromNodeId = cytoEditEdge.source().id();
-    let readToken = cytoEditEdge.data("readToken");
-    editEdgeKey = turingMachine.getKeyByContent([turingMachine.getStatebyId(fromNodeId), readToken]);
-    editEdgeContent = turingMachine.delta.get(editEdgeKey);
-    
-    //open Modal at click position
-    const position = event.position;
-    const edgeModal = document.getElementById('edgeModal');
-    //get cytoscape window position
-    const cytoWindow = document.querySelector('#cytoscape');
-    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
-    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+cy.on('click', 'edge', function(event){
+    //only if in edit mode
+    if(editMode.checked){
+        ////Precalculations
+        //save edge clicked on (global var)
+        cytoEditEdge = event.target;
 
-    //display modal at node position
-    edgeModal.style.paddingLeft = `${position.x + leftValue}px`
-    edgeModal.style.paddingTop = `${position.y + topValue}px`;
-    edgeModal.style.display = 'block';
+        //get edge TM object (delta)
+        let fromNodeId = cytoEditEdge.source().id();
+        let readToken = cytoEditEdge.data("readToken");
+        editEdgeKey = turingMachine.getKeyByContent([turingMachine.getStatebyId(fromNodeId), readToken]);
+        editEdgeContent = turingMachine.delta.get(editEdgeKey);
+        
+        //open Modal at click position
+        const position = event.position;
+        const edgeModal = document.getElementById('edgeModal');
+        //get cytoscape window position
+        const cytoWindow = document.querySelector('#cytoscape');
+        const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+        const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
 
-    ////change nodeModal to edit style
-    //replace "create edge" with "edit edge" button
-    var edgeButton = document.getElementById("edgeButton");
-    if(edgeButton){
-        var edgeEditButton = document.createElement("button");
-        edgeEditButton.id = "edgeEditButton";
-        edgeEditButton.innerText = "Übergang bearbeiten";
-        edgeEditButton.style.width = "180px";
-        edgeButton.parentNode.replaceChild(edgeEditButton, edgeButton);
+        //display modal at node position
+        edgeModal.style.paddingLeft = `${position.x + leftValue}px`
+        edgeModal.style.paddingTop = `${position.y + topValue}px`;
+        edgeModal.style.display = 'block';
+
+        ////change nodeModal to edit style
+        //replace "create edge" with "edit edge" button
+        var edgeButton = document.getElementById("edgeButton");
+        if(edgeButton){
+            var edgeEditButton = document.createElement("button");
+            edgeEditButton.id = "edgeEditButton";
+            edgeEditButton.innerText = "Übergang bearbeiten";
+            edgeEditButton.style.width = "180px";
+            edgeButton.parentNode.replaceChild(edgeEditButton, edgeButton);
+        }
+        
+        ////Create Delete button (if not yet existing)
+        const deleteButton = document.getElementById("edgeDeleteButton");
+        if(!deleteButton){
+            var newButton = document.createElement("button");
+            newButton.id = "edgeDeleteButton";
+            newButton.innerText = "Übergang löschen";
+            newButton.className = "red-button";
+            document.getElementById("deleteEdgeDiv").appendChild(newButton);
+            //event listener
+            addEventListenerWithCheck(newButton, 'click', userDeleteEdgeHandler)
+        }
+        else{
+            //event listener
+            addEventListenerWithCheck(deleteButton, 'click', userDeleteEdgeHandler)
+        }
+
+
+        ////get current edge properties
+        getCurrentEdgeProperties();
+
+        addEventListenerWithCheck(document.getElementById("edgeEditButton"), "click", userEditEdgeHandler);
     }
-    
-    ////Create Delete button (if not yet existing)
-    const deleteButton = document.getElementById("edgeDeleteButton");
-    if(!deleteButton){
-        var newButton = document.createElement("button");
-        newButton.id = "edgeDeleteButton";
-        newButton.innerText = "Übergang löschen";
-        newButton.className = "red-button";
-        document.getElementById("deleteEdgeDiv").appendChild(newButton);
-        //event listener
-        addEventListenerWithCheck(newButton, 'click', userDeleteEdgeHandler)
-    }
-    else{
-        //event listener
-        addEventListenerWithCheck(deleteButton, 'click', userDeleteEdgeHandler)
-    }
 
-
-    ////get current edge properties
-    getCurrentEdgeProperties();
-
-    addEventListenerWithCheck(document.getElementById("edgeEditButton"), "click", userEditEdgeHandler);
 });
 
 /**

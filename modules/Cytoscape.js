@@ -37,6 +37,27 @@ var cy = cytoscape({
     userPanningEnabled: false,
   });
 
+//disallow drag & drop in edit mode
+//global var: EditMode
+let editMode = document.getElementById("editMode")
+//disable editmode at page load
+if(editMode.checked){
+    editMode.checked = false;
+}
+//cy nodes not grabbable during edit mode
+editMode.addEventListener("change", function(){
+    cyGrabifyNodes();
+})
+function cyGrabifyNodes(){
+    if(editMode.checked){
+        cy.nodes().ungrabify();
+    }
+    else{
+        cy.nodes().grabify();
+    }
+}
+
+
 
 //// ----------- Node Creation
 
