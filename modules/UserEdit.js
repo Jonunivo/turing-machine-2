@@ -2,6 +2,7 @@ import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh} from "
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders } from "./UserInput.js";
 
+export {nodeEdgeEditCount, nodeEdgeEditCountReset}
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////
 //////////////////////////////////////////////////////////////
@@ -14,6 +15,9 @@ var editNode;
 var cytoEditEdge;
 var editEdgeKey
 var editEdgeContent;
+//AB test
+var numEditedNodes = 0;
+var numEditedEdges = 0;
 
 //// ----------- Node Edit
 /**Node Edit works as follows:
@@ -56,7 +60,7 @@ cy.on('cxttap', 'node', function(event){
     if(nodeButton){
         var nodeEditButton = document.createElement("button");
         nodeEditButton.id = "nodeEditButton";
-        nodeEditButton.innerText = "Edit Node";
+        nodeEditButton.innerText = "Zustand bearbeiten";
         // Replace the existing button with the new button
         nodeButton.parentNode.replaceChild(nodeEditButton, nodeButton);
     }
@@ -66,7 +70,7 @@ cy.on('cxttap', 'node', function(event){
     if(!deleteButton){
         var newButton = document.createElement("button");
         newButton.id = "nodeDeleteButton";
-        newButton.innerText = "Delete Node";
+        newButton.innerText = "Zustand löschen";
         newButton.className = "red-button";
         document.getElementById("deleteNodeDiv").appendChild(newButton);
         addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
@@ -128,7 +132,7 @@ function userEditNodeHandler(){
     var isRejecting = document.getElementById("stateRejecting").checked;
     //catch accepting&rejecting case
     if(isAccepting && isRejecting){
-        alert("A node cannot be accepting & rejecting at the same time")
+        alert("Ein Zustand kann nicht gleichzeitig akzeptierend und verwerfend sein")
         return;
     }
 
@@ -189,6 +193,9 @@ function userEditNodeHandler(){
         editNode.isRejecting = false;
         turingMachine.rejectstate = null;
     }
+
+    //AB test
+    numEditedNodes++;
 
 }
 
@@ -265,7 +272,8 @@ cy.on('cxttap', 'edge', function(event){
     if(edgeButton){
         var edgeEditButton = document.createElement("button");
         edgeEditButton.id = "edgeEditButton";
-        edgeEditButton.innerText = "Edit Edge";
+        edgeEditButton.innerText = "Übergang bearbeiten";
+        edgeEditButton.style.width = "180px";
         edgeButton.parentNode.replaceChild(edgeEditButton, edgeButton);
     }
     
@@ -274,7 +282,7 @@ cy.on('cxttap', 'edge', function(event){
     if(!deleteButton){
         var newButton = document.createElement("button");
         newButton.id = "edgeDeleteButton";
-        newButton.innerText = "Delete Edge";
+        newButton.innerText = "Übergang löschen";
         newButton.className = "red-button";
         document.getElementById("deleteEdgeDiv").appendChild(newButton);
         //event listener
@@ -304,7 +312,7 @@ function getCurrentEdgeProperties(){
         const labelElement = document.createElement("label");
         labelElement.id = "fromStateLabel"
         labelElement.setAttribute("for", "fromState");
-        labelElement.textContent = "From State: "
+        labelElement.textContent = "Von: "
         const selectElement = document.createElement("select")
         selectElement.id = "fromState";
         //add to div
@@ -337,6 +345,14 @@ function getCurrentEdgeProperties(){
             document.getElementById("tapeMovement").value = 1;
             break;       
     }
+
+    //Tape Movement slider input info
+    const slider = document.getElementById("tapeMovement");
+    const sliderValue = document.getElementById("slider-value");
+    const value = parseFloat(slider.value);
+    sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
+    sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
+
 }
 
 /**
@@ -380,10 +396,10 @@ function userEditEdgeHandler(){
     if(document.getElementById('writeLabel').value !== '' && 
     document.getElementById('writeLabel').value !== undefined){
         writeToken = document.getElementById('writeLabel').value;
-        cyLabel = "R: " + readToken + " W: " + writeToken + " | " + labelMove;
+        cyLabel = "🔍 " + readToken + "  | ✎ " + writeToken + " | " + labelMove;
     }
     else{
-        cyLabel = "R: " + readToken + " | " + labelMove;
+        cyLabel = "🔍 " + readToken + " | " + labelMove;
     }
 
 
@@ -404,6 +420,9 @@ function userEditEdgeHandler(){
     //create new
     cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
 
+    //AB test
+    numEditedEdges++;
+
 }
 
 /**
@@ -417,4 +436,16 @@ function userDeleteEdgeHandler(){
     turingMachine.delta.delete(editEdgeKey);
     //delete in cyto
     cy.remove(cytoEditEdge);
+}
+
+
+
+//AB Test stats collection
+function nodeEdgeEditCount(){
+    return [numEditedNodes, numEditedEdges];
+}
+
+function nodeEdgeEditCountReset(){
+    numEditedEdges = 0;
+    numEditedNodes = 0;
 }

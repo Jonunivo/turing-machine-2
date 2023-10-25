@@ -1,7 +1,7 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders };
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, nodeEdgeCreationCount, nodeEdgeCreationCountReset };
 
 
 //////////////////////////////////////////////////////////////
@@ -17,6 +17,9 @@ var fromNode;
 var position;
 //eventlistener already exists?
 var eventListenerActive = true;
+//AB Test variables
+var numCreatedNodes = 0;
+var numCreatedEdges = 0;
 
 //// ----------- Node Creation
 /**Node Creation works as follows:
@@ -107,7 +110,7 @@ function userNodeInputHandler(){
     let isRejectingState = document.getElementById("stateRejecting").checked === true;
     //catch accepting & rejecting case
     if(isAcceptingState && isRejectingState){
-        alert("a state cannot be accepting & rejecting at the same time");
+        alert("Ein Zustand kann nicht gleichzeitig akzeptierend und verwerfend sein");
         nodeModal.style.display = 'block';
         return;
     }
@@ -132,6 +135,9 @@ function userNodeInputHandler(){
     console.log("-----NEW STATE CREATED-----");
     console.log("new State with id: ", nodeId-1);
     console.log("tm now: ", turingMachine);
+
+    //AB test
+    numCreatedNodes++;
 
 }
 //User presses cancel button in NodeModal -> hide nodeModal
@@ -264,15 +270,13 @@ function userEdgeInputHandler(){
     }
     //writeLabel
     let cyLabel = "";
-
-    let writeLabel;
+    let writeLabel = "";
     if(document.getElementById('writeLabel').value !== ''){
         writeLabel = document.getElementById('writeLabel').value;
-        cyLabel = "R: " + readLabel + " W: " + writeLabel + " | " + labelMove;
+        cyLabel = "🔍 " + readLabel + "  | ✎ " + writeLabel + " | " + labelMove;
     }
     else{
-        writeLabel = undefined;
-        cyLabel = "R: " + readLabel + " | " + labelMove;
+        cyLabel = "🔍 " + readLabel + " | " + labelMove;
     }
 
     //create Edge Cytoscape
@@ -302,6 +306,9 @@ function userEdgeInputHandler(){
 
     //logging
     console.log(turingMachine);
+
+    //AB test
+    numCreatedEdges++;
 }
 
 //Cancel button (edge) pressed
@@ -381,4 +388,13 @@ function disableSliders(){
     
 }
 
+//used in AB test evaluation: number of created nodes & edges
+function nodeEdgeCreationCount(){
+    return [numCreatedNodes, numCreatedEdges];
+}
+
+function nodeEdgeCreationCountReset(){
+    numCreatedNodes = 0;
+    numCreatedEdges = 0;
+}
 

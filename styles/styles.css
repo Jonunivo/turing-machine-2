@@ -184,13 +184,30 @@ button{
 
 /*Step/Reset Simulation Buttons*/
 #stepSimulationButton, #resetSimulationButton{
-    width: 80px;
+    width: 130px;
 }
 
 /*Save Button*/
 #saveButton{
     width: 120px;;
 }
+
+/*ABtest buttons*/
+#startButton, #stopButton{
+    width: 120px;;
+}
+input[type="number"]{
+    width: 120px;
+    height: 24px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding-left: 5px;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+
+
+
 
 /* Text Fields */
 .modal-input{
@@ -351,6 +368,46 @@ option {
     left: calc(100% - 2px);
     transform: translateX(-100%);
 }
+
+
+
+/*tape movement*/
+
+/* Styling for input[type="range"] */
+#tapeMovement {
+    width: 60%; /* Ensure the range input takes the full width available */
+    height: 20px; /* Set the height as needed */
+    margin: 5px 0; /* Adjust the margin as needed */
+    background: #ccc; /* Background color for the range track */
+    border: 2px solid darkgray; /* Border style for the range track */
+    border-radius: 10px; /* Rounded corners for the range track */
+    cursor: pointer; /* Change the cursor to a pointer on hover */
+    transition: transform 0.2s; /* Add a smooth transform effect on hover */
+}
+
+/* Stil für den Slider-Wert */
+#slider-value {
+    color: black;
+    display: inline-block;
+
+}
+
+/* Stil für den neutralen Wert */
+#slider-value.neutral {
+    margin-left: 0px;
+}
+
+/* Stil für den linken Wert */
+#slider-value.left {
+    margin-left: -160px;
+    color: black;
+}
+
+/* Stil für den rechten Wert */
+#slider-value.right {
+    margin-left: 160px;
+}
+
 
 
 

@@ -37,8 +37,8 @@
 
         <!-- Simulation Control -->
         <div id="simulationControlDiv" class="centered-content">
-            <button id="resetSimulationButton" class="green-button"><| Reset</button>
-            <button id="runSimulationButton" class="green-button">Run Simulation</button>
+            <button id="resetSimulationButton" class="green-button"><| Zurücksetzen</button>
+            <button id="runSimulationButton" class="green-button">Play Simulation</button>
             <button id="stepSimulationButton" class="green-button">Schritt ></button>
             <div id="animationToggleDiv">
                 <input type="checkbox" id="fastSimulation" class="fancy-checkbox" name="fastSimulation" checked>
@@ -47,7 +47,7 @@
             <div id="simulationSpeeddiv" class="centered-content">
                 <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
                 <br>
-                <label for="simulationSpeed">Simulation Speed</label>
+                <label for="simulationSpeed">Simulationsgeschwindigkeit</label>
                 <br>
                
             </div>
@@ -59,26 +59,39 @@
             <!-- Preset -->
             <div id="choosePreset" class="optionMenu">
                 <select id="presetSelect" name="preset">
-                    <option value="empty" selected>No Preset</option>
-                    <option value="PresetOne">add one binary</option>
+                    <option value="empty" selected>Kein Preset</option>
+                    <option value="PresetOne">binary increment</option>
                 </select>
             </div>
 
             <!-- Save/Load -->
             <div id="saveLoad">
+
                 <input id="fileInput" type="file" accept=".json">
                 <br>
                 <button id="saveButton" class="button grey-button">TM speichern</button>
             </div>
 
             <div>
-                <button id="subWindowOpener" class="button grey-button">Open SubWindow</button>
+                <!-- <button id="subWindowOpener" class="button grey-button">Open SubWindow</button> -->
             </div>
         </div>
 
 
         <!-- User Description -->
         <div id="leftWindow">
+            <br>
+            <h3>Experiment: </h3>
+            <div>
+                <input id="userId" type="number">
+            </div>
+            <div>
+                <button id="startButton" class="grey-button">Start</button>
+            </div>
+            <div>
+                <button id="stopButton" class="grey-button">Stop</button>
+            </div>
+            <br>
             <h3>Bedienung:</h3>
             <div id="userGuide">
                 Doppelklick erstellt Zustand 
@@ -89,6 +102,8 @@
                 <br><br>
                 Rechtsklick auf Übergang, <br> um Übergang zu bearbeiten
             </div>
+            <br>
+
         </div>
 
 
@@ -97,15 +112,15 @@
         <!-- Save Modal -->
         <div id="saveModal" class="modal">
             <div id="saveModalContent" class="modal-content">
-                <h2>Enter a filename for the downloaded file:</h2>
+                <h2>TuringMachine speichern</h2>
                 <div>
-                    <label id="saveTapeContent" for="filenameInput">filename: </label>            
-                    <input type="text" id="filenameInput" placeholder="MyTuringMachine.json">
+                    <label id="saveTapeContent" for="filenameInput">Name: </label>            
+                    <input type="text" id="filenameInput" placeholder="TuringMachine.json">
 
                 </div>
                 <div>
                     <input type="checkbox" class="basic-checkbox" id="saveTape">
-                    <label id="saveTapeCheckbox" for="saveTape">also save tape?</label>
+                    <label id="saveTapeCheckbox" for="saveTape">Band auch speichern?</label>
                 </div>
                 <br>
                 <button id="saveConfirm">Save</button>
@@ -122,26 +137,26 @@
                     <button id="cancelButton" class ="cancel-button" type="button">x</button>
                 </div>
 
-                <h3>Node Properties</h3>
+                <h3>Zustand</h3>
 
-                <label for="stateName" >Node Name:</label>
+                <label for="stateName" >Name:</label>
                 <input type="text" id="stateName" oninput="limitNameSize(8)">
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateStarting" class="fancy-checkbox" name="startingState" value="false" required checked>
-                    <label class="checkboxLabel" for="stateStarting">Starting?</label>
+                    <label class="checkboxLabel" for="stateStarting">Startzustand?</label>
                 </div>
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateAccepting" class="fancy-checkbox" name="acceptingState" value="true" required>
-                    <label class="checkboxLabel" for="stateAccepting">Accepting?</label>
+                    <label class="checkboxLabel" for="stateAccepting">akzeptierend?</label>
                 </div>
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateRejecting" class="fancy-checkbox" name="rejectingState" value="true" required>
-                    <label class="checkboxLabel" for="stateRejecting">Rejecting?</label>
+                    <label class="checkboxLabel" for="stateRejecting">verwerfend?</label>
                 </div>
                 
                 <br>
                 <div class="submit-button-div">
-                    <button id="nodeButton" type="button">Create Node</button>
+                    <button id="nodeButton" type="button">Zustand erstellen</button>
                 </div>
                 <div id="deleteNodeDiv">
                     <!-- UserEdit.js  will insert a delete button here -->
@@ -156,27 +171,30 @@
                 <div class="cancel-button-div">
                     <button id="cancelButton2" class="cancel-button" type="button">x</button>
                 </div>
-                <h3>Edge Properties</h3>
+                <h3>Übergang</h3>
                 <div id="fromStateDiv"></div>
-                <label for="toState">To State:</label>
-                <select id="toState"></select>
+                <label for="toState">Zu: </label>
+                <select id="toState">🔍</select>
                 
                 <br>
-                <label for="readLabel">When reading label</label>
+                <label for="readLabel">🔍</label>
                 <input type="text" id="readLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
-                <br>
-                <label for="writeLabel">Write Label?</label>
+                &nbsp;
+                <label for="writeLabel">✎</label>
                 <input type="text" id="writeLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
                 <br>
+                <br>
                 <div class="slider-div">
-                    <label for="tapeMovement">Cursor Movement</label>
+                    <label for="tapeMovement">Zeigerbewegung:</label>
                     <input type="range" id="tapeMovement" min="-1" max="1" step="1" value="0">
+                    <br>
+                    <span id="slider-value">neutral</span>
                 </div>
                 
                 
                 <br>
                 <div class="submit-button-div">
-                    <button id="edgeButton" type="button">Create Edge</button>
+                    <button id="edgeButton" type="button">Übergang erstellen</button>
                 </div>
                 <div id="deleteEdgeDiv">
                     <!-- cytoscape.js will insert a delete button here -->
@@ -239,6 +257,16 @@
                     document.getElementById("stateName").value = output;
                 }
             }
+
+            //Tape Movement slider input info
+            const slider = document.getElementById("tapeMovement");
+            const sliderValue = document.getElementById("slider-value");
+
+            slider.addEventListener("input", function() {
+                const value = parseFloat(slider.value);
+                sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
+                sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
+            });
         </script>
         
         <!-- modules -->
@@ -256,6 +284,8 @@
 
         <script type="module" src="./modules/Presets.js"></script>
         <script type="module" src="./modules/SaveLoad.js"></script>
+
+        <script type="module" src="./modules/ABtest.js"></script>
 
     </body>
 

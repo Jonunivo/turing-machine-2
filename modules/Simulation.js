@@ -2,6 +2,8 @@ import {cy} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
 
+export{simulationReset, enableButtons};
+
 //// Global Variables
 // used to run / pause simulation
 let simIsRunning = false;
@@ -330,6 +332,11 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     if(!simIsRunning){
         enableButtons();
     }
+}
+
+//reset simulation back to startstate. Used when loading new TM/editing TM
+function simulationReset(){
+    currentState = turingMachine.startstate;
 }
 
 //////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh};
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow};
 
 
 //////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ function refresh(){
 /**
  * Experimental Area to try to create supernode
  */
-
+/*
 cy.on('dbltap', 'node', function(event){
     var node = event.target;
     openNewSubWindow();
@@ -208,7 +208,7 @@ document.getElementById("subWindowOpener").addEventListener('click', openNewSubW
 function openNewSubWindow(){
     var newWindow = window.open('sub_window.html', '_blank', 'width=800, height=600');
 }
-
+*/
 
 
 //////////////////////////////////////////////////////////////

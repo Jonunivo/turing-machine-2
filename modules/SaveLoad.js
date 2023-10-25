@@ -1,7 +1,9 @@
-import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode } from "./Cytoscape.js";
+import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, moveNodesIntoWindow } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
+import {simulationReset, enableButtons} from "./Simulation.js";
+
 
 //global Variables
 //Array of TM properties to be saved
@@ -136,10 +138,12 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         const lines = fileContent.split('\n');
 
         //// core 
-        //reset TM & canvas
+        //reset TM & canvas & simulation
         turingMachine.createTuringMachineBasic();
         cyClearCanvas();
         nodePresetReset();
+        simulationReset();
+        enableButtons();
 
         //
         //load states
@@ -202,10 +206,10 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                     }
 
                     if(writeChar !== ''){
-                        cyLabel = "R: " + readChar + " W: " + writeChar + " | " + labelMove;
+                        cyLabel = "🔍 " + readChar + "  | ✎ " + writeChar + " | " + labelMove;
                     }
                     else{
-                        cyLabel = "R: " + readChar + " | " + labelMove;
+                        cyLabel = "🔍 " + readChar + " | " + labelMove;
                     }
                 cyCreateEdge(edgeProperties[0], edgeProperties[6], cyLabel, readChar);
             }
@@ -240,6 +244,9 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             //reset tape to empty
             cyWriteOnTape("");
         }
+        moveNodesIntoWindow();
+        console.log(turingMachine);
     }
+
 });
 
