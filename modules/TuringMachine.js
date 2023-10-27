@@ -109,8 +109,6 @@ export class TuringMachine{
             {
                 currentState = this.simulationStep(currentState, this.readTape())
             }
-        //final result handler
-        this.simulationResult(currentState);
     }
 
     /**
@@ -180,6 +178,10 @@ export class TuringMachine{
                 break;
             default:
                 throw new Error("Could not interpret movement")
+        }
+        //if last state: run simulationResult
+        if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
+            this.simulationResult(deltaValue[0]);
         }
 
         //return next state
