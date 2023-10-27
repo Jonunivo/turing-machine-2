@@ -181,6 +181,10 @@ button{
     text-align: right;
 }
 
+/*move tape left, move tape right*/
+#move-tape-left, #move-tape-right{
+    width: 50px;
+}
 
 /*Step/Reset Simulation Buttons*/
 #stepSimulationButton, #resetSimulationButton{
