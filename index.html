@@ -27,12 +27,11 @@
 
         <!-- Tape control -->
         <div id="tapeControlDiv" class="centered-content">
-            <button id="move-tape-left" class="grey-button">Band nach links</button>
-            <button id="move-tape-right" class="grey-button">Band nach rechts</button>
-            <div id="writeOnTapeDiv">
-                <input type="text" id="tape-input-field" required oninput="replaceSpace()">
-                <button id="tape-input" class="grey-button">Band überschreiben</button>
-            </div>
+            <button id="move-tape-right" class="grey-button"> ⮜ </button>
+            <input type="text" id="tape-input-field" required oninput="replaceSpace()">
+            <button id="tape-input" class="grey-button">Band überschreiben</button>
+            <button id="move-tape-left" class="grey-button"> ➤ </button>
+
         </div>
 
         <!-- Simulation Control -->
@@ -44,7 +43,7 @@
                 <input type="checkbox" id="fastSimulation" class="fancy-checkbox" name="fastSimulation" checked>
                 <label class="checkboxLabel" for="fastSimulation">Animation</label>
             </div>
-            <div id="simulationSpeeddiv" class="centered-content">
+            <div id="simulationSpeeddiv">
                 <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
                 <br>
                 <label for="simulationSpeed">Simulationsgeschwindigkeit</label>
