@@ -502,7 +502,6 @@ function tmTapetoCyto(){
 
     }
     //shift left if possible
-    let j = 0;
     while(turingMachine.tapePosition > 8 && turingMachine.tape[0] === ""){
         turingMachine.tape.shift();
         turingMachine.tape.push("");
@@ -517,7 +516,7 @@ function tmTapetoCyto(){
         }
     }
 
-
+    //// create cyto tape
     cyTape.nodes().remove();
 
     let color;
@@ -560,13 +559,17 @@ function tmTapetoCyto(){
             });
         }
 
-        j++;
     }
+
     //add remaining nodes to rightOverflow
+    let j = numElements + shift;
+    console.log(j, " ", turingMachine.tape.length);
     while(j < turingMachine.tape.length){
+        //console.log("D ", j, " ", turingMachine.tape.length);
         rightOverflow += turingMachine.tape[j];
         j++;
     }
+    console.log("LOF: ", leftOverflow, " ROF: ", rightOverflow);
     //lock node movement
     cyTape.nodes().lock();
 }
