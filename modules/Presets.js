@@ -1,4 +1,4 @@
-import { cyCreateNode, cyCreateEdge, cyClearCanvas } from "./Cytoscape.js";
+import { cyCreateNode, cyCreateEdge, cyClearCanvas, cyGrabifyNodes } from "./Cytoscape.js";
 import { cyTapeClear } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js";
 import { nodePresetHelper, nodePresetReset } from "./UserInput.js";
@@ -71,6 +71,9 @@ function loadPresetOne(){
     turingMachine.sigma.add(1);
     turingMachine.gamma.add(0);
     turingMachine.gamma.add(1);
+
+    //grabify nodes if in edit mode
+    cyGrabifyNodes();
 
 
 }

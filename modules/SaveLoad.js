@@ -1,4 +1,4 @@
-import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, moveNodesIntoWindow } from "./Cytoscape.js";
+import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js"
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
@@ -245,6 +245,8 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
             cyWriteOnTape("");
         }
         moveNodesIntoWindow();
+            //grabify nodes if in edit mode
+        cyGrabifyNodes();
         console.log(turingMachine);
     }
 
