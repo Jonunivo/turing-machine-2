@@ -24,6 +24,20 @@ body{
     min-width: 920px;
 }
 
+/* ----- A/B mention ---- */
+#titleAB{
+    position: absolute;
+    font-size: 50px;
+    left: 10;
+    top: -30px;
+}
+#switchVersion{
+    position: absolute;
+    font-size: 15px;
+    left: 50px;
+    top: 35px;
+}
+
 /* ----- CytoScape ----- */
 #cytoscape {
     min-width: 640px;
