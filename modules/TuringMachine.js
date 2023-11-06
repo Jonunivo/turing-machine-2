@@ -135,6 +135,8 @@ export class TuringMachine{
             document.getElementById('move-tape-left').disabled = false;
             document.getElementById('move-tape-right').disabled = false;
             document.getElementById('tape-input').disabled = false;
+            document.getElementById('fastSimulation').disabled = false;
+
 
 
             alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)

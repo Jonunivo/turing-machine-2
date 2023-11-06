@@ -179,6 +179,10 @@ cy.on('tap', 'node', (event) => {
     //save click position
     const position = event.position;
 
+    //save node clicked on
+    const node = event.target;
+    fromNode = turingMachine.getStatebyId(node.id());
+
     //
     const edgeModal = document.getElementById('edgeModal');
     const modal = document.querySelector('.modal-content');
@@ -206,6 +210,7 @@ cy.on('tap', 'node', (event) => {
         document.getElementById("deleteEdgeDiv").removeChild(deleteButton);
     }
     //remove fromnode field (if exists)
+    /*
     const fromNode1 = document.getElementById("fromState");
     const fromNode2 = document.getElementById("fromStateLabel");
     if(fromNode1){
@@ -214,18 +219,37 @@ cy.on('tap', 'node', (event) => {
     if(fromNode2){
         document.getElementById("fromStateDiv").removeChild(fromNode2);
     }
+    */
 
     //display modal at click position
     edgeModal.style.paddingLeft = `${position.x + leftValue}px`
     edgeModal.style.paddingTop = `${position.y + topValue}px`;
     edgeModal.style.display = 'block';
 
+    //create DropDownMenu for FromNode
+    ////Create Option to Change FromState (if not yet existing)
+    const fromState = document.getElementById("fromState")
+    if(!fromState){
+        //if not: create it!
+        const labelElement = document.createElement("label");
+        labelElement.id = "fromStateLabel"
+        labelElement.setAttribute("for", "fromState");
+        labelElement.textContent = "Von: "
+        const selectElement = document.createElement("select")
+        selectElement.id = "fromState";
+        //add to div
+        document.getElementById("fromStateDiv").appendChild(labelElement);
+        document.getElementById("fromStateDiv").appendChild(selectElement);
+    }
+
+
+    createDropdownMenues(document.getElementById("fromState"));
+    document.getElementById("fromState").value = fromNode.name;
+    
     //create DropDownMenu for ToNode
     createDropdownMenues(document.getElementById("toState"))
 
-    //save node clicked on
-    const node = event.target;
-    fromNode = turingMachine.getStatebyId(node.id());
+
 
     //enter to confirm node creation (TO DO)
     /*
@@ -347,7 +371,6 @@ function createDropdownMenues(dropdown){
         /*
         optionElement.text = option;
         */
-        console.log(",",textNode.nodeValue,",", option, ",");
         
         dropdown.appendChild(optionElement);
     }

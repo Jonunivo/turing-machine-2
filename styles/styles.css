@@ -44,7 +44,7 @@ body{
     width: calc(100% - 300px);
     margin-left: 150px;
     margin-right: 150px;
-    height: 400px;
+    height: 500px;
     position: absolute;
     top: 90px;
 
@@ -59,7 +59,7 @@ body{
     margin-right: 150px;
     height: 50px;
     position: absolute;
-    top: 515px;
+    top: 615px;
 }
 
 /* ----- Arrow Tape Position ----- */
@@ -71,20 +71,20 @@ body{
     border-right: 10px solid transparent;
     border-top: 15px solid #000; 
     left: 462px;
-    top: 425px;
+    top: 525px;
   }
 
 /* ----- Move Tape div ----- */
 #tapeControlDiv{
     min-width: 950px;
     position: relative;
-    top: 480px;
+    top: 580px;
 }
 /* ----- Simulation Control div ----- */
 #simulationControlDiv{
     min-width: 950px;
     position: relative;
-    top: 490px;
+    top: 590px;
 }
 
 /* ----- presets & save & load ----- */
@@ -434,5 +434,5 @@ option {
 /*---- Footer ----*/
 footer {
     position: absolute;
-    top: 800px;
+    top: 1000px;
 }
