@@ -253,6 +253,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         document.getElementById('move-tape-left').disabled = false;
         document.getElementById('move-tape-right').disabled = false;
         document.getElementById('tape-input').disabled = false;
+        document.getElementById('fastSimulation').disabled = false;
 
         simIsRunning = false;
 
@@ -617,6 +618,7 @@ function disableButtons(mode){
     document.getElementById('move-tape-right').disabled = true;
     document.getElementById('move-tape-left').disabled = true;
     document.getElementById('tape-input').disabled = true;
+    document.getElementById('fastSimulation').disabled = true;
     if(mode === "all"){
         document.getElementById('runSimulationButton').disabled = true;
     }
@@ -631,6 +633,7 @@ function enableButtons(){
     document.getElementById('move-tape-right').disabled = false;
     document.getElementById('move-tape-left').disabled = false;
     document.getElementById('tape-input').disabled = false;
+    document.getElementById('fastSimulation').disabled = false;
 }
 
 //////////////////////////////////////////////////////////////
