@@ -16,6 +16,20 @@ startButton.addEventListener("click", () => {
     rightclickCount = 0;
     startButton.disabled = true;
     stopButton.disabled = false;
+
+    //disable all non-necessary things
+    document.getElementById('resetSimulationButton').disabled = true;
+    document.getElementById('runSimulationButton').disabled = true;
+    document.getElementById('stepSimulationButton').disabled = true;
+    document.getElementById('move-tape-right').disabled = true;
+    document.getElementById('move-tape-left').disabled = true;
+    document.getElementById('tape-input').disabled = true;
+    document.getElementById('tape-input-field').disabled = true;
+    document.getElementById('saveButton').disabled = true;
+    document.getElementById('fileInput').disabled = true;
+
+
+
 });
 //Stop Button Pressed
 stopButton.addEventListener("click", () => {
@@ -27,6 +41,17 @@ stopButton.addEventListener("click", () => {
     resultClickCounter();
     resultNodesCreated();
     resultNodesEdited();
+
+    //reenable things
+    document.getElementById('resetSimulationButton').disabled = false;
+    document.getElementById('runSimulationButton').disabled = false;
+    document.getElementById('stepSimulationButton').disabled = false;
+    document.getElementById('move-tape-right').disabled = false;
+    document.getElementById('move-tape-left').disabled = false;
+    document.getElementById('tape-input').disabled = false;
+    document.getElementById('tape-input-field').disabled = false;
+    document.getElementById('saveButton').disabled = false;
+    document.getElementById('fileInput').disabled = false;
 });
 
 //Time measurement

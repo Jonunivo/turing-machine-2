@@ -31,7 +31,9 @@ var cy = cytoscape({
             'curve-style': 'bezier',
             'control-point-distance': 50,
             'control-point-weight': 0.5, 
-            'loop-direction': '0deg'
+            'loop-direction': '0deg',
+            'text-margin-x': "-10px",
+            'text-margin-y': "-5px",
         }
         
     }],
@@ -138,7 +140,7 @@ function cyCreateEdge(fromNode, toNode, label, readToken){
         style: {
             'label': `${label}`,
             'font-size': '12px',
-            "text-margin-y": "-5px",
+
 
           }
         }
