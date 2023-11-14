@@ -81,7 +81,7 @@ function loadPresetOne(){
 /**
  * Handles Dropdown menu & calls functions accordingly (upon change)
  */
-/*
+
 var presetSelect = document.getElementById("presetSelect");
     
 presetSelect.addEventListener("change", function() {
@@ -95,4 +95,4 @@ presetSelect.addEventListener("change", function() {
         } 
         // Add more conditions for other options as needed
     });
-*/
+
