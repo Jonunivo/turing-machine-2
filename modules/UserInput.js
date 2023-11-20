@@ -180,7 +180,6 @@ let waitForDragging = 0;
 //get drag from node
 cy.on('mousedown', 'node', (event) =>{
     dragFromNode = event.target;
-    console.log("DRAGGING_FROM", dragFromNode);
     //start dragging timer
     waitForDragging = Date.now();
 })
@@ -195,17 +194,11 @@ cy.on('mouseup', 'node', (event) =>{
     if(dragFromNode === dragToNode){
         //user held mouse button for at least 300ms
         if(waitForDragging > 300){
-            //create loop node
-            console.log("loop edge");
             dragCreateEdge(event);
-            console.log("called1")
         }
     }
     else{
-        //create normal edge
-        console.log("called2")
         console.log(dragFromNode, " ", dragToNode);
-
         dragCreateEdge(event);
     }
 });
@@ -215,8 +208,6 @@ function dragCreateEdge(event){
         //save from node (TM) (to global var)
         fromNode = turingMachine.getStatebyId(dragFromNode.id());
         dragToNode = event.target;
-
-        console.log("DRAGGING_TO", dragToNode);
 
         ////open modal
         //save click position

@@ -268,7 +268,6 @@ export class TuringMachine{
      */
     getStatebyName(name){
         for(const state of this.states){
-            console.log("TM: ,", state.name, ", search: ,", name, ",")
             if(state.name === name){
                 return state;
             }
