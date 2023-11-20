@@ -254,7 +254,6 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         document.getElementById('move-tape-right').disabled = false;
         document.getElementById('tape-input').disabled = false;
         document.getElementById('fastSimulation').disabled = false;
-        document.getElementById('fastSimulation').disabled = false;
 
         simIsRunning = false;
 

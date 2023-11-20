@@ -569,7 +569,6 @@ function tmTapetoCyto(){
         j++;
     }
     console.log("LOF: ", leftOverflow, " ROF: ", rightOverflow);
-    console.log("LOF: ", leftOverflow, " ROF: ", rightOverflow);
     //lock node movement
     cyTape.nodes().lock();
 }
