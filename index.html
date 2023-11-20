@@ -56,8 +56,8 @@
         <div id="rightWindow">
             <!-- Edit Button -->
             <div>
-                <input type="checkbox" id="editMode" class="fancy-checkbox"></input>
-                <label class="checkboxLabel" for="editMode">Bearbeiten</label>
+                <button id="editButton" class="toggle-button" onclick="toggleButton()">Bearbeiten</button>
+
             </div>
             <br><br><br><br><br><br><br><br><br>
 
@@ -270,6 +270,15 @@
                 sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
                 sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
             });
+
+            //Toggle Button
+            function toggleButton() {
+                var button = document.querySelector('.toggle-button');
+                button.classList.toggle('active');
+                    // Check if the button is currently active
+                var isActive = button.classList.contains('active');
+                console.log('Button is active:', isActive);
+            }
         </script>
         
         <!-- modules -->

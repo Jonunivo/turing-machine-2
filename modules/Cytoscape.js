@@ -1,5 +1,6 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
+
 export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow, cyGrabifyNodes};
 
 
@@ -46,15 +47,18 @@ var cy = cytoscape({
 //global var: EditMode
 let editMode = document.getElementById("editMode")
 //disable editmode at page load
-if(editMode.checked){
-    editMode.checked = false;
+if(inEditMode()){
+    var button = document.querySelector('.toggle-button');
+    button.classList.toggle('active');
 }
 //cy nodes not grabbable during edit mode
-editMode.addEventListener("change", function(){
+var button = document.getElementById("editButton");
+button.addEventListener('click', function (event) {
+    console.log("hello");
     cyGrabifyNodes();
 })
 function cyGrabifyNodes(){
-    if(editMode.checked){
+    if(inEditMode()){
         cy.nodes().ungrabify();
     }
     else{
@@ -302,3 +306,10 @@ function seperateNodes(){
     
 }
 
+
+function inEditMode(){
+    var button = document.querySelector('.toggle-button');
+    // Check if the button is currently active
+    var isActive = button.classList.contains('active');
+    return isActive;
+}

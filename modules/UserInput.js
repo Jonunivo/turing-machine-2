@@ -1,7 +1,7 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders};
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode};
 
 
 //////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ const editMode = document.getElementById("editMode");
 //Opens Create Node Modal
 cy.on('click', (event) => {
     //only allow in editMode (& click on canvas)
-    if(editMode.checked && event.target === cy){
+    if(inEditMode() && event.target === cy){
         //get click position
         position = event.position;
 
@@ -204,7 +204,7 @@ cy.on('mouseup', 'node', (event) =>{
 });
 
 function dragCreateEdge(event){
-    if(editMode.checked){
+    if(inEditMode()){
         //save from node (TM) (to global var)
         fromNode = turingMachine.getStatebyId(dragFromNode.id());
         dragToNode = event.target;
@@ -449,3 +449,10 @@ function disableSliders(){
     
 }
 
+
+function inEditMode(){
+    var button = document.querySelector('.toggle-button');
+    // Check if the button is currently active
+    var isActive = button.classList.contains('active');
+    return isActive;
+}

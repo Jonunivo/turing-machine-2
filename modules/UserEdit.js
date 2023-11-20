@@ -1,6 +1,6 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
-import {createDropdownMenues, disableSliders } from "./UserInput.js";
+import {createDropdownMenues, disableSliders, inEditMode } from "./UserInput.js";
 
 
 //////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ cy.on('mousedown', 'node', (event) =>{
 cy.on('mouseup', 'node', (event) =>{
     clickTime = Date.now() - clickTime;
     //in edit mode & clicked not longer than 200ms (otherwise it is a loop edge creation)
-    if(editMode.checked && clickTime < 200){
+    if(inEditMode() && clickTime < 200){
         console.log("clicked on node");
         clickEditNode(event);
     }
@@ -120,7 +120,7 @@ function clickEditNode(event){
 /*
 cy.on('click', 'node', function(event){
     //only if in edit mode
-    if(editMode.checked && clickTime < 200){
+    if(inEditMode() && clickTime < 200){
         
     }
 })
@@ -280,7 +280,7 @@ function userDeleteNodeHandler(){
 
 cy.on('click', 'edge', function(event){
     //only if in edit mode
-    if(editMode.checked){
+    if(inEditMode()){
         ////Precalculations
         //save edge clicked on (global var)
         cytoEditEdge = event.target;
