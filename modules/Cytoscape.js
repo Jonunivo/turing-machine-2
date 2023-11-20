@@ -46,15 +46,14 @@ var cy = cytoscape({
 //disallow drag & drop in edit mode
 //global var: EditMode
 let editMode = document.getElementById("editMode")
-//disable editmode at page load
-if(inEditMode()){
+//disable move mode at page load
+if(!inEditMode()){
     var button = document.querySelector('.toggle-button');
     button.classList.toggle('active');
 }
 //cy nodes not grabbable during edit mode
 var button = document.getElementById("editButton");
 button.addEventListener('click', function (event) {
-    console.log("hello");
     cyGrabifyNodes();
 })
 function cyGrabifyNodes(){
@@ -310,6 +309,6 @@ function seperateNodes(){
 function inEditMode(){
     var button = document.querySelector('.toggle-button');
     // Check if the button is currently active
-    var isActive = button.classList.contains('active');
+    var isActive = !button.classList.contains('active');
     return isActive;
 }

@@ -1,7 +1,7 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode};
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler};
 
 
 //////////////////////////////////////////////////////////////
@@ -453,6 +453,6 @@ function disableSliders(){
 function inEditMode(){
     var button = document.querySelector('.toggle-button');
     // Check if the button is currently active
-    var isActive = button.classList.contains('active');
+    var isActive = !button.classList.contains('active');
     return isActive;
 }

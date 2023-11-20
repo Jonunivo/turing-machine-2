@@ -1,6 +1,6 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
-import {createDropdownMenues, disableSliders, inEditMode } from "./UserInput.js";
+import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
 
 
 //////////////////////////////////////////////////////////////
@@ -15,8 +15,9 @@ var editNode;
 var cytoEditEdge;
 var editEdgeKey
 var editEdgeContent;
-//editMode
-const editMode = document.getElementById("editMode");
+
+
+
 
 //// ----------- Node Edit
 /**Node Edit works as follows:
@@ -111,9 +112,8 @@ function clickEditNode(event){
     }
 
     //user submit node inputs (Event Listener)
-    document.getElementById('nodeEditButton').addEventListener('click', function(){
-        userEditNodeHandler();
-    })
+    addEventListenerWithCheck(document.getElementById('nodeEditButton'), 'click', userEditNodeHandler);
+
 }
 
 //Right click on Node to Edit node (opens Edit Node Modal)
@@ -140,6 +140,7 @@ function userEditNodeHandler(){
     var newName = document.getElementById("stateName").value;
 
     //catch name already exists
+    if(newName !== editNode.name)
     for(const state of turingMachine.states){
         if(state.name === newName){
             alert(`state with Name ${state.name} already exists, please choose a unique name`);
@@ -481,3 +482,64 @@ function userDeleteEdgeHandler(){
     cy.remove(cytoEditEdge);
 }
 
+
+window.addEventListener("keydown", function(event) {
+    // Check if the pressed key is Enter (key code 13)
+    if (event.key === "Enter") {
+        userPressEnter();
+        console.log("enter");
+    }
+})
+
+function userPressEnter(){
+    //decide on what to do when user presses enter
+    const nodeModal = document.getElementById('nodeModal');
+    const edgeModal = document.getElementById('edgeModal');
+    const saveModal = document.getElementById('saveModal');
+    //Node Create Modal open
+    if(nodeModal.style.display === 'block' && !document.getElementById("nodeDeleteButton")){
+        console.log("0");
+        simulateButtonClick("nodeButton");
+    }
+    //Edge Create Modal open
+    else if(edgeModal.style.display === 'block' && !document.getElementById("edgeDeleteButton")){
+        simulateButtonClick("edgeButton");
+    }
+    //Node Edit Modal open
+    else if(nodeModal.style.display === 'block'){
+        simulateButtonClick("nodeEditButton");
+    }
+    //Edge Edit Modal open
+    else if(edgeModal.style.display === 'block'){
+        simulateButtonClick("edgeEditButton");
+    }
+    //Save/Load modal open
+    else if(saveModal.style.display === "block"){
+        simulateButtonClick("saveConfirm");
+    }
+    //write tape field in focus
+    else if(document.activeElement === document.getElementById("tape-input-field")){
+        simulateButtonClick("tape-input");
+    }
+    else{
+        //else: play/pause simulation
+        simulateButtonClick("runSimulationButton");
+    }
+
+}
+
+function simulateButtonClick(id){
+    var button = document.getElementById(id);
+
+    if (button) {
+        // Create a new MouseEvent
+        var event = new MouseEvent('click', {
+            view: window
+        });
+        // Dispatch the click event on the button
+        button.dispatchEvent(event);
+    } else {
+        //catch button not found
+        console.error('Button not found with id:', id);
+    }
+}

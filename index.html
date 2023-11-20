@@ -56,7 +56,7 @@
         <div id="rightWindow">
             <!-- Edit Button -->
             <div>
-                <button id="editButton" class="toggle-button" onclick="toggleButton()">Bearbeiten</button>
+                <button id="editButton" class="toggle-button" onclick="toggleButton()">Bewegen</button>
 
             </div>
             <br><br><br><br><br><br><br><br><br>
@@ -93,8 +93,6 @@
             <br>
             <h3>Bedienung:</h3>
             <div id="userGuide">
-                Wenn in Bearbeitungsmodus:
-                <br><br>
                 Klick auf Canvas, <br> um Zustand zu erstellen
                 <br><br>
                 Klick auf Zustand, <br> um Zustand zu bearbeiten
@@ -102,6 +100,8 @@
                 Drag & Drop auf Zustände, <br> um Übergang zu erstellen
                 <br><br>
                 Klick auf Übergang, <br> um Übergang zu bearbeiten
+                <br><br>
+                Bewegen button klicken, <br> um Knoten zu bewegen
             </div>
             <br>
 
@@ -275,9 +275,6 @@
             function toggleButton() {
                 var button = document.querySelector('.toggle-button');
                 button.classList.toggle('active');
-                    // Check if the button is currently active
-                var isActive = button.classList.contains('active');
-                console.log('Button is active:', isActive);
             }
         </script>
         
