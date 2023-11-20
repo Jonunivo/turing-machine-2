@@ -58,8 +58,9 @@ function clickEditNode(event){
     const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
 
     //display modal at node position
-    nodeModal.style.paddingLeft = `${position.x + leftValue}px`
-    nodeModal.style.paddingTop = `${position.y + topValue}px`;
+    nodeModal.style.paddingLeft = `${position.x + leftValue}px`;
+    let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
+    nodeModal.style.paddingTop = `${maxPaddingTop}px`;
     nodeModal.style.display = 'block';
 
 
@@ -300,7 +301,8 @@ cy.on('click', 'edge', function(event){
 
         //display modal at node position
         edgeModal.style.paddingLeft = `${position.x + leftValue}px`
-        edgeModal.style.paddingTop = `${position.y + topValue}px`;
+        let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-410);
+        edgeModal.style.paddingTop = `${maxPaddingTop}px`;
         edgeModal.style.display = 'block';
 
         ////change nodeModal to edit style

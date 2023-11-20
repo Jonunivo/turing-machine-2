@@ -67,7 +67,8 @@ cy.on('click', (event) => {
 
         //display modal at doubleclick position
         nodeModal.style.paddingLeft = `${position.x + leftValue}px`
-        nodeModal.style.paddingTop = `${position.y + topValue}px`;
+        let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
+        nodeModal.style.paddingTop = `${maxPaddingTop}px`;
         nodeModal.style.display = 'block';
 
 
@@ -276,7 +277,8 @@ function dragCreateEdge(event){
 
         //display modal at click position
         edgeModal.style.paddingLeft = `${position.x + leftValue}px`
-        edgeModal.style.paddingTop = `${position.y + topValue}px`;
+        let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
+        edgeModal.style.paddingTop = `${maxPaddingTop}px`;
         edgeModal.style.display = 'block';
 
 
