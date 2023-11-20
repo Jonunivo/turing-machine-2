@@ -225,7 +225,12 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         animationTime = 1000/document.getElementById('simulationSpeed').value;
         animateSimulationStep(turingMachine, currentState, charOnTape);
         //wait for simulation step to finish
-        await new Promise(resolve => setTimeout(resolve, 9*animationTime+10));
+        await new Promise(resolve => setTimeout(resolve, 9*animationTime+100));
+        //wait an additional 100ms (test to fix animation not looking correct)
+        console.log("before");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        console.log("after");
+
 
         //run Simulation in TuringMachine.js on turingMachine object to get next state
 
@@ -303,8 +308,6 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
    // animateEdge(tmState, charOnTape, animationTime);
     animateEdgeIn(tmState, charOnTape, animationTime);
 
-
-
     //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
 
@@ -312,21 +315,22 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     //// animate tape write
     animateTapeWrite(deltaValue[1], animationTime)
     //wait for simulation step to finish
-    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+    await new Promise(resolve => setTimeout(resolve, (animationTime+100)));
 
     //// animate tape movement
     animateTapeMovement(deltaValue[2], animationTime)
     //wait for simulation step to finish
-    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
-    //fix tape position if animation (for some reason) didnt work correctly
-    fixTapePosition();
+    await new Promise(resolve => setTimeout(resolve, (animationTime+100)));
+
 
     //// animate node OUT & edge OUT
     animateNodeOut(tmState, animationTime);
     animateEdgeOut(tmState, charOnTape, animationTime);
-    await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
+    await new Promise(resolve => setTimeout(resolve, (2*animationTime+100)));
 
 
+    //fix tape position if animation (for some reason) didnt work correctly
+    fixTapePosition();
 
 
     //re-enable run simulation buttons after simulation step finished (for single step)
