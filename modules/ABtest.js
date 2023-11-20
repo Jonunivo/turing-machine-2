@@ -1,6 +1,7 @@
 import { nodeEdgeCreationCount, nodeEdgeCreationCountReset } from "./UserInput.js";
 import {nodeEdgeEditCount, nodeEdgeEditCountReset} from "./UserEdit.js";
 
+//File used to gather stats about AB test
 
 let startTime;
 

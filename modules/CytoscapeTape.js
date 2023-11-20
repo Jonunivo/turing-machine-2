@@ -516,7 +516,7 @@ function tmTapetoCyto(){
         }
     }
 
-
+    //// create cyto tape
     cyTape.nodes().remove();
 
     let color;
@@ -560,12 +560,15 @@ function tmTapetoCyto(){
         }
 
     }
+
     //add remaining nodes to rightOverflow
     let j = numElements + shift;
     while(j < turingMachine.tape.length){
+        //console.log("D ", j, " ", turingMachine.tape.length);
         rightOverflow += turingMachine.tape[j];
         j++;
     }
+    console.log("LOF: ", leftOverflow, " ROF: ", rightOverflow);
     console.log("LOF: ", leftOverflow, " ROF: ", rightOverflow);
     //lock node movement
     cyTape.nodes().lock();

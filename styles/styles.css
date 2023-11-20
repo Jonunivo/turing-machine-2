@@ -204,6 +204,11 @@ button{
 #stepSimulationButton, #resetSimulationButton{
     width: 130px;
 }
+/*move left move right button*/
+#move-tape-right,
+#move-tape-left {
+    width: 50px;
+}
 
 /*Save Button*/
 #saveButton{
