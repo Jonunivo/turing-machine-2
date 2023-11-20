@@ -1,5 +1,5 @@
 //this file was once used to gather AB Test statistics, not used anymore
-
+/*
 import { nodeEdgeCreationCount, nodeEdgeCreationCountReset } from "./UserInput.js";
 import {nodeEdgeEditCount, nodeEdgeEditCountReset} from "./UserEdit.js";
 
@@ -92,3 +92,4 @@ function resultNodesEdited(){
     console.log("Edges Edited: ", nodeEdgeEditCount()[1])
     nodeEdgeEditCountReset();
 }
+*/

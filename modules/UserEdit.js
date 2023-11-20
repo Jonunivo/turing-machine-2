@@ -2,7 +2,7 @@ import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrab
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders } from "./UserInput.js";
 
-export {nodeEdgeEditCount, nodeEdgeEditCountReset}
+
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////
 //////////////////////////////////////////////////////////////
@@ -15,9 +15,6 @@ var editNode;
 var cytoEditEdge;
 var editEdgeKey
 var editEdgeContent;
-//AB test
-var numEditedNodes = 0;
-var numEditedEdges = 0;
 //editMode
 const editMode = document.getElementById("editMode");
 
@@ -136,8 +133,20 @@ function userEditNodeHandler(){
     //close modal
     nodeModal.style.display = 'none';
 
+
+
     ////Name
     var newName = document.getElementById("stateName").value;
+
+    //catch name already exists
+    for(const state of turingMachine.states){
+        if(state.name === newName){
+            alert(`state with Name ${state.name} already exists, please choose a unique name`);
+            nodeModal.style.display = 'block';
+            return;
+        }
+    }
+
     //cyto
     cytoEditNode.style('label', newName);
     cytoEditNode.style('width', `${newName.length*10 + 10}px`)
@@ -218,8 +227,6 @@ function userEditNodeHandler(){
     //Grabify nodes
     cyGrabifyNodes();
 
-    //AB test
-    numEditedNodes++;
 
 }
 
@@ -455,8 +462,7 @@ function userEditEdgeHandler(){
     //create new
     cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
 
-    //AB test
-    numEditedEdges++;
+
 
 }
 
@@ -473,14 +479,3 @@ function userDeleteEdgeHandler(){
     cy.remove(cytoEditEdge);
 }
 
-
-
-//AB Test stats collection
-function nodeEdgeEditCount(){
-    return [numEditedNodes, numEditedEdges];
-}
-
-function nodeEdgeEditCountReset(){
-    numEditedEdges = 0;
-    numEditedNodes = 0;
-}

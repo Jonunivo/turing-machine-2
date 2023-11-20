@@ -1,7 +1,7 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, nodeEdgeCreationCount, nodeEdgeCreationCountReset };
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders};
 
 
 //////////////////////////////////////////////////////////////
@@ -17,9 +17,6 @@ var fromNode;
 var position;
 //eventlistener already exists?
 var eventListenerActive = true;
-//AB Test variables
-var numCreatedNodes = 0;
-var numCreatedEdges = 0;
 //editMode
 const editMode = document.getElementById("editMode");
 
@@ -144,12 +141,6 @@ function userNodeInputHandler(){
 
     //Grabify nodes
     cyGrabifyNodes();
-    
-    //AB test
-    numCreatedNodes++;
-
-
-
 }
 //User presses cancel button in NodeModal -> hide nodeModal
 document.getElementById("cancelButton").addEventListener('click', function(){
@@ -386,9 +377,6 @@ function userEdgeInputHandler(){
 
     //logging
     console.log(turingMachine);
-
-    //AB test
-    numCreatedEdges++;
 }
 
 //Cancel button (edge) pressed
@@ -466,15 +454,5 @@ function disableSliders(){
     document.getElementById("stateAccepting").checked = false;
     document.getElementById("stateRejecting").checked = false;
     
-}
-
-//used in AB test evaluation: number of created nodes & edges
-function nodeEdgeCreationCount(){
-    return [numCreatedNodes, numCreatedEdges];
-}
-
-function nodeEdgeCreationCountReset(){
-    numCreatedNodes = 0;
-    numCreatedEdges = 0;
 }
 

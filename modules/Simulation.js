@@ -634,6 +634,7 @@ function enableButtons(){
     document.getElementById('move-tape-left').disabled = false;
     document.getElementById('tape-input').disabled = false;
     document.getElementById('fastSimulation').disabled = false;
+
 }
 
 //////////////////////////////////////////////////////////////
