@@ -1,3 +1,5 @@
+//this file was once used to gather AB Test statistics, not used anymore
+
 import { nodeEdgeCreationCount, nodeEdgeCreationCountReset } from "./UserInput.js";
 import {nodeEdgeEditCount, nodeEdgeEditCountReset} from "./UserEdit.js";
 
