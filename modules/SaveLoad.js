@@ -4,6 +4,8 @@ import { turingMachine } from "./TuringMachine.js"
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 import {simulationReset, enableButtons} from "./Simulation.js";
 
+export {loadFile};
+
 
 //global Variables
 //Array of TM properties to be saved
@@ -131,8 +133,15 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
     const reader = new FileReader();
     reader.readAsText(file);
 
-    ////read file content
-    reader.onload = (event) => {
+    loadFile(reader);
+
+   
+
+});
+
+function loadFile(reader){
+     ////read file content
+     reader.onload = (event) => {
         const fileContent = event.target.result;
         //split into lines
         const lines = fileContent.split('\n');
@@ -249,6 +258,5 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         cyGrabifyNodes();
         console.log(turingMachine);
     }
-
-});
+}
 

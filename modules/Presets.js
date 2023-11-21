@@ -2,6 +2,9 @@ import { cyCreateNode, cyCreateEdge, cyClearCanvas, cyGrabifyNodes } from "./Cyt
 import { cyTapeClear } from "./CytoscapeTape.js";
 import { turingMachine } from "./TuringMachine.js";
 import { nodePresetHelper, nodePresetReset } from "./UserInput.js";
+import {loadFile} from "./SaveLoad.js"
+
+
 
 /**
  * Empties canvas & tape & turingMachine object,
@@ -16,66 +19,56 @@ function empty(){
 
 /**
  * Loads Preset 1 (binary Increment)
- *  - creates&adjusts TM object
- *  - creates cyto nodes & edges
+ *  - calls SaveLoad's load function to load file from ../presets
  */
 function loadPresetOne(){
-    //reset
-    empty();
-    //Create States
-    //right state
-    cyCreateNode(0, 'right', 200, 200, true, false, false)
-    turingMachine.createState(0, 'right', true, false, false);
-    
-    //carry state
-    cyCreateNode(nodePresetHelper(),'carry', 350, 200, false, false, false)
-    turingMachine.createState(1, 'carry', false, false, false);
+    //load binary Increment preset
+    const filePath = '../presets/binaryincrement.json';
 
-    //done state
-    cyCreateNode(nodePresetHelper(),'done', 500, 200, false, true, false)
-    turingMachine.createState(2, 'done', false, true, false);
+    fetch(filePath)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        // read File & call loadFile method (SaveLoad.json)
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const reader = new FileReader();
+        reader.readAsText(blob);
+        loadFile(reader);
+      })
+      .catch(error => {
+        console.error('Error reading file:', error);
+      });
+}
 
-    nodePresetHelper();
+/**
+ * Loads Preset 1 (ab Palindrom checker)
+ *  - calls SaveLoad's load function to load file from ../presets
+ */
+function loadPresetTwo(){
+    //ab Palindrom
+    const filePath = '../presets/abPalindrome.json';
 
-    //Create Transitions
-    //// from right
-    //0->0 & move left when reading 0
-    let cyLabel = "🔍 " + '0' + " | " + "➤";
-    cyCreateEdge(0, 0, cyLabel, '0');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '0', turingMachine.getStatebyId(0), 'nothing', 'R')
-    //0->0 & move left when reading 1
-    cyLabel = "🔍 " + '1' + " | " + "➤";
-    cyCreateEdge(0, 0, cyLabel, '1');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '1', turingMachine.getStatebyId(0), 'nothing', 'R')
-    //0->1 & move right when reading ""
-    cyLabel = "🔍 " + '' + " | " + "⮜";
-    cyCreateEdge(0, 1, cyLabel, '');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(1), 'nothing', 'L')
-    
-    ////from carry
-    //1 -> 0, R
-    cyLabel = "🔍 " + '1' + " | ✎ " + '0' + " | " + "⮜";
-    cyCreateEdge(1, 1, cyLabel, '1');
-    turingMachine.createTransition(turingMachine.getStatebyId(1), '1', turingMachine.getStatebyId(1), '0', 'L')
-    //0 -> 1, L
-    cyLabel = "🔍 " + '0' + " | ✎ " + '1' + " | " + "➤";
-    cyCreateEdge(1, 2, cyLabel, '0');
-    turingMachine.createTransition(turingMachine.getStatebyId(1), '0', turingMachine.getStatebyId(2), '1', 'R')
-    //"" -> 1, L
-    cyLabel = "🔍 " + '' + " | ✎ " + '1' + " | " + "➤";
-    cyCreateEdge(1, 2, cyLabel, '');
-    turingMachine.createTransition(turingMachine.getStatebyId(1), '', turingMachine.getStatebyId(2), '1', 'R')
-
-    //Create alphabet
-    turingMachine.sigma.add(0);
-    turingMachine.sigma.add(1);
-    turingMachine.gamma.add(0);
-    turingMachine.gamma.add(1);
-
-    //grabify nodes if in edit mode
-    cyGrabifyNodes();
-
-
+    fetch(filePath)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        // read File & call loadFile method (SaveLoad.json)
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const reader = new FileReader();
+        reader.readAsText(blob);
+        loadFile(reader);
+      })
+      .catch(error => {
+        console.error('Error reading file:', error);
+      });
 }
 
 /**
@@ -92,6 +85,10 @@ presetSelect.addEventListener("change", function() {
         else if (presetSelect.value === "PresetOne") {
             loadPresetOne();
             console.log("PresetOne clicked");
+        } 
+        else if (presetSelect.value === "PresetTwo") {
+            loadPresetTwo();
+            console.log("PresetTwo clicked");
         } 
         // Add more conditions for other options as needed
     });
