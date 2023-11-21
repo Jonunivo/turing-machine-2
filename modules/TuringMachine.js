@@ -159,7 +159,7 @@ export class TuringMachine{
         ////
 
         //write on tape if needed
-        if(deltaValue[1] !== null && deltaValue[1] !== undefined && deltaValue[1] !== ""){
+        if(deltaValue[1] !== null && deltaValue[1] !== undefined && deltaValue[1] !== "nothing"){
             console.log(`write ${deltaValue[1]} at ${this.tapePosition}`);
             this.tape[this.tapePosition] = deltaValue[1];
         }

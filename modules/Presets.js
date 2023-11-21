@@ -42,15 +42,15 @@ function loadPresetOne(){
     //0->0 & move left when reading 0
     let cyLabel = "🔍 " + '0' + " | " + "➤";
     cyCreateEdge(0, 0, cyLabel, '0');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '0', turingMachine.getStatebyId(0), '', 'R')
+    turingMachine.createTransition(turingMachine.getStatebyId(0), '0', turingMachine.getStatebyId(0), 'nothing', 'R')
     //0->0 & move left when reading 1
     cyLabel = "🔍 " + '1' + " | " + "➤";
     cyCreateEdge(0, 0, cyLabel, '1');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '1', turingMachine.getStatebyId(0), '', 'R')
+    turingMachine.createTransition(turingMachine.getStatebyId(0), '1', turingMachine.getStatebyId(0), 'nothing', 'R')
     //0->1 & move right when reading ""
     cyLabel = "🔍 " + '' + " | " + "⮜";
     cyCreateEdge(0, 1, cyLabel, '');
-    turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(1), '', 'L')
+    turingMachine.createTransition(turingMachine.getStatebyId(0), '', turingMachine.getStatebyId(1), 'nothing', 'L')
     
     ////from carry
     //1 -> 0, R

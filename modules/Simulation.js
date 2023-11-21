@@ -257,6 +257,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         if(currentState === null){
             //error occured in turingMachine.simulationStep
+            console.log("error occured");
             simIsRunning = false;
             break;
         }
@@ -264,7 +265,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
 
         ////logging
         console.log("----------ANIMATION------------")
-        console.log(`at State ${currentState.id} reading ${charOnTape}`);
+        console.log(`at State ${currentState.name} reading ${charOnTape}`);
         ////
 
     }
@@ -353,7 +354,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     if(!simIsRunning && !deltaValue[0].isAccepting && !deltaValue[0].isRejecting){
         enableButtons();
     }
-    else if(!simIsRunning){
+    else if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
         //final state reached
 
         //animate last state & call simulationResult
@@ -615,10 +616,9 @@ function animateEdgeOut(tmState, charOnTape, animationTime){
  * @param {number} animationTime - animationTime in ms
  */
 function animateTapeWrite(writeToken, animationTime){
-    //only write when token isn't empty
-    if(writeToken !== "" && writeToken !== undefined){
+    //only write when token isn't "nothing"
+    if(writeToken !== undefined && writeToken !== 'nothing'){
         cyWriteCurrentPos(writeToken, animationTime);
-        console.log("WRITE", writeToken);
     }
 }
 

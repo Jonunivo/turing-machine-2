@@ -205,7 +205,7 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
                         labelMove = "➤"
                     }
 
-                    if(writeChar !== ''){
+                    if(writeChar !== 'nothing'){
                         cyLabel = "🔍 " + readChar + "  | ✎ " + writeChar + " | " + labelMove;
                     }
                     else{

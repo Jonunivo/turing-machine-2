@@ -337,15 +337,18 @@ function userEdgeInputHandler(){
     else{
         tapeMovement = "N";
     }
+
     //writeLabel
     let cyLabel = "";
-    let writeLabel = "";
-    if(document.getElementById('writeLabel').value !== ''){
+    let writeLabel = 'nothing';
+    if(!document.getElementById('writeLabelNothing').checked){
         writeLabel = document.getElementById('writeLabel').value;
         cyLabel = "🔍 " + readLabel + "  | ✎ " + writeLabel + " | " + labelMove;
     }
     else{
+        //write nothing checked (dont write)
         cyLabel = "🔍 " + readLabel + " | " + labelMove;
+        writeLabel = 'nothing';
     }
 
     //create Edge Cytoscape

@@ -383,7 +383,15 @@ function getCurrentEdgeProperties(){
     }
 
     //write Label
-    document.getElementById("writeLabel").value = editEdgeContent[1];
+    if(editEdgeContent[1] === 'nothing'){
+        //write Nothing was eneabled
+        document.getElementById("writeLabel").value = '';
+        document.getElementById('writeLabelNothing').checked = true;
+    }
+    else{
+        document.getElementById("writeLabel").value = editEdgeContent[1];
+        document.getElementById('writeLabelNothing').checked = false;
+    }
 
     //tape Movement
     switch (editEdgeContent[2]){
@@ -448,14 +456,16 @@ function userEditEdgeHandler(){
 
     //writeToken
     let cyLabel = "";
-    let writeToken = "";
-    if(document.getElementById('writeLabel').value !== '' && 
-    document.getElementById('writeLabel').value !== undefined){
+    let writeToken = "nothing";
+    if(!document.getElementById('writeLabelNothing').checked){
+        //write
         writeToken = document.getElementById('writeLabel').value;
         cyLabel = "🔍 " + readToken + "  | ✎ " + writeToken + " | " + labelMove;
     }
     else{
+        //don't write
         cyLabel = "🔍 " + readToken + " | " + labelMove;
+        writeToken = "nothing";
     }
 
 

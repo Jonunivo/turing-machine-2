@@ -29,7 +29,7 @@
         <!-- Tape control -->
         <div id="tapeControlDiv" class="centered-content">
             <button id="move-tape-right" class="grey-button"> ⮜ </button>
-            <input type="text" id="tape-input-field" required oninput="replaceSpace()">
+            <input type="text" id="tape-input-field" required>
             <button id="tape-input" class="grey-button">Band überschreiben</button>
             <button id="move-tape-left" class="grey-button"> ➤ </button>
         </div>
@@ -183,6 +183,7 @@
                 <input type="text" id="readLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
                 &nbsp;
 
+                <input type="checkbox" id="writeLabelNothing">
                 <label for="writeLabel">✎</label>
                 <input type="text" id="writeLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
                 <br>
