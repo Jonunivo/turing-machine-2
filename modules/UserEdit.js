@@ -373,7 +373,14 @@ function getCurrentEdgeProperties(){
     document.getElementById("toState").value = editEdgeContent[0].name;
 
     //read Label
-    document.getElementById("readLabel").value = editEdgeKey[1];
+    if(editEdgeKey[1] === 'else'){
+        document.getElementById("readLabelElse").checked = true;
+        document.getElementById("readLabel").value = '';
+    }
+    else{
+        document.getElementById("readLabelElse").checked = false;
+        document.getElementById("readLabel").value = editEdgeKey[1];
+    }
 
     //write Label
     document.getElementById("writeLabel").value = editEdgeContent[1];
@@ -420,6 +427,10 @@ function userEditEdgeHandler(){
     
     //readToken
     let readToken = document.getElementById("readLabel").value;
+    //'else'
+    if(document.getElementById("readLabelElse").checked){
+        readToken = 'else';
+    }
 
     //TapeMovement
     let tapeMovementValue = document.getElementById('tapeMovement').value;

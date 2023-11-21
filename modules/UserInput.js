@@ -317,6 +317,11 @@ function userEdgeInputHandler(){
 
     //readLabel
     let readLabel = document.getElementById('readLabel').value;
+    //Else label checked?
+    if(document.getElementById("readLabelElse").checked){
+        readLabel = 'else';
+    }
+
     //tapeMovement
     let tapeMovementValue = document.getElementById('tapeMovement').value;
     let tapeMovement = "N"

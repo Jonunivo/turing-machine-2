@@ -15,6 +15,9 @@ let isReady = false;
 let originalColorNode = "grey";
 let originalColorEdge = "grey";
 
+//find corresponding edge
+let edgeToAnimate = null;
+
 //////////////////////////////////////////////////////////////
 //// -------------------- User Action ------------------- ////
 //////////////////////////////////////////////////////////////
@@ -227,9 +230,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         //wait for simulation step to finish
         await new Promise(resolve => setTimeout(resolve, 9*animationTime+100));
         //wait an additional 100ms (test to fix animation not looking correct)
-        console.log("before");
         await new Promise(resolve => setTimeout(resolve, 100));
-        console.log("after");
 
 
         //run Simulation in TuringMachine.js on turingMachine object to get next state
@@ -285,9 +286,17 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
     }
     catch(error){
-        //animtate final node
-        animateNode(tmState, animationTime);
-        return;
+        try{
+            //Else edge
+            deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, 'else']))
+
+        }
+        catch(error){
+            //no next node found: animate final node
+            animateNode(tmState, animationTime);
+            return;
+        }
+
     }
     
     //// animate node IN
@@ -482,6 +491,9 @@ function animateEdge(tmState, charOnTape, animationTime){
         if(edge.data().readToken === charOnTape){
             edgeToAnimate = edge;
         }
+        else if (edge.data().readToken === 'else'){
+            edgeToAnimate = edge;
+        }
     })
 
     //Animation
@@ -522,13 +534,22 @@ function animateEdge(tmState, charOnTape, animationTime){
 
 function animateEdgeIn(tmState, charOnTape, animationTime){
     //find corresponding edge
-    let edgeToAnimate = null;
+    edgeToAnimate = null;
+    let elseEdgeToAnimate = null;
     const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
     outgoingEdges.forEach(edge => {
         if(edge.data().readToken === charOnTape){
             edgeToAnimate = edge;
         }
+        //catch else edge
+        else if (edge.data().readToken === 'else'){
+            elseEdgeToAnimate = edge;
+        }
     })
+    //case else edge
+    if(edgeToAnimate === null && elseEdgeToAnimate != null){
+        edgeToAnimate = elseEdgeToAnimate;
+    }
 
     //Animation
     //fade-in
@@ -547,16 +568,10 @@ function animateEdgeIn(tmState, charOnTape, animationTime){
 
 function animateEdgeOut(tmState, charOnTape, animationTime){
     //find corresponding edge
-    let edgeToAnimate = null;
-    const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
-    outgoingEdges.forEach(edge => {
-        if(edge.data().readToken === charOnTape){
-            edgeToAnimate = edge;
-        }
-    })
+    //done in animateEdgeIn
 
     //Animation
-    //fade-in
+    //fade-out
     if(edgeToAnimate != null){
         edgeToAnimate.animate({
             style: {

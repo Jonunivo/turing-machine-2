@@ -124,22 +124,32 @@ export class TuringMachine{
         let deltaValue;
         //find corresponding transition in delta
         try{
+            //normal Transition?
             deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
         }
         catch(error){
-            document.getElementById('runSimulationButton').disabled = true;
-            document.getElementById('stepSimulationButton').disabled = true;
-            document.getElementById('resetSimulationButton').disabled = false;
-            document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
-            document.getElementById('move-tape-left').disabled = false;
-            document.getElementById('move-tape-right').disabled = false;
-            document.getElementById('tape-input').disabled = false;
-            document.getElementById('fastSimulation').disabled = false;
+            //"else" Transition?
+            try{
+                deltaValue = this.delta.get(this.getKeyByContent([state, 'else']))
+
+            }
+            catch(error){
+                //no valid transition found, disable simulation
+                document.getElementById('runSimulationButton').disabled = true;
+                document.getElementById('stepSimulationButton').disabled = true;
+                document.getElementById('resetSimulationButton').disabled = false;
+                document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
+                document.getElementById('move-tape-left').disabled = false;
+                document.getElementById('move-tape-right').disabled = false;
+                document.getElementById('tape-input').disabled = false;
+                document.getElementById('fastSimulation').disabled = false;
+
+                alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
+                return null;
+            }
 
 
-            alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
 
-            return null;
         }
         ////logging
         console.log("//--------TM CORE-------------")
