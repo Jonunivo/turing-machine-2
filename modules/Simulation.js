@@ -34,10 +34,9 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
     if(!simIsRunning){
         simIsRunning = true;
 
-        //catch first iteration & no start state
+        //catch first iteration
         if(currentState === undefined){
             currentState = turingMachine.startstate;
-
         }
         //catch no start state defined
         if(turingMachine.startstate === undefined){
@@ -148,13 +147,20 @@ function fastSimulation(){
     if(new Date().getTime() - startTime >= timeLimit){
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
     }
+
     else if(currentState == turingMachine.acceptstate ||
         currentState == turingMachine.rejectstate){
+            //simulation finished
+            tmTapetoCyto();
             turingMachine.simulationResult(currentState);
         }
-    //simulation finished
+
     currentState = turingMachine.startstate;
-    tmTapetoCyto();
+    let from = Date.now()
+    while (Date.now() - from > 100){
+        
+    }
+
 
 }
 
@@ -175,9 +181,22 @@ function fastSimulationStep(){
     console.log(currentState + " " + charOnTape);
     //get next state
     currentState = turingMachine.simulationStep(currentState, charOnTape);
-
     //cyto
+    console.log("here1");
     tmTapetoCyto();
+    console.log("here2");
+
+
+    //last state reached
+    if(currentState === turingMachine.acceptstate || currentState === turingMachine.rejectstate){
+        turingMachine.simulationResult(currentState);
+        //disable buttons
+        document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
+        document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('stepSimulationButton').disabled = true;
+    }
+
+
 
 }
 
@@ -251,20 +270,8 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
     }
     if(simIsRunning){
         //handle simulation result when accept or reject state reached
-        //button manipulation
-        document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
-        document.getElementById('runSimulationButton').disabled = true;
-        document.getElementById('stepSimulationButton').disabled = true;
-        document.getElementById("resetSimulationButton").disabled = false;
-        document.getElementById('move-tape-left').disabled = false;
-        document.getElementById('move-tape-right').disabled = false;
-        document.getElementById('tape-input').disabled = false;
-        document.getElementById('fastSimulation').disabled = false;
-
+        //moved to animateSimulationStep
         simIsRunning = false;
-
-        //turingMachine Resulthandler
-        turingMachine.simulationResult(currentState);
     }
 }
 
@@ -343,8 +350,23 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
 
 
     //re-enable run simulation buttons after simulation step finished (for single step)
-    if(!simIsRunning){
+    if(!simIsRunning && !deltaValue[0].isAccepting && !deltaValue[0].isRejecting){
         enableButtons();
+    }
+    else if(!simIsRunning){
+        //final state reached
+
+        //animate last state & call simulationResult
+        animateNode(currentState, 2*animationTime);
+        await new Promise(resolve => setTimeout(resolve, 2*animationTime));
+        turingMachine.simulationResult(deltaValue[0]);
+        
+        //enable buttons
+        enableButtons();
+        document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
+        document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('stepSimulationButton').disabled = true;
+
     }
 }
 

@@ -190,10 +190,12 @@ export class TuringMachine{
             default:
                 throw new Error("Could not interpret movement")
         }
-        //if last state: run simulationResult
+        //if last state: run simulationResult (moved to animateSimulationStep)
+        /*
         if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
-            this.simulationResult(deltaValue[0]);
+            //this.simulationResult(deltaValue[0]);
         }
+        */
 
         //return next state
         return deltaValue[0];
@@ -208,16 +210,15 @@ export class TuringMachine{
     simulationResult(lastState){
         ////logging
         console.log("//-----------FINAL RESULT------------")
-        console.log("FINAL RESULT");
         console.log(`Tape: ${this.tape}`);
         ////
         if(lastState == this.acceptstate){
             console.log("Simulation finished: Input Accepted!")
-            //alert("Simulation finished: Input Accepted!")
+            alert("Simulation finished: Input Accepted!")
         }
         else if(lastState == this.rejectstate){
             console.log("Simulation finished: Input Rejected!");
-            //alert("Simulation finished: Input Rejected!")
+            alert("Simulation finished: Input Rejected!")
 
         }
         else{
