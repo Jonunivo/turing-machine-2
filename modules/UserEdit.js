@@ -376,6 +376,7 @@ function getCurrentEdgeProperties(){
     if(editEdgeKey[1] === 'else'){
         document.getElementById("readLabelElse").checked = true;
         document.getElementById("readLabel").value = '';
+        document.getElementById("readLabel").style.display = "none";
     }
     else{
         document.getElementById("readLabelElse").checked = false;
@@ -387,6 +388,7 @@ function getCurrentEdgeProperties(){
         //write Nothing was eneabled
         document.getElementById("writeLabel").value = '';
         document.getElementById('writeLabelNothing').checked = true;
+        document.getElementById("writeLabel").style.display = "none";
     }
     else{
         document.getElementById("writeLabel").value = editEdgeContent[1];

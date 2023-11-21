@@ -178,14 +178,20 @@
                 <select id="toState">🔍</select>
                 
                 <br>
-                <input type="checkbox" id="readLabelElse">
+
                 <label for="readLabel">🔍</label>
                 <input type="text" id="readLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
-                &nbsp;
 
-                <input type="checkbox" id="writeLabelNothing">
+                <input type="checkbox" id="readLabelElse" oninput="disableRead()">
+                <label for="readLabelElse">else</label>
+                <br>
+
+
                 <label for="writeLabel">✎</label>
                 <input type="text" id="writeLabel"  class="modal-input" oninput="limitInputTo1Character(this)">
+                <input type="checkbox" id="writeLabelNothing" oninput="disableWrite()">
+                <label for="writeLabelNothing">don't write</label>
+
                 <br>
                 <br>
                 <div class="slider-div">
@@ -274,11 +280,33 @@
                 sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
             });
 
-            //Toggle Button
+            //Toggle Button ("Bewegen")
             function toggleButton() {
                 var button = document.querySelector('.toggle-button');
                 button.classList.toggle('active');
             }
+
+            //disable Read (in Edge Modal)
+            function disableRead(){
+                const readLabelInput = document.getElementById("readLabel");
+                if(document.getElementById("readLabelElse").checked){
+                    readLabelInput.style.display = 'none';
+                }
+                else{
+                    readLabelInput.style.display = '';
+                }
+            }
+            //disable Write (in Edge Modal)
+            function disableWrite(){
+                const writeLabelInput = document.getElementById("writeLabel");
+                if(document.getElementById("writeLabelNothing").checked){
+                    writeLabelInput.style.display = 'none';
+                }
+                else{
+                    writeLabelInput.style.display = '';
+                }
+            }
+
         </script>
         
         <!-- modules -->
