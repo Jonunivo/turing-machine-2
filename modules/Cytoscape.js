@@ -1,7 +1,7 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
 
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow, cyGrabifyNodes};
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow, cyGrabifyNodes, generateNodePosMap};
 
 
 //////////////////////////////////////////////////////////////
@@ -246,6 +246,23 @@ function openNewSubWindow(){
 
 /**
  * 
+ * Helper: that generates the positionMap of current Cytoscape window 
+ * used in TreeNode to save Positions of CytoNodes
+ * 
+ * @returns Map<number, [number, number]> positionMap
+ */
+function generateNodePosMap(){
+    let positionMap = new Map();
+    cy.nodes().forEach(node => {
+        positionMap.set(node.data().id, [node.position().x, node.position().y])
+    });
+    console.log(positionMap);
+    return positionMap;
+}
+
+
+/**
+ * 
  * Helper: that creates EventListeners, if not yet existent (avoids duplication of EventListeners)
  * 
  * @param {document Element} element - HTML element the EventListener is used on
@@ -302,7 +319,7 @@ cy.on('mouseup', function (e) {
 //Helper: seperates Nodes too close to each other
 //TO DO
 function seperateNodes(){
-    
+
 }
 
 

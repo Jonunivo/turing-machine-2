@@ -211,13 +211,12 @@ button{
 }
 
 /*Save Button*/
-#saveButton{
-    width: 120px;;
+.thin{
+    width: 120px;
 }
 
 /* Toggle Buttons (Edit) */
 .toggle-button {
-    width: 120px;
     background-color: #ccc;
     border: 2px solid darkgray;
     }

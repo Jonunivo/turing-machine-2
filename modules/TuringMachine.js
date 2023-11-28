@@ -83,7 +83,7 @@ export class TuringMachine{
      * @param {char} label - Character that is read
      * @param {State} toState - State Transition points to
      * @param {char} writeLabel - Character to write on Tape ("" means don't write)
-     * @param {*} tapeMovement - Tape Movement
+     * @param {char} tapeMovement - Tape Movement
      */
     createTransition(fromState, label, toState, writeLabel, tapeMovement){
         this.delta.set([fromState, label], [toState, writeLabel, tapeMovement]);
@@ -284,6 +284,29 @@ export class TuringMachine{
             }
         }
         throw new Error(`There is no state with Name ${name}`)
+    }
+
+    /**
+     * Helper: Add all info from other into this Turingmachine
+     * note: Only states, alphabets and transitions are merged into "this", rest of
+     *      "this" stays the same
+     * 
+     * @param {TuringMachine} other - 2nd TuringMachine
+     */
+    mergeInTuringMachine(other){
+        //TO DO
+        //add states
+        for(let state of other.states){
+            this.states.add(state);
+        }
+        //sigma & gamma union
+        this.sigma = new Set([...this.sigma, ...other.sigma]);
+        this.gamma = new Set([...this.gamma, ...other.gamma]);
+        //add delta
+        for(let [key, value] of other.delta){
+            this.delta.set(key, value);
+        }
+        //rest stays the same (is overwritten by "this")
     }
 
 }

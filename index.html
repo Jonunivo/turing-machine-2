@@ -56,8 +56,9 @@
         <div id="rightWindow">
             <!-- Edit Button -->
             <div>
-                <button id="editButton" class="toggle-button" onclick="toggleButton()">Bewegen</button>
-
+                <button id="editButton" class="toggle-button thin" onclick="toggleButton()">Bewegen</button>
+                <br>
+                <button id="createSuperState" class="grey-button thin">Create Super</button>
             </div>
             <br><br><br><br><br><br><br><br><br>
 
@@ -80,7 +81,7 @@
 
                 <input id="fileInput" type="file" accept=".json">
                 <br>
-                <button id="saveButton" class="button grey-button">TM speichern</button>
+                <button id="saveButton" class="button grey-button thin">TM speichern</button>
             </div>
 
             <div>
@@ -313,15 +314,18 @@
         <!-- modules -->
         <script type="module" src="./modules/General.js" ></script>
 
+        <script type="module" src="./datastructures/Tree.js"></script>
+
         <script type="module" src="./modules/State.js" ></script>
         <script type="module" src="./modules/TuringMachine.js" ></script>
-
 
         <script type="module" src="./modules/Cytoscape.js"></script>
         <script type="module" src="./modules/CytoscapeTape.js"></script>
 
         <script type="module" src="./modules/UserInput.js"></script>
         <script type="module" src="./modules/UserEdit.js"></script>
+
+        <script type="module" src="./modules/SuperStates.js"></script>
 
         <script type="module" src="./modules/Simulation.js"></script>
 
