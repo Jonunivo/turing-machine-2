@@ -254,7 +254,7 @@ function openNewSubWindow(){
 function generateNodePosMap(){
     let positionMap = new Map();
     cy.nodes().forEach(node => {
-        positionMap.set(node.data().id, [node.position().x, node.position().y])
+        positionMap.set(parseInt(node.data().id), [parseInt(node.position().x), parseInt(node.position().y)])
     });
     console.log(positionMap);
     return positionMap;

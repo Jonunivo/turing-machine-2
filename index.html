@@ -59,6 +59,9 @@
                 <button id="editButton" class="toggle-button thin" onclick="toggleButton()">Bewegen</button>
                 <br>
                 <button id="createSuperState" class="grey-button thin">Create Super</button>
+                <br>
+                <button id="leaveSuperState" class="grey-button thin">Leave Super</button>
+
             </div>
             <br><br><br><br><br><br><br><br><br>
 
@@ -163,6 +166,29 @@
                 </div>
                 <div id="deleteNodeDiv">
                     <!-- UserEdit.js  will insert a delete button here -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Super Node Creation Modal -->
+        <div id="superNodeModal" class="modal">
+            <div id="superNodeModalContent" class="modal-content">
+                <div class="cancel-button-div">
+                    <button id="cancelButton4" class ="cancel-button" type="button">x</button>
+                </div>
+
+                <h3>Turingmachine as State</h3>
+
+                <label for="superStateName" >Name:</label>
+                <input type="text" id="superStateName" oninput="limitNameSize(8)">
+                
+                <br>
+                <div class="submit-button-div">
+                    <button id="superNodeButton" type="button">Zustand erstellen</button>
+                </div>
+                <div id="deleteNodeDiv">
+                    <!-- SuperStates.js  will insert a delete button here -->
                 </div>
 
             </div>

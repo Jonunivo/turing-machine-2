@@ -1,7 +1,7 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-
+import { editNodeLocalTM, editEdgeLocalTM } from "./SuperStates.js";
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////
@@ -153,7 +153,7 @@ function userEditNodeHandler(){
     cytoEditNode.style('label', newName);
     cytoEditNode.style('width', `${newName.length*10 + 10}px`)
     refresh()
-    //TM object (node)
+    //Global TM object (node)
     editNode.name = newName;
 
 
@@ -167,6 +167,9 @@ function userEditNodeHandler(){
         alert("Ein Zustand kann nicht gleichzeitig akzeptierend und verwerfend sein")
         return;
     }
+
+    //localTM object
+    editNodeLocalTM(editNode, isStarting, isAccepting, isRejecting);
 
     //isStarting
     if (isStarting){
@@ -473,13 +476,15 @@ function userEditEdgeHandler(){
 
     ////Edit TM object & cyto
 
-    //TM object
+    //Global TM object
     //remove old
     turingMachine.delta.delete(editEdgeKey);
     //create new
     const newEdgeKey = [newfromNode, readToken];
     const newEdgeValue = [newtoNode, writeToken, tapeMovement];
     turingMachine.delta.set(newEdgeKey, newEdgeValue);
+    //Local TM object
+    editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey);
 
     //Cyto
 

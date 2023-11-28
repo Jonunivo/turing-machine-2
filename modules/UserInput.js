@@ -1,5 +1,6 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
+import { addStateLocalTM, addEdgeLocalTM } from "./SuperStates.js";
 
 export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler};
 
@@ -65,7 +66,7 @@ cy.on('click', (event) => {
             document.getElementById("deleteNodeDiv").removeChild(deleteButton);
         }
 
-        //display modal at doubleclick position
+        //display modal at click position
         nodeModal.style.paddingLeft = `${position.x + leftValue}px`
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         nodeModal.style.paddingTop = `${maxPaddingTop}px`;
@@ -86,15 +87,7 @@ cy.on('click', (event) => {
 
 });
 
-//Helper: handles Enter to Confirm node creation
-function enterToConfirm(event, id){
-    if (event.key === 'Enter' && eventListenerActive) {
-        let button = document.getElementById(id);
-        button.click();
-        // Remove the event listener
-        eventListenerActive = false;
-      }
-}
+
 
 
 /**
@@ -130,8 +123,10 @@ function userNodeInputHandler(){
     //create cyto node
     cyCreateNode(nodeId, stateName, position.x, position.y, isStartingState, isAcceptingState, isRejectingState);
     
-    //create node in TM
+    //create node in Global TM
     turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
+    //create node in Local TM
+    addStateLocalTM(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
     //adjust nodeId
     nodeId++;
 
@@ -151,15 +146,9 @@ document.getElementById("cancelButton").addEventListener('click', function(){
 
 
 //Helper functions to adjust global variable nodeId (used in Presets.js & SaveLoad.js)
-//sets nodeId to maxId of TM states + 1
+//increases nodeId
 function nodePresetHelper(){
-    let maxid = 0;
-    for(let node of turingMachine.states){
-        if(node.id > maxid){
-            maxid = node.id;
-        }
-    }
-    nodeId = maxid + 1;
+    nodeId = nodeId + 1;
     return nodeId;
 }
 function nodePresetReset(){
@@ -354,10 +343,13 @@ function userEdgeInputHandler(){
     //create Edge Cytoscape
     cyCreateEdge(`${fromNodeId}`, `${toNodeId}`, cyLabel, readLabel);
 
-    //create edge in TM
+    //create edge in Global TM
     let fromState = turingMachine.getStatebyId(fromNodeId);
     let toState = turingMachine.getStatebyId(toNodeId);
     turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
+    //create Edge in Local TM
+    addEdgeLocalTM(fromState, readLabel, toState, writeLabel, tapeMovement);
+
 
     //adjust Alphabets of TM if user enters new token (write)
     if(turingMachine.sigma.has(writeLabel)){
