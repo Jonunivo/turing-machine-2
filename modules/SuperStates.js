@@ -104,6 +104,9 @@ function userSuperNodeInputHandler(){
     let superState = new State(superStateId, stateName)
     currTreeNode.turingMachine.states.add(superState);
 
+    //increase ID
+    nodePresetHelper();
+
 }   
 
 //////////////////////////////////////////////////////////////
@@ -198,55 +201,50 @@ function createCytoWindow(){
 function addStateLocalTM(id, name, isStarting, isAccepting, isRejecting){
     let localTM = currTreeNode.turingMachine;
     localTM.createState(id, name, isStarting, isAccepting, isRejecting);
+    console.log("local TM states now: ", localTM.states);
 }
 
 function addEdgeLocalTM(fromState, readLabel, toState, writeLabel, tapeMovement){
     let localTM = currTreeNode.turingMachine;
     localTM.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
+    console.log("local TM delta now: ", localTM.delta);
 }
 
-//functionality copied from userEditNodeHandler
-function editNodeLocalTM(editNode, isStarting, isAccepting, isRejecting){
-    //isStarting
-    if (isStarting){
-        turingMachine.startstate = editNode;
-        editNode.isStarting = true;
-    }
-    else if(editNode.isStarting){
-        //edit node was starting node but edit removed starting node property
-        editNode.isStarting = false;
-        turingMachine.startstate = undefined;
-    }
-
-    //isAccepting
-    if (isAccepting){
-        turingMachine.acceptstate = editNode;
-        editNode.isAccepting = true;
-    }
-    else if(editNode.isAccepting){
-        //edit node was accepting node but edit removed starting node property
-        editNode.isAccepting = false;
-        turingMachine.acceptstate = null;
-    }
-
-    //isRejecting
-    if (isRejecting){
-        turingMachine.rejectstate = editNode;
-        editNode.isRejecting = true;
-    }
-    else if(editNode.isRejecting){
-        //edit node was rejecting node but edit removed starting node property
-        editNode.isRejecting = false;
-        turingMachine.rejectstate = null;
-    }
+//adjust local TM when node edit (borrow from global tm)
+function editNodeLocalTM(editNode){
+    //find state with correspond. id
+    let editNodeLocal = currTreeNode.turingMachine.getStatebyId(editNode.id);
+    console.log(editNodeLocal);
+    console.log(editNode);
+    //copy properties
+    editNodeLocal.name = editNode.name;
+    editNodeLocal.isStarting = editNode.isStarting;
+    editNodeLocal.isAccepting = editNode.isAccepting;
+    editNodeLocal.isRejecting = editNode.isRejecting;
+    console.log(editNodeLocal);
 }
 
+//adjust local TM when edge Edit (borrow from global tm)
 function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey){
+    //find corresponding edge
+    
+    //borrow from other edge
+
     let localTM = currTreeNode.turingMachine;
     //remove old
-    localTM.delta.delete(editEdgeKey);
+
+    let localTMeditEdgeKey = [editEdgeKey[0], editEdgeKey[1]];
+    console.log(localTMeditEdgeKey);
+    console.log("LOCAL TM Delta", localTM.delta);
+    localTM.delta.delete(localTMeditEdgeKey);
     //create new
     const newEdgeKey = [newfromNode, readToken];
     const newEdgeValue = [newtoNode, writeToken, tapeMovement];
     localTM.delta.set(newEdgeKey, newEdgeValue);
+
+    console.log("LOCAL TM Delta", localTM.delta)
+}
+
+function getLocalTM(){
+    return currTreeNode.turingMachine;
 }

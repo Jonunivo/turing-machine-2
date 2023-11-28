@@ -121,6 +121,7 @@ function userNodeInputHandler(){
     }
 
     //create cyto node
+    console.log("before cyCreateNode");
     cyCreateNode(nodeId, stateName, position.x, position.y, isStartingState, isAcceptingState, isRejectingState);
     
     //create node in Global TM
@@ -133,7 +134,7 @@ function userNodeInputHandler(){
     ////logging
     console.log("-----NEW STATE CREATED-----");
     console.log("new State with id: ", nodeId-1);
-    console.log("tm now: ", turingMachine);
+    console.log("global tm now: ", turingMachine);
 
     //Grabify nodes
     cyGrabifyNodes();

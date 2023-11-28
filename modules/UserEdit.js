@@ -45,6 +45,7 @@ function clickEditNode(event){
     cytoEditNode = event.target;
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
 
+
     ////open Modal at click position
     //get click position
     const position = event.position;
@@ -168,8 +169,6 @@ function userEditNodeHandler(){
         return;
     }
 
-    //localTM object
-    editNodeLocalTM(editNode, isStarting, isAccepting, isRejecting);
 
     //isStarting
     if (isStarting){
@@ -183,6 +182,8 @@ function userEditNodeHandler(){
     }
     else if(editNode.isStarting){
         //edit node was starting node but edit removed starting node property
+        console.log("HERE", editNode);
+
         //cyto
         cytoEditNode.style('background-color', 'lightgrey');
         cytoEditNode.style('border-width', 0);
@@ -228,6 +229,9 @@ function userEditNodeHandler(){
         editNode.isRejecting = false;
         turingMachine.rejectstate = null;
     }
+
+    //localTM object
+    editNodeLocalTM(editNode);
 
     //Grabify nodes
     cyGrabifyNodes();
