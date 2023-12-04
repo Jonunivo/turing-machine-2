@@ -5,13 +5,18 @@ import { State } from "./State.js";
 import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
 import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
+import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler};
+export{currTreeNodeName, tmTree, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler};
 
 //Global Variables
 
 //current TreeNode (initialized to empty TM = local TM of root)
 var currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0));
+currTreeNode.superNodeId = 0;
+//currTreeNodeName
+var currTreeNodeName;
+
 // Tree of TMs
 var tmTree = new Tree(currTreeNode);
 //createNode Position
@@ -31,6 +36,8 @@ function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
     newNode.parent = currTreeNode;
 
 
+    //create Tree
+    cyTreeCreate();
 }
 
 //////////////////////////////////////////////////////////////
@@ -86,6 +93,8 @@ function userSuperNodeInputHandler(){
             return;
         }
     }
+
+    currTreeNodeName = stateName;
     
     //create cyto node
     let superStateId = nodePresetHelper();
@@ -123,6 +132,8 @@ function userSuperNodeInputHandler(){
     //add SuperState to local TM (parent)
     let superState = new State(superStateId, stateName)
     currTreeNode.turingMachine.states.add(superState);
+
+
 
     //increase ID
     nodePresetHelper();
@@ -199,6 +210,8 @@ cy.on('cxttap', 'node', function(event){
     ////Create Nodes & Edges according to TM object that is being entered
     createCytoWindow();
 
+    cyTreeStyleCurrentNode(currTreeNode.superNodeId);
+
 });
 
 //leave superstate (to parent)
@@ -214,6 +227,8 @@ function leaveSuperState(){
 
     ////Create Nodes & Edges according to TM object that is being entered
     createCytoWindow();
+
+    cyTreeStyleCurrentNode(currTreeNode.superNodeId);
 }
 document.getElementById("leaveSuperState").addEventListener("click", leaveSuperState);
 

@@ -1,6 +1,6 @@
 
 export class TreeNode{
-    /**
+    /*
      * Node of the Tree, saving Turingmachine & node positions in cytowindow
      * 
      * @param {TuringMachine} turingMachine - turingMachine in this node

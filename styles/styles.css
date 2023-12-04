@@ -61,6 +61,13 @@ body{
     position: absolute;
     top: 615px;
 }
+#cytoscape-tree{
+    position: absolute;
+    top: 90px;
+    width: 140px;
+    height: calc(50%);
+    border: dotted 1px black;
+}
 
 /* ----- Arrow Tape Position ----- */
 .arrow-down {

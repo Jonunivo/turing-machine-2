@@ -22,6 +22,7 @@
         <!-- Cytoscape windows -->
         <div id="cytoscape"></div>
         <div id="cytoscape-tape"></div>
+        <div id="cytoscape-tree"></div>
 
         <!-- Tape Arrow -->
         <div class="arrow-down"></div>
@@ -61,7 +62,19 @@
                 <button id="leaveSuperState" class="grey-button thin">Leave Super</button>
 
             </div>
-            <br><br><br><br><br><br><br><br><br>
+            <h3>Bedienung:</h3>
+            <div id="userGuide">
+                Click on Canvas, <br> to Create State
+                <br><br>
+                Click on State, <br> to Edit State
+                <br><br>
+                Drag & Drop 2 States, <br> to Create Transition
+                <br><br>
+                Click on Transition, <br> to Edit Transition
+                <br><br>
+                Click on move, <br> to Move States
+            </div>
+            <br>
 
 
 
@@ -94,18 +107,7 @@
         <!-- User Description -->
         <div id="leftWindow">
             <br>
-            <h3>Bedienung:</h3>
-            <div id="userGuide">
-                Klick auf Canvas, <br> um Zustand zu erstellen
-                <br><br>
-                Klick auf Zustand, <br> um Zustand zu bearbeiten
-                <br><br>
-                Drag & Drop auf Zustände, <br> um Übergang zu erstellen
-                <br><br>
-                Klick auf Übergang, <br> um Übergang zu bearbeiten
-                <br><br>
-                Bewegen button klicken, <br> um Knoten zu bewegen
-            </div>
+
             <br>
 
         </div>
@@ -350,6 +352,8 @@
         <script type="module" src="./modules/UserEdit.js"></script>
 
         <script type="module" src="./modules/SuperStates.js"></script>
+        <script type="module" src="./modules/CytoscapeTree.js"></script>
+
 
         <script type="module" src="./modules/Simulation.js"></script>
 
