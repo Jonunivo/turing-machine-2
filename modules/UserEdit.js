@@ -615,8 +615,11 @@ function userEditEdgeHandler(){
 function userDeleteEdgeHandler(){
     //close modal
     edgeModal.style.display = 'none';
-    //delete in TM object
+    //delete in global TM object
     turingMachine.delta.delete(editEdgeKey);
+    //delete in local TM object
+    getLocalTM().delta.delete(editEdgeKeyLocal);
+
     //delete in cyto
     cy.remove(cytoEditEdge);
 }
