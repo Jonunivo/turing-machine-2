@@ -39,10 +39,13 @@ var cyTree = cytoscape({
 
 });
 
+//Create Root at load time
+cyTreeCreateNode("root", 0, 0, 0);
+cyTreeStyleCurrentNode(0);
 
 //buildup cyTree
 function cyTreeCreate(){
-    cyTreeCreateNode("root", 0, 0, 0);
+
     let currTreeNode = tmTree.root;
 
     let depth = 1;
@@ -85,7 +88,7 @@ function cyTreeCreateNode(name, id, depth, width){
             'label': `${name}`,
             "text-valign": "center",
             "text-halign": "center",
-            'width': `${20}px` //dynamically set width
+            'width': `${name.length*5 + 10}px` //dynamically set width
         },
         position: { x: parseInt(50*width + 20), y: parseInt(50* depth + 50)},
     })
