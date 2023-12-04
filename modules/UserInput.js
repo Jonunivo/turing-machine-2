@@ -1,6 +1,6 @@
 import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
-import { addStateLocalTM, addEdgeLocalTM } from "./SuperStates.js";
+import { addStateLocalTM, addEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler};
 
@@ -120,12 +120,19 @@ function userNodeInputHandler(){
         }
     }
 
+
+    //// --- CORE --- ////
     //create cyto node
-    console.log("before cyCreateNode");
     cyCreateNode(nodeId, stateName, position.x, position.y, isStartingState, isAcceptingState, isRejectingState);
     
     //create node in Global TM
-    turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
+    //check if in root -> set global start/accept/reject state
+    if(getRootTM() === getLocalTM()){
+        turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
+    }
+    else{
+        turingMachine.createState(nodeId, stateName);
+    }
     //create node in Local TM
     addStateLocalTM(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
     //adjust nodeId
@@ -135,6 +142,7 @@ function userNodeInputHandler(){
     console.log("-----NEW STATE CREATED-----");
     console.log("new State with id: ", nodeId-1);
     console.log("global tm now: ", turingMachine);
+    console.log("local TM now: ", getLocalTM())
 
     //Grabify nodes
     cyGrabifyNodes();
@@ -196,7 +204,7 @@ cy.on('mouseup', 'node', (event) =>{
 function dragCreateEdge(event){
     if(inEditMode()){
         //save from node (TM) (to global var)
-        fromNode = turingMachine.getStatebyId(dragFromNode.id());
+        fromNode = getLocalTM().getStatebyId(dragFromNode.id());
         dragToNode = event.target;
 
         ////open modal
@@ -226,13 +234,14 @@ function dragCreateEdge(event){
             document.getElementById("fromStateDiv").appendChild(labelElement);
             document.getElementById("fromStateDiv").appendChild(selectElement);
         }
+
         //create dropdown menu of existing states
         createDropdownMenues(document.getElementById("fromState"))
         document.getElementById("fromState").value = fromNode.name;
 
         ////Create Option to Change ToState
         createDropdownMenues(document.getElementById("toState"))
-        var toNode = turingMachine.getStatebyId(dragToNode.id());
+        var toNode = getLocalTM().getStatebyId(dragToNode.id());
         document.getElementById("toState").value = toNode.name;
 
 
@@ -296,13 +305,13 @@ function userEdgeInputHandler(){
 
     //fromNode
     let dropdownfrom = document.getElementById("fromState");
-    let fromNode = turingMachine.getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let fromNode = getLocalTM().getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
     let fromNodeId = fromNode.id;
 
 
     //toNode 
     let dropdown = document.getElementById("toState")
-    let toNode = turingMachine.getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
+    let toNode = getLocalTM().getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
     let toNodeId = toNode.id;
 
     //readLabel
@@ -341,18 +350,30 @@ function userEdgeInputHandler(){
         writeLabel = 'nothing';
     }
 
+    //// --- CORE --- ////
+
     //create Edge Cytoscape
     cyCreateEdge(`${fromNodeId}`, `${toNodeId}`, cyLabel, readLabel);
 
     //create edge in Global TM
     let fromState = turingMachine.getStatebyId(fromNodeId);
+    if(fromState === undefined){
+        //fromState is not in global TM = is a SuperState
+        fromState = getAcceptSubTM(fromNodeId);
+    }
+
     let toState = turingMachine.getStatebyId(toNodeId);
+    if(toState === undefined){
+        //toState is not in global TM = is a SuperState
+        toState = getStartSubTM(toNodeId);
+    }
     turingMachine.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
+    
     //create Edge in Local TM
-    addEdgeLocalTM(fromState, readLabel, toState, writeLabel, tapeMovement);
+    addEdgeLocalTM(fromNodeId, readLabel, toNodeId, writeLabel, tapeMovement);
 
 
-    //adjust Alphabets of TM if user enters new token (write)
+    //// adjust Alphabets of TM if user enters new token (write)
     if(turingMachine.sigma.has(writeLabel)){
         //sigma already has Label, do nothing
     }
@@ -370,7 +391,9 @@ function userEdgeInputHandler(){
     }
 
     //logging
-    console.log(turingMachine);
+    console.log("-----NEW EDGE CREATED-----")
+    console.log("Global TM now: ", turingMachine);
+    console.log("Local TM now: ", getLocalTM())
 }
 
 //Cancel button (edge) pressed
@@ -398,7 +421,7 @@ function createDropdownMenues(dropdown){
     }
     //fetch options from existing nodeIds
     let options = [];
-    for(const state of turingMachine.states){
+    for(const state of getLocalTM().states){
         options.push(state.name);
     }
     //create HTML elements from options

@@ -1,7 +1,7 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-import { editNodeLocalTM, editEdgeLocalTM } from "./SuperStates.js";
+import { editNodeLocalTM, editEdgeLocalTM, getLocalTM } from "./SuperStates.js";
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////
@@ -230,8 +230,14 @@ function userEditNodeHandler(){
         turingMachine.rejectstate = null;
     }
 
-    //localTM object
+    //edit localTM object
     editNodeLocalTM(editNode);
+
+    ////logging
+    console.log("---NODE EDITED---")
+    console.log("global TM ", turingMachine);
+    console.log('local TM ', getLocalTM());
+
 
     //Grabify nodes
     cyGrabifyNodes();
@@ -456,7 +462,6 @@ function userEditEdgeHandler(){
     if(parseInt(tapeMovementValue) === -1){
         tapeMovement = "L";
         labelMove = "⮜";
-
     }
     else if(parseInt(tapeMovementValue) === 1){
         tapeMovement = "R";

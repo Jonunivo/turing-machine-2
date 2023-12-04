@@ -5,7 +5,7 @@ import { State } from "./State.js";
 import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
 import { nodePresetHelper, inEditMode } from "./UserInput.js";
 
-export{addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM};
+export{addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM};
 
 //Global Variables
 
@@ -95,6 +95,7 @@ function userSuperNodeInputHandler(){
     //set position of start & end state of subTM
     positionMap.set(id1, [100, 200])
     positionMap.set(id2, [500, 200])
+    //add TM to tree
     addTuringmaschine(subTuringMachine, positionMap, superStateId);
 
     //merge into main TM (adds start & stop state to globalTM)
@@ -122,7 +123,6 @@ cy.on('cxttap', 'node', function(event){
     let childrenArr = currTreeNode.children
     let found = false;
     for(let i = 0; i<childrenArr.length; i++){
-        console.log(childrenArr[i].superNodeId, " | ", event.target.id())
         if(childrenArr[i].superNodeId === parseInt(event.target.id())){
             currTreeNode = childrenArr[i];
             found = true;
@@ -201,30 +201,32 @@ function createCytoWindow(){
 function addStateLocalTM(id, name, isStarting, isAccepting, isRejecting){
     let localTM = currTreeNode.turingMachine;
     localTM.createState(id, name, isStarting, isAccepting, isRejecting);
-    console.log("local TM states now: ", localTM.states);
 }
 
-function addEdgeLocalTM(fromState, readLabel, toState, writeLabel, tapeMovement){
+function addEdgeLocalTM(fromStateId, readLabel, toStateId, writeLabel, tapeMovement){
     let localTM = currTreeNode.turingMachine;
+    let fromState = localTM.getStatebyId(fromStateId);
+    let toState = localTM.getStatebyId(toStateId);
     localTM.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
-    console.log("local TM delta now: ", localTM.delta);
 }
 
 //adjust local TM when node edit (borrow from global tm)
 function editNodeLocalTM(editNode){
-    //find state with correspond. id
+    //find state in local TM with corresponding id
     let editNodeLocal = currTreeNode.turingMachine.getStatebyId(editNode.id);
-    console.log(editNodeLocal);
-    console.log(editNode);
+
     //copy properties
     editNodeLocal.name = editNode.name;
     editNodeLocal.isStarting = editNode.isStarting;
     editNodeLocal.isAccepting = editNode.isAccepting;
     editNodeLocal.isRejecting = editNode.isRejecting;
-    console.log(editNodeLocal);
+
+    currTreeNode.turingMachine.startstate = turingMachine.startstate;
+    currTreeNode.turingMachine.acceptstate = turingMachine.acceptstate;
+    currTreeNode.turingMachine.rejectstate = turingMachine.rejectstate;
 }
 
-//adjust local TM when edge Edit (borrow from global tm)
+//adjust local TM when edge Edit (borrow from global tm) !!TO DO: fix this!
 function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey){
     //find corresponding edge
     
@@ -235,6 +237,7 @@ function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMove
 
     let localTMeditEdgeKey = [editEdgeKey[0], editEdgeKey[1]];
     console.log(localTMeditEdgeKey);
+    console.log("LOCAL TM editedgeKey", localTMeditEdgeKey);
     console.log("LOCAL TM Delta", localTM.delta);
     localTM.delta.delete(localTMeditEdgeKey);
     //create new
@@ -247,4 +250,41 @@ function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMove
 
 function getLocalTM(){
     return currTreeNode.turingMachine;
+}
+
+function getRootTM(){
+    return tmTree.root.turingMachine;
+}
+
+function getStartSubTM(superstateId){
+    //find requested node in local TM & get childTM
+    let childrenArr = currTreeNode.children
+    let childTreeNode;
+
+    for(let i = 0; i<childrenArr.length; i++){
+        console.log('sni ', childrenArr[i].superNodeId, ' | ', parseInt(superstateId));
+        if(childrenArr[i].superNodeId === parseInt(superstateId)){
+            childTreeNode = childrenArr[i];
+            break;
+        }
+    }
+    //return start state of childTM
+    return childTreeNode.turingMachine.startstate
+}
+
+function getAcceptSubTM(superstateId){
+
+    //find requested node in local TM & get childTM
+    let childrenArr = currTreeNode.children
+    let childTreeNode;
+
+    for(let i = 0; i<childrenArr.length; i++){
+        if(childrenArr[i].superNodeId === parseInt(superstateId)){
+            childTreeNode = childrenArr[i];
+            break;
+        }
+    }
+    //return accept state of childTM
+    return childTreeNode.turingMachine.acceptstate
+    
 }

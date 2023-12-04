@@ -57,21 +57,15 @@ export class TuringMachine{
         //add to TM object
         this.states.add(newState);
 
-        ////logging
-        console.log("---- TM OBJECT ----")
-
         //set startstate, acceptstate, rejectstate if needed
         if(isStarting){
             this.startstate = newState
-            console.log("startstate set")
         }
         if(isAccepting){
             this.acceptstate = newState
-            console.log("acceptstate set")
         }
         if(isRejecting){
             this.rejectstate = newState
-            console.log("rejectstate set")
         }
     }
 
@@ -255,7 +249,7 @@ export class TuringMachine{
     }
 
     /**
-     * Helper: Returns State with id @param id from turingMachine.states
+     * Helper: Returns State with id @param id from turingMachine.states. Returns undefined if none found
      * 
      * @param {number} id - id of requested State
      * @returns {State} with given id
@@ -266,7 +260,8 @@ export class TuringMachine{
                 return state;
             }
         }
-        throw new Error(`There is no state with Id ${id}`)
+        console.log("getStatebyId unsuccessful");
+        return undefined
     }
 
     /**

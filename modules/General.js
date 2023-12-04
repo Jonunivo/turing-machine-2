@@ -23,7 +23,6 @@ function userPressEnter(){
     const saveModal = document.getElementById('saveModal');
     //Node Create Modal open
     if(nodeModal.style.display === 'block' && !document.getElementById("nodeDeleteButton")){
-        console.log("0");
         simulateButtonClick("nodeButton");
     }
     //Edge Create Modal open
