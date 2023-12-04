@@ -2,10 +2,11 @@ import { Tree, TreeNode } from "../datastructures/Tree.js";
 import { TuringMachine, turingMachine} from "./TuringMachine.js";
 import { State } from "./State.js";
 
-import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
+import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
 import { nodePresetHelper, inEditMode } from "./UserInput.js";
+import { cytoEditNode, editNode } from "./UserEdit.js";
 
-export{addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM};
+export{addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler};
 
 //Global Variables
 
@@ -15,6 +16,12 @@ var currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(
 var tmTree = new Tree(currTreeNode);
 //createNode Position
 var position;
+//imported globals
+//turingMachine - global TM object
+//cy            - cytoscape object
+//cytoEditNode  - cyto node currently being edited
+//editNode      - node currently being edited
+
 
 //!should be called before entering new window!
 function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
@@ -36,21 +43,33 @@ cy.on('cxttap', (event) => {
     if(inEditMode() && event.target === cy){
         position = event.position;
 
-        //
+        //Modal Element
         const superNodeModal = document.getElementById('superNodeModal');
-        const modal = document.querySelector('.modal-content');
+        
         //get cytoscape window position
         const cytoWindow = document.querySelector('#cytoscape');
         const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
         const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
-
-        addEventListenerWithCheck(document.getElementById('superNodeButton'), 'click', userSuperNodeInputHandler)
-
         //display modal at doubleclick position
         superNodeModal.style.paddingLeft = `${position.x + leftValue}px`
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
         superNodeModal.style.display = 'block';
+
+        ////change button from "edit node" to "create node"
+        var superNodeEditButton = document.getElementById("superNodeEditButton");
+        var superNodeButton = document.createElement("button");
+        superNodeButton.id = "superNodeButton";
+        superNodeButton.innerText = "Zustand erstellen";
+        if(superNodeEditButton){
+            // Replace the existing button with the new button
+            superNodeEditButton.parentNode.replaceChild(superNodeButton, superNodeEditButton);
+        }
+
+        //Event Listener
+        addEventListenerWithCheck(document.getElementById('superNodeButton'), 'click', userSuperNodeInputHandler)
+
+
     }
 });
 
@@ -70,7 +89,7 @@ function userSuperNodeInputHandler(){
     
     //create cyto node
     let superStateId = nodePresetHelper();
-    cyCreateNode(superStateId, stateName, position.x, position.y, false, false, false);
+    cyCreateNode(superStateId, stateName, position.x, position.y, false, false, false, true);
 
     //// Create SubTM & add to TreeStructure (child)
     //Create Start & End Node
@@ -108,7 +127,50 @@ function userSuperNodeInputHandler(){
     //increase ID
     nodePresetHelper();
 
+    cyGrabifyNodes();
+
 }   
+
+/**
+ * Handles User editing supernode (called by user clicking "edit node" within supernode modal)
+ */
+function userEditSuperNodeHandler(){
+    //Close the modal
+    superNodeModal.style.display = 'none';
+
+
+
+    let newName = document.getElementById('superStateName').value;
+
+    //catch name already exists in current TreeNode
+    for(const state of currTreeNode.turingMachine.states){
+        if(state.name === stateName){
+            alert(`state with Name ${state.name} already exists, please choose a unique name`);
+            superNodeModal.style.display = 'block';
+            return;
+        }
+    }
+
+    //get edit node
+
+    //cyto
+    cytoEditNode.style('label', newName);
+    cytoEditNode.style('width', `${newName.length*10 + 10}px`)
+
+    //global TM object
+    //no change, since node not in global TM
+
+    //local TM object
+    editNode.name = newName;
+    console.log("states ", currTreeNode.turingMachine.states);
+
+    cyGrabifyNodes();
+}
+
+//User presses cancel button in NodeModal -> hide nodeModal
+document.getElementById("cancelButton4").addEventListener('click', function(){
+    superNodeModal.style.display = 'none';
+})
 
 //////////////////////////////////////////////////////////////
 //// ------------------ Enter/Leave state --------------- ////
@@ -160,12 +222,26 @@ document.getElementById("leaveSuperState").addEventListener("click", leaveSuperS
 function createCytoWindow(){
     //Clear Canvas
     cyClearCanvas();
+
+    //get Ids of SuperNodes
+    let superNodeIds = new Set();
+    for(let child of currTreeNode.children){
+        superNodeIds.add(child.superNodeId)
+    }
+
     //Create Nodes
     for(let state of currTreeNode.turingMachine.states){
         let nodePositionX = currTreeNode.nodePositions.get(parseInt(state.id))[0];
         let nodePositionY = currTreeNode.nodePositions.get(state.id)[1];
         //cyto create node
-        cyCreateNode(state.id, state.name, nodePositionX, nodePositionY, state.isStarting, state.isAccepting, state.isRejecting);
+        if(superNodeIds.has(state.id)){
+            //superNode
+            cyCreateNode(state.id, state.name, nodePositionX, nodePositionY, state.isStarting, state.isAccepting, state.isRejecting, true);
+        }
+        else{
+            //not a superNode
+            cyCreateNode(state.id, state.name, nodePositionX, nodePositionY, state.isStarting, state.isAccepting, state.isRejecting);
+        }
     }
     //Create Edges
     for(let [key, value] of currTreeNode.turingMachine.delta){
@@ -193,6 +269,8 @@ function createCytoWindow(){
     }
     console.log("LOCAL TM: ", currTreeNode.turingMachine);
     console.log("GLOBAL TM: ", turingMachine);
+
+    cyGrabifyNodes();
 }
 
 //////////////////////////////////////////////////////////////
@@ -248,6 +326,10 @@ function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMove
     console.log("LOCAL TM Delta", localTM.delta)
 }
 
+//////////////////////////////////////////////////////////////
+//// ---------------- Getters -------------- ////
+//////////////////////////////////////////////////////////////
+
 function getLocalTM(){
     return currTreeNode.turingMachine;
 }
@@ -262,7 +344,6 @@ function getStartSubTM(superstateId){
     let childTreeNode;
 
     for(let i = 0; i<childrenArr.length; i++){
-        console.log('sni ', childrenArr[i].superNodeId, ' | ', parseInt(superstateId));
         if(childrenArr[i].superNodeId === parseInt(superstateId)){
             childTreeNode = childrenArr[i];
             break;

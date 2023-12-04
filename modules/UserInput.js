@@ -112,7 +112,7 @@ function userNodeInputHandler(){
         return;
     }
     //catch name already exists
-    for(const state of turingMachine.states){
+    for(const state of getLocalTM().states){
         if(state.name === stateName){
             alert(`state with Name ${state.name} already exists, please choose a unique name`);
             nodeModal.style.display = 'block';
@@ -445,22 +445,23 @@ function createDropdownMenues(dropdown){
  */
 function disableSliders(){
     console.log("disable Sliders");
+    let localTM = getLocalTM();
     //starting
-    if(turingMachine.startstate !== null && turingMachine.startstate !== undefined){
+    if(localTM.startstate !== null && localTM.startstate !== undefined){
         document.getElementById("stateStarting").disabled = true;
     }
     else{
         document.getElementById("stateStarting").disabled = false;
     }
     //accepting
-    if(turingMachine.acceptstate !== null && turingMachine.acceptstate !== undefined){
+    if(localTM.acceptstate !== null && localTM.acceptstate !== undefined){
         document.getElementById("stateAccepting").disabled = true;
     }
     else{
         document.getElementById("stateAccepting").disabled = false;
     }
     //rejecting
-    if(turingMachine.rejectstate !== null && turingMachine.rejectstate !== undefined){
+    if(localTM.rejectstate !== null && localTM.rejectstate !== undefined){
         document.getElementById("stateRejecting").disabled = true;
     }
     else{

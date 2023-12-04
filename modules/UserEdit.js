@@ -1,8 +1,9 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-import { editNodeLocalTM, editEdgeLocalTM, getLocalTM } from "./SuperStates.js";
+import { editNodeLocalTM, editEdgeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM } from "./SuperStates.js";
 
+export { editNode, cytoEditNode }
 //////////////////////////////////////////////////////////////
 //// -------------------- User Edit --------------------- ////
 //////////////////////////////////////////////////////////////
@@ -44,7 +45,31 @@ function clickEditNode(event){
     //save node clicked on (global vars)
     cytoEditNode = event.target;
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
+    
+    //// Case 1: clicked on SuperNode
+    if(editNode === undefined){
+        //open superNode window & return
+        editNode = getLocalTM().getStatebyId(cytoEditNode.id())
+        
+        //change button from "create node" to "edit node"
+        let superNodeButton = document.getElementById("superNodeButton");
+        if(superNodeButton){
+            let nodeEditButton = document.createElement("button");
+            nodeEditButton.id = "superNodeEditButton";
+            nodeEditButton.innerText = "Zustand bearbeiten";
+            // Replace the existing button with the new button
+            superNodeButton.parentNode.replaceChild(nodeEditButton, superNodeButton);
+        }
 
+        //event listener, userEditSuperNodeHandler implemented in SuperStates.js
+        addEventListenerWithCheck(document.getElementById('superNodeEditButton'), 'click', userEditSuperNodeHandler);
+
+        //open modal
+        superNodeModal.style.display = 'block';
+        return;
+    }
+
+    //// Case 2: clicked on normal node
 
     ////open Modal at click position
     //get click position
@@ -135,14 +160,12 @@ function userEditNodeHandler(){
     //close modal
     nodeModal.style.display = 'none';
 
-
-
     ////Name
     var newName = document.getElementById("stateName").value;
 
     //catch name already exists
     if(newName !== editNode.name)
-    for(const state of turingMachine.states){
+    for(const state of getLocalTM().states){
         if(state.name === newName){
             alert(`state with Name ${state.name} already exists, please choose a unique name`);
             nodeModal.style.display = 'block';
@@ -245,6 +268,8 @@ function userEditNodeHandler(){
 
 }
 
+
+
 /**
  * Handles the User deleting a node (TM object & cyto node) & closes Modal
  * 
@@ -256,16 +281,16 @@ function userDeleteNodeHandler(){
     ////Delete in cyto
     cy.remove(cytoEditNode);
 
-    ////delete from TM object
+    ////delete from global TM object
     //remove node
     turingMachine.states.delete(editNode);
-    if(editNode.isStarting){
+    if(editNode.isStarting && (getLocalTM() == getRootTM())){
         turingMachine.startstate = null;
     }
-    if(editNode.isAccepting){
+    if(editNode.isAccepting && (getLocalTM() == getRootTM())){
         turingMachine.acceptstate = null;
     }
-    if(editNode.isRejecting){
+    if(editNode.isRejecting && (getLocalTM() == getRootTM())){
         turingMachine.rejectstate = null;
     }
     //remove all edges from / to this node
@@ -276,6 +301,28 @@ function userDeleteNodeHandler(){
         }
     }
     turingMachine.delta = updatedDelta;
+
+    ////delete from local TM object
+    const localTM = getLocalTM();
+    editNode = localTM.getStatebyId(editNode.id)
+    localTM.states.delete(editNode);
+    if(editNode.isStarting){
+        localTM.startstate = null;
+    }
+    if(editNode.isAccepting){
+        localTM.acceptstate = null;
+    }
+    if(editNode.isRejecting){
+        localTM.rejectstate = null;
+    }
+    //remove all edges from/to this node
+    updatedDelta = new Map();
+    for(const [key, value] of localTM.delta){
+        if(key[0] !== editNode && value[0] !== editNode){
+            updatedDelta.set(key, value)
+        }
+    }
+    localTM.delta = updatedDelta;
 
     //Grabify nodes
     cyGrabifyNodes();
@@ -493,7 +540,7 @@ function userEditEdgeHandler(){
     const newEdgeValue = [newtoNode, writeToken, tapeMovement];
     turingMachine.delta.set(newEdgeKey, newEdgeValue);
     //Local TM object
-    editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey);
+    //editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey);
 
     //Cyto
 
@@ -502,7 +549,9 @@ function userEditEdgeHandler(){
     //create new
     cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
 
-
+    console.log('---Edge Edited---');
+    console.log('Global delta now: ', turingMachine.delta);
+    console.log('local delta now: ', getLocalTM().delta);
 
 }
 

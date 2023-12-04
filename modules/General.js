@@ -41,6 +41,11 @@ function userPressEnter(){
     else if(saveModal.style.display === "block"){
         simulateButtonClick("saveConfirm");
     }
+    //SuperNode create modal open
+    else if(superNodeModal.style.display === "block"){
+        //not yet supported
+    }
+
     //write tape field in focus
     else if(document.activeElement === document.getElementById("tape-input-field")){
         simulateButtonClick("tape-input");

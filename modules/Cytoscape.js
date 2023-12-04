@@ -80,7 +80,7 @@ function cyGrabifyNodes(){
  * @param {boolean} isAccepting - used to specify style properties
  * @param {boolean} isRejecting - used to specify style properties
  */
-function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting){
+function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting, isSuperNode = false){
     console.log("cyCreateNode with id", nodeId, " xPos: ", xPos, " yPos: ", yPos);
     
     //default values
@@ -89,6 +89,7 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
     let color = 'lightgrey';
     let borderWidth = 0;
     let borderColor = 'white';
+    let borderStyle = 'solid';
 
     //adjust style for Accepting/Starting/Rejecting nodes
     if(isStarting){
@@ -102,6 +103,13 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
     else if(isRejecting){
         color = 'red';
     }
+    //styling of SuperNode
+    if(isSuperNode){
+        borderStyle = 'dashed';
+        borderWidth = 2;
+        borderColor = 'black';
+        color = '#ffffa3';
+    }
     //core
     cy.add({
         group: 'nodes',
@@ -110,6 +118,7 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
             'background-color': `${color}`,
             'border-width': `${borderWidth}`, // Set the border width for the nodes
             'border-color': `${borderColor}`,
+            'border-style': `${borderStyle}`,
             'label': `${label}`,
             "text-valign": "center",
             "text-halign": "center",
