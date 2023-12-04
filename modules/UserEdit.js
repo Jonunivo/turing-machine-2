@@ -1,7 +1,7 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
-import { turingMachine } from "./TuringMachine.js";
+import { TuringMachine, turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-import { editNodeLocalTM, editEdgeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM } from "./SuperStates.js";
+import { editNodeLocalTM, editEdgeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }
 //////////////////////////////////////////////////////////////
@@ -14,8 +14,10 @@ var cytoEditNode;
 var editNode;
 //editEdge to save edge clicked on to edit
 var cytoEditEdge;
-var editEdgeKey
+var editEdgeKey;
+var editEdgeKeyLocal;
 var editEdgeContent;
+var editEdgeContentLocal;
 
 
 
@@ -205,8 +207,6 @@ function userEditNodeHandler(){
     }
     else if(editNode.isStarting){
         //edit node was starting node but edit removed starting node property
-        console.log("HERE", editNode);
-
         //cyto
         cytoEditNode.style('background-color', 'lightgrey');
         cytoEditNode.style('border-width', 0);
@@ -337,7 +337,7 @@ function userDeleteNodeHandler(){
  *      (3) User cancels modal -> hide Modal
  */
 
-//Right click on Node to Edit edge (opens Edit Edge Modal)
+//Click on Edge to Edit edge (opens Edit Edge Modal)
 
 cy.on('click', 'edge', function(event){
     //only if in edit mode
@@ -346,11 +346,33 @@ cy.on('click', 'edge', function(event){
         //save edge clicked on (global var)
         cytoEditEdge = event.target;
 
-        //get edge TM object (delta)
+        //local TM
+        let localTM = getLocalTM();
+
+
+
+        //get edge TM object (delta) 
         let fromNodeId = cytoEditEdge.source().id();
         let readToken = cytoEditEdge.data("readToken");
-        editEdgeKey = turingMachine.getKeyByContent([turingMachine.getStatebyId(fromNodeId), readToken]);
-        editEdgeContent = turingMachine.delta.get(editEdgeKey);
+        let fromNode = turingMachine.getStatebyId(fromNodeId)
+        if(fromNode === undefined){
+            //Case 1.1: from node is supernode
+            //EdgeKey for GlobalTM
+            editEdgeKey = turingMachine.getKeyByContent([getAcceptSubTM(fromNodeId), readToken]);
+            editEdgeContent = turingMachine.delta.get(editEdgeKey);
+            //EdgeKey for LocalTM
+            editEdgeKeyLocal = localTM.getKeyByContent([localTM.getStatebyId(fromNodeId), readToken]);
+            editEdgeContentLocal = localTM.delta.get(editEdgeKeyLocal);
+        }
+        else{
+            //Case 1.2: from node is normal node
+            editEdgeKey = turingMachine.getKeyByContent([fromNode, readToken]);
+            editEdgeContent = turingMachine.delta.get(editEdgeKey);
+            editEdgeKeyLocal = editEdgeKey;
+            editEdgeContentLocal = localTM.delta.get(editEdgeKeyLocal);
+        }
+
+
         
         //open Modal at click position
         const position = event.position;
@@ -426,11 +448,11 @@ function getCurrentEdgeProperties(){
     }
     //create dropdown menu of existing states
     createDropdownMenues(document.getElementById("fromState"))
-    document.getElementById("fromState").value = editEdgeKey[0].name;
+    document.getElementById("fromState").value = editEdgeKeyLocal[0].name;
 
     //to State
     createDropdownMenues(document.getElementById("toState"))
-    document.getElementById("toState").value = editEdgeContent[0].name;
+    document.getElementById("toState").value = editEdgeContentLocal[0].name;
 
     //read Label
     if(editEdgeKey[1] === 'else'){
@@ -487,13 +509,32 @@ function userEditEdgeHandler(){
 
     ////Read User Input
 
+    //get local TM
+    let localTM = getLocalTM();
+
+    //new from node is supernode
+    let isFromNodeSuper = false;
+    //new to node is supernode
+    let isToNodeSuper = false;
+
     //fromNode
     let dropdown1 = document.getElementById("fromState");
     let newfromNode = turingMachine.getStatebyName(dropdown1.value);
+    if(newfromNode === undefined){
+        //node from superstate
+        newfromNode = localTM.getStatebyName(dropdown1.value);
+        isFromNodeSuper = true;
+    }
     
     //toNode
     let dropdown2 = document.getElementById("toState");
     let newtoNode = turingMachine.getStatebyName(dropdown2.value);
+    if(newtoNode === undefined){
+        //node to superstate
+        newtoNode = localTM.getStatebyName(dropdown2.value);
+        isToNodeSuper = true;
+        console.log("new TO NODE", newtoNode);
+    }
     
     //readToken
     let readToken = document.getElementById("readLabel").value;
@@ -530,20 +571,32 @@ function userEditEdgeHandler(){
     }
 
 
-    ////Edit TM object & cyto
+    ////Edit Global & Local TM object
 
     //Global TM object
     //remove old
     turingMachine.delta.delete(editEdgeKey);
+    let newEdgeKey = [newfromNode, readToken];
+    let newEdgeValue = [newtoNode, writeToken, tapeMovement];
     //create new
-    const newEdgeKey = [newfromNode, readToken];
-    const newEdgeValue = [newtoNode, writeToken, tapeMovement];
+    if(isFromNodeSuper){
+        //Case 1: now originating from superNode: connect to AcceptState of subTM
+        newEdgeKey[0] = getAcceptSubTM(newfromNode.id)
+    }
+    if(isToNodeSuper){
+        //Case 2: now connecting from superNode: connect to StartState of subTM
+        newEdgeValue[0] = getStartSubTM(newtoNode.id)
+    }
     turingMachine.delta.set(newEdgeKey, newEdgeValue);
+
+    console.log("GLOBAL TM DELTA: ", turingMachine.delta);
+    
     //Local TM object
-    //editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey);
-
-    //Cyto
-
+    editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKeyLocal);
+    console.log("LOCAL TM Delta: ", localTM.delta)
+    
+    
+    ////Cyto
     //remove
     cy.remove(cytoEditEdge);
     //create new

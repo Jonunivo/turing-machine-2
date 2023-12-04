@@ -278,7 +278,8 @@ export class TuringMachine{
                 return state;
             }
         }
-        throw new Error(`There is no state with Name ${name}`)
+        console.log("getStatebyName unsuccessful");
+        return undefined
     }
 
     /**

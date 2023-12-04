@@ -304,26 +304,18 @@ function editNodeLocalTM(editNode){
     currTreeNode.turingMachine.rejectstate = turingMachine.rejectstate;
 }
 
-//adjust local TM when edge Edit (borrow from global tm) !!TO DO: fix this!
+//adjust local TM when edge Edit
 function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey){
-    //find corresponding edge
-    
-    //borrow from other edge
-
     let localTM = currTreeNode.turingMachine;
+    
     //remove old
-
     let localTMeditEdgeKey = [editEdgeKey[0], editEdgeKey[1]];
-    console.log(localTMeditEdgeKey);
-    console.log("LOCAL TM editedgeKey", localTMeditEdgeKey);
-    console.log("LOCAL TM Delta", localTM.delta);
-    localTM.delta.delete(localTMeditEdgeKey);
+    localTM.delta.delete(localTM.getKeyByContent(localTMeditEdgeKey));
+    
     //create new
     const newEdgeKey = [newfromNode, readToken];
     const newEdgeValue = [newtoNode, writeToken, tapeMovement];
     localTM.delta.set(newEdgeKey, newEdgeValue);
-
-    console.log("LOCAL TM Delta", localTM.delta)
 }
 
 //////////////////////////////////////////////////////////////
@@ -344,6 +336,7 @@ function getStartSubTM(superstateId){
     let childTreeNode;
 
     for(let i = 0; i<childrenArr.length; i++){
+        console.log("check ",childrenArr[i].superNodeId," | ", parseInt(superstateId))
         if(childrenArr[i].superNodeId === parseInt(superstateId)){
             childTreeNode = childrenArr[i];
             break;
