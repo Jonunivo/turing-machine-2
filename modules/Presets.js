@@ -23,7 +23,8 @@ function empty(){
  */
 function loadPresetOne(){
     //load binary Increment preset
-    const filePath = '../presets/binaryincrement.json';
+    const filePath = 'https://n.ethz.ch/~mavogel/version-b/presets/binaryincrement.json';
+
 
     fetch(filePath)
       .then(response => {
@@ -50,7 +51,7 @@ function loadPresetOne(){
  */
 function loadPresetTwo(){
     //ab Palindrom
-    const filePath = '../presets/abPalindrome.json';
+    const filePath = 'https://n.ethz.ch/~mavogel/version-b/presets/abPalindrome.json';
 
     fetch(filePath)
       .then(response => {
