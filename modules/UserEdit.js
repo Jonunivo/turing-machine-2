@@ -354,8 +354,9 @@ cy.on('click', 'edge', function(event){
         //get edge TM object (delta) 
         let fromNodeId = cytoEditEdge.source().id();
         let readToken = cytoEditEdge.data("readToken");
-        let fromNode = turingMachine.getStatebyId(fromNodeId)
-        if(fromNode === undefined){
+        let fromNodeGlobal = turingMachine.getStatebyId(fromNodeId);
+        let fromNodeLocal = localTM.getStatebyId(fromNodeId);
+        if(fromNodeGlobal === undefined){
             //Case 1.1: from node is supernode
             //EdgeKey for GlobalTM
             editEdgeKey = turingMachine.getKeyByContent([getAcceptSubTM(fromNodeId), readToken]);
@@ -366,10 +367,12 @@ cy.on('click', 'edge', function(event){
         }
         else{
             //Case 1.2: from node is normal node
-            editEdgeKey = turingMachine.getKeyByContent([fromNode, readToken]);
+            editEdgeKey = turingMachine.getKeyByContent([fromNodeLocal, readToken]);
             editEdgeContent = turingMachine.delta.get(editEdgeKey);
-            editEdgeKeyLocal = editEdgeKey;
+
+            editEdgeKeyLocal = localTM.getKeyByContent([fromNodeLocal, readToken]);
             editEdgeContentLocal = localTM.delta.get(editEdgeKeyLocal);
+
         }
 
 
@@ -519,22 +522,23 @@ function userEditEdgeHandler(){
 
     //fromNode
     let dropdown1 = document.getElementById("fromState");
-    let newfromNode = turingMachine.getStatebyName(dropdown1.value);
-    if(newfromNode === undefined){
+    let newfromNode = localTM.getStatebyName(dropdown1.value);
+    let newfromNodeId = newfromNode.id;
+    if(turingMachine.getStatebyId(newfromNodeId) === undefined){
         //node from superstate
-        newfromNode = localTM.getStatebyName(dropdown1.value);
         isFromNodeSuper = true;
     }
+
     
     //toNode
     let dropdown2 = document.getElementById("toState");
-    let newtoNode = turingMachine.getStatebyName(dropdown2.value);
-    if(newtoNode === undefined){
+    let newtoNode = localTM.getStatebyName(dropdown2.value);
+    let newtoNodeId = newtoNode.id;
+    if(turingMachine.getStatebyId(newtoNodeId) === undefined){
         //node to superstate
-        newtoNode = localTM.getStatebyName(dropdown2.value);
         isToNodeSuper = true;
-        console.log("new TO NODE", newtoNode);
     }
+
     
     //readToken
     let readToken = document.getElementById("readLabel").value;

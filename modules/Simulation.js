@@ -356,6 +356,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     }
     else if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
         //final state reached
+        console.log(deltaValue[0]);
 
         //animate last state & call simulationResult
         animateNode(currentState, 2*animationTime);

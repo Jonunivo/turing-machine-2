@@ -7,7 +7,7 @@ import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
 import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{currTreeNodeName, tmTree, setTmTree, setCurrTreeNode, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
+export{currTreeNodeName, currTreeNode, tmTree, setTmTree, setCurrTreeNode, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
 
 //Global Variables
 
@@ -100,6 +100,9 @@ function userSuperNodeInputHandler(){
     let superStateId = nodePresetHelper();
     cyCreateNode(superStateId, stateName, position.x, position.y, false, false, false, true);
 
+    //save node positions
+    currTreeNode.nodePositions = generateNodePosMap();
+
     //// Create SubTM & add to TreeStructure (child)
     //Create Start & End Node
     let id1 = nodePresetHelper();
@@ -117,6 +120,7 @@ function userSuperNodeInputHandler(){
     subTuringMachine.states.add(startState);
     subTuringMachine.states.add(endState);
 
+
     //add TM Object to tree 
     //add positionmap (default)
     let positionMap = new Map();
@@ -127,6 +131,9 @@ function userSuperNodeInputHandler(){
     addTuringmaschine(subTuringMachine, positionMap, superStateId);
 
     //merge into main TM (adds start & stop state to globalTM)
+        //remove isStarting & isAccepting for global TM
+    subTuringMachine.getStatebyId(id1).isStarting = false;
+    subTuringMachine.getStatebyId(id2).isAccepting = false;
     turingMachine.mergeInTuringMachine(subTuringMachine);
 
     //add SuperState to local TM (parent)
@@ -148,8 +155,6 @@ function userSuperNodeInputHandler(){
 function userEditSuperNodeHandler(){
     //Close the modal
     superNodeModal.style.display = 'none';
-
-
 
     let newName = document.getElementById('superStateName').value;
 
@@ -295,6 +300,7 @@ function createCytoWindow(){
 //////////////////////////////////////////////////////////////
 function addStateLocalTM(id, name, isStarting, isAccepting, isRejecting){
     let localTM = currTreeNode.turingMachine;
+    console.log(currTreeNode);
     localTM.createState(id, name, isStarting, isAccepting, isRejecting);
 }
 

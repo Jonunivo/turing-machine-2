@@ -1,8 +1,8 @@
-import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
+import { cy, cyClearCanvas, generateNodePosMap, cyCreateEdge, cyCreateNode, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { State } from "./State.js";
 import { TuringMachine, turingMachine } from "./TuringMachine.js"
-import { tmTree, setTmTree, setCurrTreeNode, createCytoWindow} from "./SuperStates.js";
+import { tmTree, setTmTree, currTreeNode, setCurrTreeNode, createCytoWindow} from "./SuperStates.js";
 import { Tree, TreeNode } from "../datastructures/Tree.js";
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 import {simulationReset, enableButtons} from "./Simulation.js";
@@ -37,6 +37,8 @@ function saveTuringMachine(){
     //Open Save File Modal
     document.getElementById("saveModal").style.display = "block";
 
+    //save Node Positions of current window
+    currTreeNode.nodePositions = generateNodePosMap();
 
     //// Global TM
     tmProperties = [];
@@ -216,12 +218,17 @@ function loadFile(reader){
         //
         //load States
         let globalStates = loadStates(lines)
-        for(let j = 0; j<globalStates.length; j++){
-            turingMachine.states.add(globalStates[j]);
+        for(const state of globalStates){
+            turingMachine.states.add(state);
             //TO DO: handle setting turingMachine.startstate etc..
+            if (state.isAccepting){
+
+            }
         }
         console.log(turingMachine.states);
         lineId += 2;
+        //initialize TM Array to all empty strings
+        turingMachine.tape = Array.from({ length: 41 }, () => "");
 
         //load Transitions
         let globalTransitions = loadTransitions(lines);
@@ -294,6 +301,7 @@ function loadFile(reader){
         cyTreeCreate();
         //build root window
         createCytoWindow();
+        cyGrabifyNodes();
 
 
 /*
@@ -335,12 +343,12 @@ function loadFile(reader){
  * @returns {[State]} list of states read from input
  */
 function loadStates(lines){
-    let stateList = []
+    let stateSet = new Set();
     while(true){
         const currentLine = lines[lineId];
         //check if at finish
         if(currentLine == "" || currentLine == undefined){
-            return stateList;
+            return stateSet;
         }
         //load line
         try{
@@ -350,7 +358,7 @@ function loadStates(lines){
             const isStarting = parsedData.isStarting;
             const isAccepting = parsedData.isAccepting;
             const isRejecting = parsedData.isRejecting;
-            stateList.push(new State(id, name, isStarting, isAccepting, isRejecting));
+            stateSet.add(new State(id, name, isStarting, isAccepting, isRejecting));
             
         } catch(error){
             console.log('Error parsing JSON:', error.message);
