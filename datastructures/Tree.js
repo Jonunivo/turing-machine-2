@@ -15,10 +15,26 @@ export class TreeNode{
         this.children = [];
         this.superNodeId = superNodeId;
     }
+    getTreeNodeById(id){
+        if(this.superNodeId == id){
+            console.log("**", this.superNodeId);
+            return this;
+        }
+        // Recursively search for the node in the children
+        for (const child of this.children) {
+            const foundNode = child.getTreeNodeById(id);
+            if (foundNode) {
+                return foundNode; // Node found in the child subtree
+            }
+        }
+        return null;
+    }
+
 }
 
 export class Tree{
     constructor(root){
         this.root = root;
     }
+
 }

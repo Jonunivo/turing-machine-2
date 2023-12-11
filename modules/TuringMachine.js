@@ -33,7 +33,7 @@ export class TuringMachine{
     //////////////////////////////////////////////////////////////
 
     /**
-     * creates default turingmachine object (also used to reset TM object)
+     * creates global default turingmachine object (also used to reset TM object)
      */
     createTuringMachineBasic(){
         turingMachine = new TuringMachine(new Set(), new Set(), new Set(""), new Map(), undefined, undefined, undefined, null, 0);
@@ -283,17 +283,16 @@ export class TuringMachine{
     }
 
     /**
-     * Helper: Add all info from other into this Turingmachine
+     * Helper: Add all info from other into this Turingmachine; start & accept state from "this"
      * note: Only states, alphabets and transitions are merged into "this", rest of
      *      "this" stays the same
      * 
      * @param {TuringMachine} other - 2nd TuringMachine
      */
     mergeInTuringMachine(other){
-        //TO DO
         //add states
         for(let state of other.states){
-            this.states.add(state);
+            this.createState(state.id, state.name, false, false, state.isRejecting)
         }
         //sigma & gamma union
         this.sigma = new Set([...this.sigma, ...other.sigma]);

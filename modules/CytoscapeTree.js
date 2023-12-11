@@ -79,7 +79,9 @@ function cyTreeCreate(){
 }
 
 function cyTreeCreateNode(name, id, depth, width){
-
+    if(name=== undefined){
+        name = "";
+    }
     cyTree.add({
         group: 'nodes',
         data: {id: id},

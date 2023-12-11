@@ -7,7 +7,7 @@ import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
 import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{currTreeNodeName, tmTree, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler};
+export{currTreeNodeName, tmTree, setTmTree, setCurrTreeNode, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
 
 //Global Variables
 
@@ -36,7 +36,7 @@ function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
     newNode.parent = currTreeNode;
 
 
-    //create Tree
+    //create visible Tree
     cyTreeCreate();
 }
 
@@ -209,7 +209,7 @@ cy.on('cxttap', 'node', function(event){
 
     ////Create Nodes & Edges according to TM object that is being entered
     createCytoWindow();
-
+    //show current cyTree node red
     cyTreeStyleCurrentNode(currTreeNode.superNodeId);
 
 });
@@ -237,6 +237,9 @@ document.getElementById("leaveSuperState").addEventListener("click", leaveSuperS
 function createCytoWindow(){
     //Clear Canvas
     cyClearCanvas();
+    console.log("LOCAL TM: ", currTreeNode.turingMachine);
+    console.log("GLOBAL TM: ", turingMachine);
+    console.log(currTreeNode);
 
     //get Ids of SuperNodes
     let superNodeIds = new Set();
@@ -282,8 +285,7 @@ function createCytoWindow(){
         //cyto create Edge
         cyCreateEdge(fromNode, toNode, cyLabel, key[1]);
     }
-    console.log("LOCAL TM: ", currTreeNode.turingMachine);
-    console.log("GLOBAL TM: ", turingMachine);
+
 
     cyGrabifyNodes();
 }
@@ -376,4 +378,15 @@ function getAcceptSubTM(superstateId){
     //return accept state of childTM
     return childTreeNode.turingMachine.acceptstate
     
+}
+
+//////////////////////////////////////////////////////////////
+//// ---------------- Setters -------------- ////
+//////////////////////////////////////////////////////////////
+function setTmTree(tree){
+    tmTree = tree;
+}
+
+function setCurrTreeNode(node){
+    currTreeNode = node;
 }
