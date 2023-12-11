@@ -247,7 +247,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
         animationTime = 1000/document.getElementById('simulationSpeed').value;
         animateSimulationStep(turingMachine, currentState, charOnTape);
         //wait for simulation step to finish
-        await new Promise(resolve => setTimeout(resolve, 9*animationTime+100));
+        await new Promise(resolve => setTimeout(resolve, 8*animationTime+350));
         //wait an additional 100ms (test to fix animation not looking correct)
         await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -288,7 +288,10 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     //read animationTime
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
     let deltaValue = null;
-        
+
+    console.log("TM!: ", turingMachine);
+
+       
     //find corresponding transition in delta
     try{
         deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
@@ -306,6 +309,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         }
 
     }
+
     
     //// animate node IN
     //animateNode(tmState, animationTime);
@@ -356,6 +360,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     }
     else if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
         //final state reached
+        // !(TO DO) deltaValue is edited 1 step before actually reaching accept/reject state
         console.log(deltaValue[0]);
 
         //animate last state & call simulationResult

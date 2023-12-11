@@ -305,8 +305,15 @@ function userEdgeInputHandler(){
 
     //fromNode
     let dropdownfrom = document.getElementById("fromState");
-    let fromNode = getLocalTM().getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let localFromNode = getLocalTM().getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
     let fromNodeId = fromNode.id;
+    let globalFromNode = turingMachine.getStatebyId(fromNode.id)
+    if (globalFromNode === undefined){
+        //from node supernode (=not in global TM)
+        
+    }
+        
+    
 
 
     //toNode 

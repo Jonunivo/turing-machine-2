@@ -135,6 +135,8 @@ function userSuperNodeInputHandler(){
     subTuringMachine.getStatebyId(id1).isStarting = false;
     subTuringMachine.getStatebyId(id2).isAccepting = false;
     turingMachine.mergeInTuringMachine(subTuringMachine);
+    subTuringMachine.getStatebyId(id1).isStarting = true;
+    subTuringMachine.getStatebyId(id2).isAccepting = true;
 
     //add SuperState to local TM (parent)
     let superState = new State(superStateId, stateName)
@@ -365,8 +367,15 @@ function getStartSubTM(superstateId){
             break;
         }
     }
-    //return start state of childTM
-    return childTreeNode.turingMachine.startstate
+
+    //return accept state of childTM
+    if(found){
+        return childTreeNode.turingMachine.startstate
+    }
+    else{
+        console.error("getStartSubTM not found");
+        return undefined;
+    }
 }
 
 function getAcceptSubTM(superstateId){
@@ -374,15 +383,23 @@ function getAcceptSubTM(superstateId){
     //find requested node in local TM & get childTM
     let childrenArr = currTreeNode.children
     let childTreeNode;
+    let found = false;
 
     for(let i = 0; i<childrenArr.length; i++){
         if(childrenArr[i].superNodeId === parseInt(superstateId)){
             childTreeNode = childrenArr[i];
+            found = true;
             break;
         }
     }
     //return accept state of childTM
-    return childTreeNode.turingMachine.acceptstate
+    if(found){
+        return childTreeNode.turingMachine.acceptstate
+    }
+    else{
+        console.error("getAcceptSubTM not found");
+        return undefined;
+    }
     
 }
 

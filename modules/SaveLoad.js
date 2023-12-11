@@ -220,9 +220,16 @@ function loadFile(reader){
         let globalStates = loadStates(lines)
         for(const state of globalStates){
             turingMachine.states.add(state);
-            //TO DO: handle setting turingMachine.startstate etc..
-            if (state.isAccepting){
 
+            //setting turingMachine.startstate etc..
+            if (state.isStarting){
+                turingMachine.startstate = state;
+            }
+            if (state.isAccepting){
+                turingMachine.acceptstate = state;
+            }
+            else if (state.isRejecting){
+                turingMachine.rejectstate = state;
             }
         }
         console.log(turingMachine.states);
@@ -260,6 +267,18 @@ function loadFile(reader){
             let localStates = loadStates(lines);
             let localTM = new TuringMachine(localStates, new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
             lineId+=2;
+            //set starting/accepting/rejecting state of localTM
+            for(const state of localStates){
+                if(state.isStarting){
+                    localTM.startstate = state;
+                }
+                if(state.isAccepting){
+                    localTM.acceptstate = state;
+                }
+                else if(state.isRejecting){
+                    localTM.rejectstate = state;
+                }
+            }
 
             //transitions
             let localTransitions = loadTransitions(lines);
@@ -304,10 +323,9 @@ function loadFile(reader){
         cyGrabifyNodes();
 
 
-/*
-        //update nodeId variable (!TO DO)
-        nodePresetHelper();
 
+        //update nodeId variable (!TO DO)
+/*
         //
         //load Tape
         //
@@ -343,6 +361,8 @@ function loadFile(reader){
  * @returns {[State]} list of states read from input
  */
 function loadStates(lines){
+
+
     let stateSet = new Set();
     while(true){
         const currentLine = lines[lineId];
@@ -358,6 +378,9 @@ function loadStates(lines){
             const isStarting = parsedData.isStarting;
             const isAccepting = parsedData.isAccepting;
             const isRejecting = parsedData.isRejecting;
+            //adjust nodeId (such that it is ready after loading TM)
+            nodePresetHelper();
+            //add State to return
             stateSet.add(new State(id, name, isStarting, isAccepting, isRejecting));
             
         } catch(error){
