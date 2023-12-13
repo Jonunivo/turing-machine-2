@@ -122,8 +122,11 @@ document.getElementById('resetSimulationButton').addEventListener('click', funct
 function fastSimulation(){
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     let charOnTape = turingMachine.readTape()
-    currentState = turingMachine.startstate;
 
+    //catch first iteration
+    if(currentState === undefined){
+        currentState = turingMachine.startstate;
+    }
     //catch no startstate
     if(turingMachine.startstate === undefined){
         alert("Please create Start State first");
@@ -145,6 +148,7 @@ function fastSimulation(){
     }
     //simulation timeout
     if(new Date().getTime() - startTime >= timeLimit){
+        tmTapetoCyto();
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
     }
 
@@ -154,12 +158,6 @@ function fastSimulation(){
             tmTapetoCyto();
             turingMachine.simulationResult(currentState);
         }
-
-    currentState = turingMachine.startstate;
-    let from = Date.now()
-    while (Date.now() - from > 100){
-        
-    }
 
 
 }

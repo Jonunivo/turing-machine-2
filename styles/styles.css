@@ -63,9 +63,9 @@ body{
 }
 #cytoscape-tree{
     position: absolute;
-    top: 90px;
+    top: 140px;
     width: 140px;
-    height: calc(50%);
+    height: 450px;
     border: dotted 1px black;
 }
 

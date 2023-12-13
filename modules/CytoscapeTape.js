@@ -383,12 +383,18 @@ function cyWriteOnTape(input, animationTime){
         // -- TO DO -- remove animation
         currNode.remove();
         //create new node (animate fade in)
+        //color
+        let color = 'lightgrey';
+        if(currToken === " "){
+            currToken = "";
+            color = 'darkgrey';
+        }
         cyTape.add({
             group: 'nodes',
             data: { id: currNodeId },
             position: { x: currNodeX, y: currNodeY-10},
             style:{
-                'background-color': 'lightgrey',
+                'background-color': `${color}`,
                 'label': `${currToken}`,
                 'text-valign': "center",
                 'text-halign': "center",
@@ -457,12 +463,16 @@ function cyWriteCurrentPos(inputToken, animationTime){
     //remove old node
     currNode.remove();
     //create new node (animate fade in)
+    let color = 'lightgrey'
+    if(inputToken === ""){
+        color = 'darkgrey';
+    }
     cyTape.add({
         group: 'nodes',
         data: { id: currNodeId },
         position: { x: currNodeX, y: currNodeY-10},
         style:{
-            'background-color': 'lightgrey',
+            'background-color': `${color}`,
             'label': `${inputToken}`,
             'text-valign': "center",
             'text-halign': "center",
