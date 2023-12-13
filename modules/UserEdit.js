@@ -1,7 +1,7 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { TuringMachine, turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-import { editNodeLocalTM, editEdgeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
+import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }
 //////////////////////////////////////////////////////////////
@@ -18,6 +18,11 @@ var editEdgeKey;
 var editEdgeKeyLocal;
 var editEdgeContent;
 var editEdgeContentLocal;
+
+var localEditEdgeKey;
+var localEditEdgeContent;
+var globalEditEdgeKey;
+var globalEditEdgeContent;
 
 
 
@@ -46,12 +51,24 @@ cy.on('mouseup', 'node', (event) =>{
 function clickEditNode(event){
     //save node clicked on (global vars)
     cytoEditNode = event.target;
+
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
+    let localEditNode = getLocalTM().getStatebyId(cytoEditNode.id());
+
+    //// Case 0: clicked on uneditable node
+    //globally not accepting, but locally (-> local End State)
+    if(editNode !== undefined && !editNode.isAccepting && localEditNode.isAccepting){
+        return;
+    }
+    //globally not starting, but locally (-> local Start State)
+    if(editNode !== undefined && !editNode.isStarting && localEditNode.isStarting){
+        return;
+    }
     
     //// Case 1: clicked on SuperNode
     if(editNode === undefined){
         //open superNode window & return
-        editNode = getLocalTM().getStatebyId(cytoEditNode.id())
+        editNode = localEditNode;
         
         //change button from "create node" to "edit node"
         let superNodeButton = document.getElementById("superNodeButton");
@@ -293,7 +310,7 @@ function userDeleteNodeHandler(){
     if(editNode.isRejecting && (getLocalTM() == getRootTM())){
         turingMachine.rejectstate = null;
     }
-    //remove all edges from / to this node
+    //GlobalTM: remove all edges from / to this node
     let updatedDelta = new Map();
     for(const [key, value] of turingMachine.delta){
         if(key[0] !== editNode && value[0] !== editNode){
@@ -349,32 +366,24 @@ cy.on('click', 'edge', function(event){
         //local TM
         let localTM = getLocalTM();
 
-
-
-        //get edge TM object (delta) 
-        let fromNodeId = cytoEditEdge.source().id();
+        //get edge TM object (delta) (& put into global variable)
+        //Local
+        let localFromNodeId = cytoEditEdge.source().id();
+        let localFromNode = localTM.getStatebyId(localFromNodeId);
         let readToken = cytoEditEdge.data("readToken");
-        let fromNodeGlobal = turingMachine.getStatebyId(fromNodeId);
-        let fromNodeLocal = localTM.getStatebyId(fromNodeId);
-        if(fromNodeGlobal === undefined){
-            //Case 1.1: from node is supernode
-            //EdgeKey for GlobalTM
-            editEdgeKey = turingMachine.getKeyByContent([getAcceptSubTM(fromNodeId), readToken]);
-            editEdgeContent = turingMachine.delta.get(editEdgeKey);
-            //EdgeKey for LocalTM
-            editEdgeKeyLocal = localTM.getKeyByContent([localTM.getStatebyId(fromNodeId), readToken]);
-            editEdgeContentLocal = localTM.delta.get(editEdgeKeyLocal);
+        localEditEdgeKey = localTM.getKeyByContent([localFromNode, readToken]);
+        localEditEdgeContent = localTM.delta.get(localEditEdgeKey);
+
+        //Global
+        let globalFromNodeId = localFromNodeId;
+        let globalFromNode = turingMachine.getStatebyId(localFromNodeId);
+        if(globalFromNode === undefined){
+            //from node is super node
+            globalFromNodeId = getAcceptSubTM(localFromNodeId);
+            globalFromNode = turingMachine.getStatebyId(globalFromNodeId);
         }
-        else{
-            //Case 1.2: from node is normal node
-            editEdgeKey = turingMachine.getKeyByContent([fromNodeLocal, readToken]);
-            editEdgeContent = turingMachine.delta.get(editEdgeKey);
-
-            editEdgeKeyLocal = localTM.getKeyByContent([fromNodeLocal, readToken]);
-            editEdgeContentLocal = localTM.delta.get(editEdgeKeyLocal);
-
-        }
-
+        globalEditEdgeKey = turingMachine.getKeyByContent([globalFromNode, readToken]);
+        globalEditEdgeContent = turingMachine.delta.get(globalEditEdgeKey);
 
         
         //open Modal at click position
@@ -451,37 +460,37 @@ function getCurrentEdgeProperties(){
     }
     //create dropdown menu of existing states
     createDropdownMenues(document.getElementById("fromState"))
-    document.getElementById("fromState").value = editEdgeKeyLocal[0].name;
+    document.getElementById("fromState").value = localEditEdgeKey[0].name;
 
     //to State
     createDropdownMenues(document.getElementById("toState"))
-    document.getElementById("toState").value = editEdgeContentLocal[0].name;
+    document.getElementById("toState").value = localEditEdgeContent[0].name;
 
     //read Label
-    if(editEdgeKey[1] === 'else'){
+    if(localEditEdgeKey[1] === 'else'){
         document.getElementById("readLabelElse").checked = true;
         document.getElementById("readLabel").value = '';
         document.getElementById("readLabel").style.display = "none";
     }
     else{
         document.getElementById("readLabelElse").checked = false;
-        document.getElementById("readLabel").value = editEdgeKey[1];
+        document.getElementById("readLabel").value = localEditEdgeKey[1];
     }
 
     //write Label
-    if(editEdgeContent[1] === 'nothing'){
+    if(localEditEdgeContent[1] === 'nothing'){
         //write Nothing was eneabled
         document.getElementById("writeLabel").value = '';
         document.getElementById('writeLabelNothing').checked = true;
         document.getElementById("writeLabel").style.display = "none";
     }
     else{
-        document.getElementById("writeLabel").value = editEdgeContent[1];
+        document.getElementById("writeLabel").value = localEditEdgeContent[1];
         document.getElementById('writeLabelNothing').checked = false;
     }
 
     //tape Movement
-    switch (editEdgeContent[2]){
+    switch (localEditEdgeContent[2]){
         case "L":
             document.getElementById("tapeMovement").value = -1;
             break;
@@ -515,30 +524,25 @@ function userEditEdgeHandler(){
     //get local TM
     let localTM = getLocalTM();
 
-    //new from node is supernode
-    let isFromNodeSuper = false;
-    //new to node is supernode
-    let isToNodeSuper = false;
-
-    //fromNode
-    let dropdown1 = document.getElementById("fromState");
-    let newfromNode = localTM.getStatebyName(dropdown1.value);
-    let newfromNodeId = newfromNode.id;
-    if(turingMachine.getStatebyId(newfromNodeId) === undefined){
-        //node from superstate
-        isFromNodeSuper = true;
+    //fromNode (Local & Global TM)
+    let dropdownfrom = document.getElementById("fromState");
+    let localFromNode = localTM.getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let fromNodeId = localFromNode.id;
+    let globalFromNode = turingMachine.getStatebyId(fromNodeId)
+    if (globalFromNode === undefined){
+        //from node supernode (=not in global TM)
+        globalFromNode = turingMachine.getStatebyId(getAcceptSubTM(fromNodeId));
     }
-
     
-    //toNode
-    let dropdown2 = document.getElementById("toState");
-    let newtoNode = localTM.getStatebyName(dropdown2.value);
-    let newtoNodeId = newtoNode.id;
-    if(turingMachine.getStatebyId(newtoNodeId) === undefined){
-        //node to superstate
-        isToNodeSuper = true;
+    //toNode (Local & Global TM)
+    let dropdown = document.getElementById("toState")
+    let localToNode = localTM.getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
+    let toNodeId = localToNode.id;
+    let globalToNode = turingMachine.getStatebyId(toNodeId);
+    if(globalToNode === undefined){
+        //to node supernode (=not in global TM)
+        globalToNode = turingMachine.getStatebyId(getStartSubTM(toNodeId));
     }
-
     
     //readToken
     let readToken = document.getElementById("readLabel").value;
@@ -579,36 +583,27 @@ function userEditEdgeHandler(){
 
     //Global TM object
     //remove old
-    turingMachine.delta.delete(editEdgeKey);
-    let newEdgeKey = [newfromNode, readToken];
-    let newEdgeValue = [newtoNode, writeToken, tapeMovement];
+    turingMachine.delta.delete(globalEditEdgeKey);
     //create new
-    if(isFromNodeSuper){
-        //Case 1: now originating from superNode: connect to AcceptState of subTM
-        newEdgeKey[0] = getAcceptSubTM(newfromNode.id)
-    }
-    if(isToNodeSuper){
-        //Case 2: now connecting from superNode: connect to StartState of subTM
-        newEdgeValue[0] = getStartSubTM(newtoNode.id)
-    }
-    turingMachine.delta.set(newEdgeKey, newEdgeValue);
+    turingMachine.createTransition(globalFromNode, readToken, globalToNode, writeToken, tapeMovement);
 
-    console.log("GLOBAL TM DELTA: ", turingMachine.delta);
     
     //Local TM object
-    editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKeyLocal);
-    console.log("LOCAL TM Delta: ", localTM.delta)
-    
+    //remove old
+    localTM.delta.delete(localEditEdgeKey);
+    //create new
+    localTM.createTransition(localFromNode, readToken, localToNode, writeToken, tapeMovement);
+
     
     ////Cyto
     //remove
     cy.remove(cytoEditEdge);
     //create new
-    cyCreateEdge(newfromNode.id, newtoNode.id, cyLabel, readToken);
+    cyCreateEdge(localFromNode.id, localToNode.id, cyLabel, readToken);
 
+
+    ////Logging
     console.log('---Edge Edited---');
-    console.log('Global delta now: ', turingMachine.delta);
-    console.log('local delta now: ', getLocalTM().delta);
 
 }
 
@@ -620,9 +615,9 @@ function userDeleteEdgeHandler(){
     //close modal
     edgeModal.style.display = 'none';
     //delete in global TM object
-    turingMachine.delta.delete(editEdgeKey);
+    turingMachine.delta.delete(globalEditEdgeKey);
     //delete in local TM object
-    getLocalTM().delta.delete(editEdgeKeyLocal);
+    getLocalTM().delta.delete(localEditEdgeKey);
 
     //delete in cyto
     cy.remove(cytoEditEdge);

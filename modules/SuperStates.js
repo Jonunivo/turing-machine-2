@@ -7,7 +7,7 @@ import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
 import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{currTreeNodeName, currTreeNode, tmTree, setTmTree, setCurrTreeNode, addStateLocalTM, addEdgeLocalTM, editNodeLocalTM, editEdgeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
+export{currTreeNodeName, currTreeNode, tmTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
 
 //Global Variables
 
@@ -300,18 +300,6 @@ function createCytoWindow(){
 //////////////////////////////////////////////////////////////
 //// ---------------- Create/Edit Local TM -------------- ////
 //////////////////////////////////////////////////////////////
-function addStateLocalTM(id, name, isStarting, isAccepting, isRejecting){
-    let localTM = currTreeNode.turingMachine;
-    console.log(currTreeNode);
-    localTM.createState(id, name, isStarting, isAccepting, isRejecting);
-}
-
-function addEdgeLocalTM(fromStateId, readLabel, toStateId, writeLabel, tapeMovement){
-    let localTM = currTreeNode.turingMachine;
-    let fromState = localTM.getStatebyId(fromStateId);
-    let toState = localTM.getStatebyId(toStateId);
-    localTM.createTransition(fromState, readLabel, toState, writeLabel, tapeMovement);
-}
 
 //adjust local TM when node edit (borrow from global tm)
 function editNodeLocalTM(editNode){
@@ -327,20 +315,6 @@ function editNodeLocalTM(editNode){
     currTreeNode.turingMachine.startstate = turingMachine.startstate;
     currTreeNode.turingMachine.acceptstate = turingMachine.acceptstate;
     currTreeNode.turingMachine.rejectstate = turingMachine.rejectstate;
-}
-
-//adjust local TM when edge Edit
-function editEdgeLocalTM(newfromNode, readToken, newtoNode, writeToken, tapeMovement, editEdgeKey){
-    let localTM = currTreeNode.turingMachine;
-    
-    //remove old
-    let localTMeditEdgeKey = [editEdgeKey[0], editEdgeKey[1]];
-    localTM.delta.delete(localTM.getKeyByContent(localTMeditEdgeKey));
-    
-    //create new
-    const newEdgeKey = [newfromNode, readToken];
-    const newEdgeValue = [newtoNode, writeToken, tapeMovement];
-    localTM.delta.set(newEdgeKey, newEdgeValue);
 }
 
 //////////////////////////////////////////////////////////////
@@ -359,18 +333,20 @@ function getStartSubTM(superstateId){
     //find requested node in local TM & get childTM
     let childrenArr = currTreeNode.children
     let childTreeNode;
+    let found = false;
 
     for(let i = 0; i<childrenArr.length; i++){
         console.log("check ",childrenArr[i].superNodeId," | ", parseInt(superstateId))
         if(childrenArr[i].superNodeId === parseInt(superstateId)){
             childTreeNode = childrenArr[i];
+            found = true;
             break;
         }
     }
 
-    //return accept state of childTM
+    //return id of accept state of childTM
     if(found){
-        return childTreeNode.turingMachine.startstate
+        return childTreeNode.turingMachine.startstate.id;
     }
     else{
         console.error("getStartSubTM not found");
@@ -394,7 +370,7 @@ function getAcceptSubTM(superstateId){
     }
     //return accept state of childTM
     if(found){
-        return childTreeNode.turingMachine.acceptstate
+        return childTreeNode.turingMachine.acceptstate.id
     }
     else{
         console.error("getAcceptSubTM not found");

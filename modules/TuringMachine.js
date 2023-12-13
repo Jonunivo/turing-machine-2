@@ -283,6 +283,7 @@ export class TuringMachine{
     }
 
     /**
+     * !!use with caution
      * Helper: Add all info from other into this Turingmachine; start & accept state from "this"
      * note: Only states, alphabets and transitions are merged into "this", rest of
      *      "this" stays the same
@@ -297,9 +298,11 @@ export class TuringMachine{
         //sigma & gamma union
         this.sigma = new Set([...this.sigma, ...other.sigma]);
         this.gamma = new Set([...this.gamma, ...other.gamma]);
-        //add delta
+        //add delta (removes starting/accepting properties)
         for(let [key, value] of other.delta){
-            this.delta.set(key, value);
+            let fromState = this.getStatebyId(key[0].id);
+            let toState = this.getStatebyId(value[0].id);
+            this.createTransition(fromState, key[1], toState, value[1], value[2]);
         }
         //rest stays the same (is overwritten by "this")
     }
