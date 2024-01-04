@@ -221,6 +221,31 @@ export class TuringMachine{
         }
     }
 
+    //return just the next state of the simulation // may be used to detect if we stay in same state
+    peekNextState(state, charOnTape){
+        let deltaValue;
+        //find corresponding transition in delta
+        try{
+            //normal Transition?
+            deltaValue = this.delta.get(this.getKeyByContent([state, charOnTape]))
+        }
+        catch(error){
+            //"else" Transition?
+            try{
+                deltaValue = this.delta.get(this.getKeyByContent([state, 'else']))
+
+            }
+            catch(error){
+                //no valid transition found
+                return undefined;
+            }
+        }
+        
+        //return next state
+        return deltaValue[0];
+
+    }
+
     /**
      * Returns Character at tape[tapePosition] of TM object
      * 

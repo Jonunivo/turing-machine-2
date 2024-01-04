@@ -109,6 +109,7 @@ function saveTuringMachine(){
         tmProperties.push("\n");
 
     }
+
 }
 //EventListener for SaveButton
 document.getElementById("saveButton").addEventListener("click", saveTuringMachine);
@@ -135,6 +136,8 @@ function saveFile(){
 
     if(document.getElementById("saveTape").checked){
         //also save tape content
+        tmProperties.push("\n");
+        tmProperties.push("\n");
         tmProperties.push(turingMachine.tape);
     }
     tmProperties.push("\n");
@@ -313,6 +316,29 @@ function loadFile(reader){
                 newNode.parent = parent;
             }
         }
+
+        //
+        //load Tape
+        //
+        lineId+=4;
+        const tapeString = lines[lineId];
+        console.log("Tape: ",tapeString);
+        if(tapeString !== "" && tapeString !== undefined){
+            //convert to string[]
+            const tape = tapeString.split(",");
+            //add to TM object
+            turingMachine.tape = tape;
+            //cyto
+            cyWriteOnTape(tapeString.replace(/,/g, ''));
+            lineId++;
+        }
+        else{
+            //reset tape to empty
+            cyWriteOnTape("");
+        }
+        moveNodesIntoWindow();
+
+
         //currTreeNode = tree.root;
         setCurrTreeNode(tree.root);
         setTmTree(tree);
@@ -324,31 +350,10 @@ function loadFile(reader){
 
 
 
-        //update nodeId variable (!TO DO)
-/*
-        //
-        //load Tape
-        //
-        const tapeString = lines[i];
-        console.log("Tape: ",tapeString);
-        if(tapeString !== "" && tapeString !== undefined){
-            //convert to string[]
-            const tape = tapeString.split(",");
-            //add to TM object
-            turingMachine.tape = tape;
-            //cyto
-            cyWriteOnTape(tapeString.replace(/,/g, ''));
-            i++;
-        }
-        else{
-            //reset tape to empty
-            cyWriteOnTape("");
-        }
-        moveNodesIntoWindow();
-            //grabify nodes if in edit mode
-        cyGrabifyNodes();
-        console.log(turingMachine);
-*/
+
+
+
+
     }
 
 }

@@ -1,5 +1,6 @@
 import {cy} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
+import { getLocalTM } from './SuperStates.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
 
 export{simulationReset, enableButtons};
@@ -287,9 +288,7 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
     let deltaValue = null;
 
-    console.log("TM!: ", turingMachine);
 
-       
     //find corresponding transition in delta
     try{
         deltaValue = turingMachine.delta.get(turingMachine.getKeyByContent([tmState, charOnTape]))
@@ -307,6 +306,8 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         }
 
     }
+
+
 
     
     //// animate node IN
@@ -358,11 +359,9 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     }
     else if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
         //final state reached
-        // !(TO DO) deltaValue is edited 1 step before actually reaching accept/reject state
-        console.log(deltaValue[0]);
 
         //animate last state & call simulationResult
-        animateNode(currentState, 2*animationTime);
+        animateNode(deltaValue[0], 2*animationTime);
         await new Promise(resolve => setTimeout(resolve, 2*animationTime));
         turingMachine.simulationResult(deltaValue[0]);
         
@@ -560,6 +559,9 @@ function animateEdge(tmState, charOnTape, animationTime){
 */
 
 function animateEdgeIn(tmState, charOnTape, animationTime){
+
+
+
     //find corresponding edge
     edgeToAnimate = null;
     let elseEdgeToAnimate = null;
