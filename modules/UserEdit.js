@@ -1,7 +1,7 @@
 import { cy, cyCreateEdge, runLayout, addEventListenerWithCheck, refresh, cyGrabifyNodes} from "./Cytoscape.js";
 import { TuringMachine, turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
-import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
+import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, userDeleteSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }
 //////////////////////////////////////////////////////////////
@@ -51,7 +51,6 @@ cy.on('mouseup', 'node', (event) =>{
 function clickEditNode(event){
     //save node clicked on (global vars)
     cytoEditNode = event.target;
-
     editNode = turingMachine.getStatebyId(cytoEditNode.id());
     let localEditNode = getLocalTM().getStatebyId(cytoEditNode.id());
 
@@ -64,6 +63,15 @@ function clickEditNode(event){
     if(editNode !== undefined && !editNode.isStarting && localEditNode.isStarting){
         return;
     }
+
+    
+    ////open Modal at click position helpers
+    //get click position
+    const position = event.position;
+    //get cytoscape window position
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
     
     //// Case 1: clicked on SuperNode
     if(editNode === undefined){
@@ -79,29 +87,44 @@ function clickEditNode(event){
             // Replace the existing button with the new button
             superNodeButton.parentNode.replaceChild(nodeEditButton, superNodeButton);
         }
+        ////Create Delete button (if not yet existing)
+        const deleteButton = document.getElementById("superNodeDeleteButton");
+        if(!deleteButton){
+            var newButton = document.createElement("button");
+            newButton.id = "superNodeDeleteButton";
+            newButton.innerText = "Delete subTM";
+            newButton.className = "red-button";
+            document.getElementById("deleteSuperNodeDiv").appendChild(newButton);
+            addEventListenerWithCheck(newButton, 'click', userDeleteSuperNodeHandler)
+        }
+        else{
+            //user delete node (Event Listener)
+            addEventListenerWithCheck(deleteButton, 'click', userDeleteSuperNodeHandler)
+        }
+
+
+        //get current node name
+        document.getElementById("superStateName").value = editNode.name;
 
         //event listener, userEditSuperNodeHandler implemented in SuperStates.js
         addEventListenerWithCheck(document.getElementById('superNodeEditButton'), 'click', userEditSuperNodeHandler);
 
-        //open modal
+        //open modal at node position
+        superNodeModal.style.paddingLeft = `${position.x + leftValue}px`;
+        let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
+        superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
         superNodeModal.style.display = 'block';
         return;
     }
 
     //// Case 2: clicked on normal node
 
-    ////open Modal at click position
-    //get click position
-    const position = event.position;
 
     //
     const nodeModal = document.getElementById('nodeModal');
     const modal = document.querySelector('.modal-content');
 
-    //get cytoscape window position
-    const cytoWindow = document.querySelector('#cytoscape');
-    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
-    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
 
     //display modal at node position
     nodeModal.style.paddingLeft = `${position.x + leftValue}px`;

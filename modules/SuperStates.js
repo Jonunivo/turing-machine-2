@@ -5,9 +5,9 @@ import { State } from "./State.js";
 import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
 import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
-import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
+import { cyTreeCreate, cyTreeReset, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{currTreeNodeName, currTreeNode, tmTree, resetTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
+export{currTreeNodeName, currTreeNode, tmTree, resetTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow, userDeleteSuperNodeHandler};
 
 //Global Variables
 
@@ -178,19 +178,52 @@ function userEditSuperNodeHandler(){
 
     //get edit node
 
-    //cyto
+    //cyto main window
     cytoEditNode.style('label', newName);
     cytoEditNode.style('width', `${newName.length*10 + 10}px`)
-
+    cyGrabifyNodes();
     //global TM object
     //no change, since node not in global TM
 
     //local TM object
     editNode.name = newName;
-    console.log("states ", currTreeNode.turingMachine.states);
 
-    cyGrabifyNodes();
+    //cyto Tree window
+    cyTreeReset();
+    cyTreeCreate(true);
 }
+
+function userDeleteSuperNodeHandler(){
+    superNodeModal.style.display = 'none';
+
+    //check if subTM only consists of start & end state ("empty" subTM)
+    //TO DO: ALSO CHECK THAT NO EDGES ARE FROM/TO THE SUPERNODE
+    //get subnode current tm:
+    let currTM = getSubNode(editNode.id).turingMachine
+    console.log(currTM);
+    
+    if(currTM.states.size === 2 && currTM.delta.size === 1){
+        //remove node: !lazy solution leaves local root unused in background
+        //& global TM still contains nodes & edges (they are not connected however)
+        
+        //remove SubTM node from local TM
+        let localState = getLocalTM().getStatebyId(editNode.id);
+        getLocalTM().states.delete(localState);
+        console.log("localTM::", getLocalTM());
+        //remove from cytoscape window
+        cy.remove(cytoEditNode);
+
+        //TO DO: REMOVE CHILD FROM TREE -> REBUILD TREE ON LEFT   
+
+    }
+    else{
+        alert("removing SubTM nodes is currently only possible if their content is empty (only contains the default states and transitions)");
+    }
+
+
+
+}
+
 
 //User presses cancel button in NodeModal -> hide nodeModal
 document.getElementById("cancelButton4").addEventListener('click', function(){
@@ -342,6 +375,18 @@ function getLocalTM(){
 
 function getRootTM(){
     return tmTree.root.turingMachine;
+}
+
+//return child with corresp. ID
+function getSubNode(superstateId){
+    let childrenArr = currTreeNode.children
+    for(let i = 0; i<childrenArr.length; i++){
+        if(childrenArr[i].superNodeId === parseInt(superstateId)){
+            return childrenArr[i];
+        }
+    }
+    return null;
+
 }
 
 function getStartSubTM(superstateId){
