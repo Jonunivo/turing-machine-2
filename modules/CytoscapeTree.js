@@ -1,8 +1,9 @@
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 
+import { turingMachine } from './TuringMachine.js';
 import { tmTree, currTreeNodeName } from "./SuperStates.js";
 
-export{cyTreeCreate, cyTreeStyleCurrentNode}
+export{cyTreeCreate, cyTreeStyleCurrentNode, cyTreeReset}
 
 var cyTree = cytoscape({
     container: document.getElementById('cytoscape-tree'),
@@ -44,8 +45,7 @@ cyTreeCreateNode("root", 0, 0, 0);
 cyTreeStyleCurrentNode(0);
 
 //buildup cyTree
-function cyTreeCreate(){
-
+function cyTreeCreate(loadTM){
     let currTreeNode = tmTree.root;
 
     let depth = 1;
@@ -59,8 +59,25 @@ function cyTreeCreate(){
         //level by level
         for(let i = 0; i < currChildren.length; i++){
             //create nodes & edges for current level
-            cyTreeCreateNode(currTreeNodeName, currChildren[i].superNodeId, depth, width);
-            console.log(currChildren[i].parent);
+            let currentChild = currChildren[i];
+
+            //get name of current node
+            let currname = "";
+            if(loadTM){
+                //Case 1: function is called in a LoadTM style, currTreeNodeName unavailable
+                if(currentChild.parent !== null && currentChild.parent !== undefined){
+                    let currState = currentChild.parent.turingMachine.getStatebyId(currChildren[i].superNodeId);
+                    if(currState !== undefined){
+                        currname = currState.name;
+                    }
+                }
+            }
+            else{
+                //Case 2: User manually creates Super State
+                currname = currTreeNodeName;
+            }
+
+            cyTreeCreateNode(currname, currChildren[i].superNodeId, depth, width);
             cyTreeCreateEdge(currChildren[i].parent.superNodeId, currChildren[i].superNodeId);
             id++;
             width++;
@@ -126,6 +143,13 @@ function cyTreeStyleCurrentNode(nodeId){
           node.style('background-color', 'grey');
         }
       });
+}
+
+function cyTreeReset(){
+    var cyNodes = cyTree.nodes();
+    cyNodes.remove();
+    cyTreeCreateNode("root", 0, 0, 0);
+    cyTreeStyleCurrentNode(0);
 }
 
 

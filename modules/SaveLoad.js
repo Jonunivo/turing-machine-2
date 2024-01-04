@@ -2,11 +2,11 @@ import { cy, cyClearCanvas, generateNodePosMap, cyCreateEdge, cyCreateNode, move
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { State } from "./State.js";
 import { TuringMachine, turingMachine } from "./TuringMachine.js"
-import { tmTree, setTmTree, currTreeNode, setCurrTreeNode, createCytoWindow} from "./SuperStates.js";
+import { tmTree, setTmTree, currTreeNode, setCurrTreeNode, createCytoWindow, resetTree} from "./SuperStates.js";
 import { Tree, TreeNode } from "../datastructures/Tree.js";
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
 import {simulationReset, enableButtons} from "./Simulation.js";
-import { cyTreeCreate } from "./CytoscapeTree.js";
+import { cyTreeCreate, cyTreeReset } from "./CytoscapeTree.js";
 
 export {loadFile};
 
@@ -208,13 +208,17 @@ function loadFile(reader){
         const lines = fileContent.split('\n');
 
         //// core 
-        //reset TM & canvas & simulation
+        //reset TM & canvas & simulation & tree
         turingMachine.createTuringMachineBasic();
         cyClearCanvas();
         nodePresetReset();
         simulationReset();
         enableButtons();
-        //TO DO: also reset TMtree
+        //reset Tree
+        resetTree();
+        cyTreeReset();
+        //reset lineId
+        lineId = 0;
 
         //
         //Global TM
@@ -343,7 +347,7 @@ function loadFile(reader){
         setCurrTreeNode(tree.root);
         setTmTree(tree);
         //build little tree showing global structure
-        cyTreeCreate();
+        cyTreeCreate(true);
         //build root window
         createCytoWindow();
         cyGrabifyNodes();

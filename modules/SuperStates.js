@@ -7,7 +7,7 @@ import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
 import { cyTreeCreate, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 
-export{currTreeNodeName, currTreeNode, tmTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
+export{currTreeNodeName, currTreeNode, tmTree, resetTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow};
 
 //Global Variables
 
@@ -27,6 +27,12 @@ var position;
 //cytoEditNode  - cyto node currently being edited
 //editNode      - node currently being edited
 
+function resetTree(){
+    tmTree = new Tree(currTreeNode);
+    currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0));
+    currTreeNode.superNodeId = 0;
+}
+
 
 //!should be called before entering new window!
 function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
@@ -36,8 +42,7 @@ function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
     newNode.parent = currTreeNode;
 
 
-    //create visible Tree
-    cyTreeCreate();
+
 }
 
 //////////////////////////////////////////////////////////////
@@ -129,6 +134,8 @@ function userSuperNodeInputHandler(){
     positionMap.set(id2, [500, 200])
     //add TM to tree
     addTuringmaschine(subTuringMachine, positionMap, superStateId);
+    //create visible Tree
+    cyTreeCreate(false);
 
     //merge into main TM (adds start & stop state to globalTM)
         //remove isStarting & isAccepting for global TM
