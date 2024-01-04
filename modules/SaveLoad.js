@@ -229,7 +229,7 @@ function loadFile(reader){
                 turingMachine.acceptstate = state;
             }
             else if (state.isRejecting){
-                turingMachine.rejectstate = state;
+                turingMachine.rejectstate.add(state);
             }
         }
         console.log(turingMachine.states);
@@ -265,7 +265,7 @@ function loadFile(reader){
 
             //states
             let localStates = loadStates(lines);
-            let localTM = new TuringMachine(localStates, new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
+            let localTM = new TuringMachine(localStates, new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0);
             lineId+=2;
             //set starting/accepting/rejecting state of localTM
             for(const state of localStates){
@@ -276,7 +276,7 @@ function loadFile(reader){
                     localTM.acceptstate = state;
                 }
                 else if(state.isRejecting){
-                    localTM.rejectstate = state;
+                    localTM.rejectstate.add(state);
                 }
             }
 

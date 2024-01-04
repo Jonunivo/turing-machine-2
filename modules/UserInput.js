@@ -133,12 +133,12 @@ function userNodeInputHandler(){
     cyCreateNode(nodeId, stateName, position.x, position.y, isStartingState, isAcceptingState, isRejectingState);
     
     //create node in Global TM
-    //check if in root -> set global start/accept/reject state
+    //check if in root -> set global start/accept state
     if(getRootTM() === localTM){
         turingMachine.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
     }
     else{
-        turingMachine.createState(nodeId, stateName);
+        turingMachine.createState(nodeId, stateName, false, false, isRejectingState);
     }
     //create node in Local TM
     localTM.createState(nodeId, stateName, isStartingState, isAcceptingState, isRejectingState);
@@ -459,7 +459,7 @@ function disableSliders(){
         document.getElementById("stateAccepting").disabled = false;
     }
     //rejecting
-    if(localTM.rejectstate !== null && localTM.rejectstate !== undefined){
+    if(localTM.rejectstate !== undefined && localTM.rejectstate !== null && localTM.rejectstate.size > 0){
         document.getElementById("stateRejecting").disabled = true;
     }
     else{

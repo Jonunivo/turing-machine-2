@@ -211,6 +211,10 @@ function userEditNodeHandler(){
         return;
     }
 
+    //booleans to save editing rejectset, parameters for editNodeLocalTM()
+    let rejectAdded = false;
+    let rejectDeleted = false;
+
 
     //isStarting
     if (isStarting){
@@ -241,7 +245,7 @@ function userEditNodeHandler(){
         editNode.isAccepting = true;
     }
     else if(editNode.isAccepting){
-        //edit node was accepting node but edit removed starting node property
+        //edit node was accepting node but edit removed accept node property
         //cyto
         if(!isRejecting){
             cytoEditNode.style('background-color', 'lightgrey');
@@ -256,22 +260,26 @@ function userEditNodeHandler(){
         //cyto
         cytoEditNode.style('background-color', 'red');
         //TM object
-        turingMachine.rejectstate = editNode;
+        turingMachine.rejectstate.add(editNode);
         editNode.isRejecting = true;
+        //parameter for editNodeLocalTM()
+        rejectAdded = true;
     }
     else if(editNode.isRejecting){
-        //edit node was rejecting node but edit removed starting node property
+        //edit node was rejecting node but edit removed reject node property
         //cyto
         if(!isAccepting){
             cytoEditNode.style('background-color', 'lightgrey');
         }
         //tm object
         editNode.isRejecting = false;
-        turingMachine.rejectstate = null;
+        turingMachine.rejectstate.delete(editNode);
+        //parameter for editNodeLocalTM()
+        rejectDeleted = true;
     }
 
     //edit localTM object
-    editNodeLocalTM(editNode);
+    editNodeLocalTM(editNode, rejectAdded, rejectDeleted);
 
     ////logging
     console.log("---NODE EDITED---")
@@ -307,8 +315,8 @@ function userDeleteNodeHandler(){
     if(editNode.isAccepting && (getLocalTM() == getRootTM())){
         turingMachine.acceptstate = null;
     }
-    if(editNode.isRejecting && (getLocalTM() == getRootTM())){
-        turingMachine.rejectstate = null;
+    if(editNode.isRejecting){
+        turingMachine.rejectstate.delete(editNode);
     }
     //GlobalTM: remove all edges from / to this node
     let updatedDelta = new Map();
@@ -330,7 +338,7 @@ function userDeleteNodeHandler(){
         localTM.acceptstate = null;
     }
     if(editNode.isRejecting){
-        localTM.rejectstate = null;
+        turingMachine.rejectstate.delete(editNode);
     }
     //remove all edges from/to this node
     updatedDelta = new Map();

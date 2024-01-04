@@ -12,7 +12,7 @@ export class TuringMachine{
      *          [state, read char] to [state, write char, move]
      * @param {State} startstate - The starting state of the Turing Machine.
      * @param {State} acceptstate - The accepting state of the Turing Machine.
-     * @param {State} rejectstate - The rejecting state of the Turing Machine.
+     * @param {Set<State>} rejectstate - The rejecting state of the Turing Machine.
      * @param {string[]} tape - The tape of the Turing Machine
      * @param {number} tapePosition - The position of the Lese/Schreibkopf
      */
@@ -36,7 +36,7 @@ export class TuringMachine{
      * creates global default turingmachine object (also used to reset TM object)
      */
     createTuringMachineBasic(){
-        turingMachine = new TuringMachine(new Set(), new Set(), new Set(""), new Map(), undefined, undefined, undefined, null, 0);
+        turingMachine = new TuringMachine(new Set(), new Set(), new Set(""), new Map(), undefined, undefined, new Set(), null, 0);
         turingMachine.gamma.add("");
     }
 
@@ -65,7 +65,8 @@ export class TuringMachine{
             this.acceptstate = newState
         }
         if(isRejecting){
-            this.rejectstate = newState
+            console.log(this);
+            this.rejectstate.add(newState);
         }
     }
 
@@ -99,7 +100,7 @@ export class TuringMachine{
 
 
         while(currentState !== this.acceptstate && 
-            currentState !== this.rejectstate)
+            !this.rejectstate.has(currentState))
             {
                 currentState = this.simulationStep(currentState, this.readTape())
             }
@@ -210,7 +211,7 @@ export class TuringMachine{
             console.log("Simulation finished: Input Accepted!")
             alert("Simulation finished: Input Accepted!")
         }
-        else if(lastState == this.rejectstate){
+        else if(this.rejectstate.has(lastState)){
             console.log("Simulation finished: Input Rejected!");
             alert("Simulation finished: Input Rejected!")
 
@@ -311,7 +312,7 @@ export class TuringMachine{
 
 //global variable
     //Basic TuringMachine object used for Creation & Simulation (imported by many other modules!)
-    var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0);
+    var turingMachine = new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0);
     turingMachine.gamma.add("");
 /*
 //create a simple TM to test the code: binary increment

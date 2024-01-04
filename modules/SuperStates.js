@@ -12,7 +12,7 @@ export{currTreeNodeName, currTreeNode, tmTree, setTmTree, setCurrTreeNode, editN
 //Global Variables
 
 //current TreeNode (initialized to empty TM = local TM of root)
-var currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, undefined, null, 0));
+var currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0));
 currTreeNode.superNodeId = 0;
 //currTreeNodeName
 var currTreeNodeName;
@@ -116,7 +116,7 @@ function userSuperNodeInputHandler(){
     let tape = currTreeNode.turingMachine.tape;
     let tapePosition = currTreeNode.turingMachine.tapePosition;
     //Create TM Object 
-    let subTuringMachine = new TuringMachine(new Set(), new Set(), new Set(), delta, startState, endState, undefined, tape, tapePosition);
+    let subTuringMachine = new TuringMachine(new Set(), new Set(), new Set(), delta, startState, endState, new Set(), tape, tapePosition);
     subTuringMachine.states.add(startState);
     subTuringMachine.states.add(endState);
 
@@ -302,7 +302,7 @@ function createCytoWindow(){
 //////////////////////////////////////////////////////////////
 
 //adjust local TM when node edit (borrow from global tm)
-function editNodeLocalTM(editNode){
+function editNodeLocalTM(editNode, rejectAdded, rejectDeleted){
     //find state in local TM with corresponding id
     let editNodeLocal = currTreeNode.turingMachine.getStatebyId(editNode.id);
 
@@ -312,9 +312,17 @@ function editNodeLocalTM(editNode){
     editNodeLocal.isAccepting = editNode.isAccepting;
     editNodeLocal.isRejecting = editNode.isRejecting;
 
-    currTreeNode.turingMachine.startstate = turingMachine.startstate;
-    currTreeNode.turingMachine.acceptstate = turingMachine.acceptstate;
-    currTreeNode.turingMachine.rejectstate = turingMachine.rejectstate;
+    if(getLocalTM() === getRootTM()){
+        currTreeNode.turingMachine.startstate = turingMachine.startstate;
+        currTreeNode.turingMachine.acceptstate = turingMachine.acceptstate;
+    }
+    //modify local rejectstate set
+    if(rejectAdded){
+        currTreeNode.turingMachine.rejectstate.add(editNodeLocal);
+    }
+    if(rejectDeleted){
+        currTreeNode.turingMachine.rejectstate.delete(editNodeLocal);
+    }
 }
 
 //////////////////////////////////////////////////////////////

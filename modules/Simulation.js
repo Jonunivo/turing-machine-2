@@ -138,7 +138,7 @@ function fastSimulation(){
     const timeLimit = 5000; // 5 seconds in milliseconds
     while(
         currentState !== turingMachine.acceptstate &&
-        currentState !== turingMachine.rejectstate &&
+        !turingMachine.rejectstate.has(currentState) &&
         new Date().getTime() - startTime < timeLimit){
         
         //CORE
@@ -153,7 +153,7 @@ function fastSimulation(){
     }
 
     else if(currentState == turingMachine.acceptstate ||
-        currentState == turingMachine.rejectstate){
+        turingMachine.rejectstate.has(currentState)){
             //simulation finished
             tmTapetoCyto();
             turingMachine.simulationResult(currentState);
@@ -186,7 +186,7 @@ function fastSimulationStep(){
 
 
     //last state reached
-    if(currentState === turingMachine.acceptstate || currentState === turingMachine.rejectstate){
+    if(currentState === turingMachine.acceptstate || turingMachine.rejectstate.has(currentState)){
         turingMachine.simulationResult(currentState);
         //disable buttons
         document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
@@ -235,7 +235,7 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
     //loop
     while(simIsRunning && 
         currentState !== turingMachine.acceptstate &&
-        currentState !== turingMachine.rejectstate){
+        !turingMachine.rejectstate.has(currentState)){
 
         //disable things that shouldn't be accessed during simulation
         disableButtons();
