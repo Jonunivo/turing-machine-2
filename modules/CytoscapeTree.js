@@ -12,7 +12,7 @@ var cyTree = cytoscape({
         selector: 'node',
         style: {
             shape: 'round-rectangle',
-            'background-color': 'red',
+            'background-color': '#5463ff',
             'width': '50px',
         }
     },
@@ -137,7 +137,7 @@ function cyTreeStyleCurrentNode(nodeId){
         console.log(node.id(), " | ", nodeId);
         if (parseInt(node.id()) === nodeId) {
           // Change color to red for the specified node
-          node.style('background-color', 'red');
+          node.style('background-color', '#5463ff');
         } else {
           // Change color to grey for all other nodes
           node.style('background-color', 'grey');

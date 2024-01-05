@@ -15,6 +15,8 @@ let isReady = false;
 // original color
 let originalColorNode = "grey";
 let originalColorEdge = "grey";
+//animationColor
+let animationColor = "#5463ff";
 
 //find corresponding edge
 let edgeToAnimate = null;
@@ -400,7 +402,7 @@ function animateNode(tmState, animationTime){
     //animate (fade in)
     cyCurrentNode.animate({
         style: {
-            "background-color": "red",
+            "background-color": `${animationColor}`,
         },
 
     },
@@ -435,7 +437,7 @@ function animateNodeIn(tmState, animationTime){
     //animate (fade in)
     cyCurrentNode.animate({
         style: {
-            "background-color": "red",
+            "background-color": `${animationColor}`,
         },
 
     },
@@ -477,7 +479,7 @@ function animateTapeRead(animationTime){
     //animate
     currNode.animate({
         style: {
-            "background-color": "red",
+            "background-color": `${animationColor}`,
         },
 
     },
@@ -590,7 +592,8 @@ function animateEdgeIn(tmState, charOnTape, animationTime){
         originalColorEdge = edgeToAnimate.style("line-color");
         edgeToAnimate.animate({
             style: {
-                "line-color": "red",
+                "line-color": `${animationColor}`,
+                "color": `${animationColor}`
             },
             },
             {
@@ -609,6 +612,7 @@ function animateEdgeOut(tmState, charOnTape, animationTime){
         edgeToAnimate.animate({
             style: {
                 "line-color": `${originalColorEdge}`,
+                "color": "black",
             },
             },
             {

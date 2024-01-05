@@ -24,11 +24,11 @@ var cy = cytoscape({
         
         selector: 'edge',
         style: {
-            'line-color': '#1903a3',
+            'line-color': 'darkgrey',
             'width': 2,
             'target-arrow-shape': 'triangle',
-            'target-arrow-color': '#03dbfc',
-            'arrow-scale': 1.5,
+            'target-arrow-color': '#363636',
+            'arrow-scale': 1.2,
             'curve-style': 'bezier',
             'control-point-distance': 50,
             'control-point-weight': 0.5, 
