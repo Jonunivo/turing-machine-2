@@ -209,7 +209,6 @@ function loadFile(reader){
         turingMachine.createTuringMachineBasic();
         cyClearCanvas();
         nodePresetReset();
-        simulationReset();
         enableButtons();
         //reset Tree
         resetTree();
@@ -348,6 +347,9 @@ function loadFile(reader){
         //build root window
         createCytoWindow();
         cyGrabifyNodes();
+        //reset simulation
+        simulationReset();
+
 
 
 

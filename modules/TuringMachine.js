@@ -130,6 +130,7 @@ export class TuringMachine{
             }
             catch(error){
                 //no valid transition found, disable simulation
+                //cannot import enableButtons() (dependencies)
                 document.getElementById('runSimulationButton').disabled = true;
                 document.getElementById('stepSimulationButton').disabled = true;
                 document.getElementById('resetSimulationButton').disabled = false;
@@ -138,6 +139,12 @@ export class TuringMachine{
                 document.getElementById('move-tape-right').disabled = false;
                 document.getElementById('tape-input').disabled = false;
                 document.getElementById('fastSimulation').disabled = false;
+
+                                //switch to move mode off again
+                var button = document.querySelector('.toggle-button');
+                if(button.classList.contains('active')){
+                    button.classList.toggle('active');
+                }
 
                 alert(`Simulation finished: Input Rejected \n\nReason: No Transition for State ${state.name} & Input ${charOnTape} \nConsider creating an else-transition to catch all cases`)
                 return null;

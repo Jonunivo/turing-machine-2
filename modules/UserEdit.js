@@ -405,6 +405,9 @@ cy.on('click', 'edge', function(event){
         let localFromNodeId = cytoEditEdge.source().id();
         let localFromNode = localTM.getStatebyId(localFromNodeId);
         let readToken = cytoEditEdge.data("readToken");
+        //!TO DO: getKeyByContent is problematic if multiple edges with same readToken exist
+        //-> Value in "From" can be set wrong in getCurrentEdgeProperties()
+        //does not have impact on actual edit, but might confuse User expecting it to be correct
         localEditEdgeKey = localTM.getKeyByContent([localFromNode, readToken]);
         localEditEdgeContent = localTM.delta.get(localEditEdgeKey);
 

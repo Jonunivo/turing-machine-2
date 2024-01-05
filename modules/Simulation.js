@@ -48,6 +48,21 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
             simIsRunning = false;
             return;
         }
+        //catch starting simulation on accept/reject state
+        console.log("CURR", currentState);
+        if(currentState === turingMachine.acceptstate || 
+            turingMachine.rejectstate.has(currentState)){
+            //animate last state & call simulationResult
+            animateNode(currentState, 2*1000/document.getElementById('simulationSpeed').value);
+            turingMachine.simulationResult(currentState);
+            
+            //enable buttons
+            enableButtons();
+            document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
+            document.getElementById('runSimulationButton').disabled = true;
+            document.getElementById('stepSimulationButton').disabled = true;
+            return;
+        }
 
         //Button manipulation
         document.getElementById('runSimulationButton').innerHTML = "Pause Simulation";
@@ -76,6 +91,21 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     //catch startstate not defined
     if(turingMachine.startstate === undefined){
         alert("Please create Starting State first");
+        return;
+    }
+    //catch starting simulation on accept/reject state
+    console.log("CURR", currentState);
+    if(currentState === turingMachine.acceptstate || 
+        turingMachine.rejectstate.has(currentState)){
+        //animate last state & call simulationResult
+        animateNode(currentState, 2*1000/document.getElementById('simulationSpeed').value);
+        turingMachine.simulationResult(currentState);
+        
+        //enable buttons
+        enableButtons();
+        document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
+        document.getElementById('runSimulationButton').disabled = true;
+        document.getElementById('stepSimulationButton').disabled = true;
         return;
     }
     //Fast Simulation if Animation is set to off
@@ -164,6 +194,9 @@ function fastSimulation(){
             tmTapetoCyto();
             turingMachine.simulationResult(currentState);
             enableButtons();
+            document.getElementById('runSimulationButton').disabled = true;
+            document.getElementById('stepSimulationButton').disabled = true;
+
         }
 
 
