@@ -202,8 +202,18 @@ function userEditSuperNodeHandler(){
 function userDeleteSuperNodeHandler(){
     superNodeModal.style.display = 'none';
 
-    //check if subTM only consists of start & end state ("empty" subTM)
-    //TO DO: ALSO CHECK THAT NO EDGES ARE FROM/TO THE SUPERNODE
+
+    ////check if any edges from/to this node
+    let stateToDelete = getLocalTM().getStatebyId(editNode.id);
+    for(const [key, value] of currTreeNode.turingMachine.delta){
+        if(key[0] === stateToDelete ||
+            value[0] === stateToDelete){
+            alert(`please remove any transition from/to this state first`)
+            return;
+        }
+    }
+    
+    ////check if subTM only consists of start & end state ("empty" subTM)
     //get subnode current tm:
     let currTM = getSubNode(editNode.id).turingMachine
     console.log(currTM);
@@ -219,7 +229,14 @@ function userDeleteSuperNodeHandler(){
         //remove from cytoscape window
         cy.remove(cytoEditNode);
 
-        //TO DO: REMOVE CHILD FROM TREE -> REBUILD TREE ON LEFT   
+        //remove child from tree & rebuild visual tree 
+        let indexOfChild = currTreeNode.children.indexOf(getSubNode(editNode.id))
+        currTreeNode.children.splice(indexOfChild, 1);
+        console.log(currTreeNode.children);
+        //rebuild tree
+        cyTreeReset();
+        cyTreeCreate(true);
+        cyTreeStyleCurrentNode(currTreeNode.superNodeId);
 
     }
     else{

@@ -1,7 +1,8 @@
-import {cy} from './Cytoscape.js';
+import {cy, cyGrabifyNodes} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
 import { currTreeNode, getLocalTM } from './SuperStates.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
+import {simulateButtonClick} from './General.js';
 
 export{simulationReset, enableButtons};
 
@@ -123,6 +124,7 @@ document.getElementById('resetSimulationButton').addEventListener('click', funct
  * resets back to StartState after end of Simulation, allowing to directly rerun simulation on new tape state.
  */
 function fastSimulation(){
+    disableButtons();
     //run Simulation in TuringMachine.js on turingMachine object to get next state
     let charOnTape = turingMachine.readTape()
 
@@ -152,6 +154,7 @@ function fastSimulation(){
     //simulation timeout
     if(new Date().getTime() - startTime >= timeLimit){
         tmTapetoCyto();
+        enableButtons();
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
     }
 
@@ -160,6 +163,7 @@ function fastSimulation(){
             //simulation finished
             tmTapetoCyto();
             turingMachine.simulationResult(currentState);
+            enableButtons();
         }
 
 
@@ -720,6 +724,14 @@ function disableButtons(mode){
     if(mode === "all"){
         document.getElementById('runSimulationButton').disabled = true;
     }
+    //automatically switch to move mode to avoid editing during animation
+    var button = document.querySelector('.toggle-button');
+    console.log("test", button.classList);
+    if(!button.classList.contains('active')){
+        button.classList.toggle('active');
+    }
+    cyGrabifyNodes();
+
 }
 /**
  * Helper: ree-enables Buttons after Simulation finished
@@ -732,6 +744,13 @@ function enableButtons(){
     document.getElementById('move-tape-left').disabled = false;
     document.getElementById('tape-input').disabled = false;
     document.getElementById('fastSimulation').disabled = false;
+
+    //switch to move mode off again
+    var button = document.querySelector('.toggle-button');
+    if(button.classList.contains('active')){
+        button.classList.toggle('active');
+    }
+    cyGrabifyNodes();
 
 }
 

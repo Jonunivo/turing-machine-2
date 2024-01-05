@@ -11,10 +11,27 @@ import {loadFile} from "./SaveLoad.js"
  * called when loading preset
  */
 function empty(){
-    turingMachine.createTuringMachineBasic();
-    nodePresetReset();
-    cyClearCanvas();
-    cyTapeClear();
+    //load binary Increment preset
+    const filePath = 'https://n.ethz.ch/~mavogel/version-b/presets/empty.json';
+
+
+    fetch(filePath)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(data => {
+        // read File & call loadFile method (SaveLoad.json)
+        const blob = new Blob([data], { type: 'application/octet-stream' });
+        const reader = new FileReader();
+        reader.readAsText(blob);
+        loadFile(reader);
+      })
+      .catch(error => {
+        console.error('Error reading file:', error);
+      });
 }
 
 /**
