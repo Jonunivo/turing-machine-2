@@ -258,6 +258,7 @@ function dragCreateEdge(event){
         var edgeButton = document.createElement("button");
         edgeButton.id = "edgeButton";
         edgeButton.innerText = "Create Edge";
+        edgeButton.className = "grey-button";
         if(edgeEditButton){
             //replace if needed
             edgeEditButton.parentNode.replaceChild(edgeButton, edgeEditButton);
