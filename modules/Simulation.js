@@ -2,7 +2,6 @@ import {cy, cyGrabifyNodes} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
 import { currTreeNode, getLocalTM } from './SuperStates.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
-import {simulateButtonClick} from './General.js';
 
 export{simulationReset, enableButtons};
 
