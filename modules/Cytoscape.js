@@ -36,6 +36,7 @@ var cy = cytoscape({
             'loop-sweep': '-120deg',
             'text-margin-x': "-10px",
             'text-margin-y': "-5px",
+//            'text-rotation': 'autorotate',
         }
         
     }],
@@ -153,10 +154,12 @@ function cyCreateEdge(fromNode, toNode, label, readToken){
         style: {
             'label': `${label}`,
             'font-size': '12px',
+            'classes': 'autorotate',
 
+          },
+        classes: 'autorotate',
 
-          }
-        }
+        },
     );
 }
 
