@@ -127,12 +127,9 @@ function saveFile(){
 
     //close the modal
     document.getElementById("saveModal").style.display = "none";
-    //get user input
-    const filename = document.getElementById("filenameInput").value;
-    if(!filename){
-        //user cancelled prompt
-        return;
-    }
+    //get user input (or choose placeholder if no name provided by user)
+    const filename = filenameInput.value || filenameInput.placeholder;
+
 
     if(document.getElementById("saveTape").checked){
         //also save tape content

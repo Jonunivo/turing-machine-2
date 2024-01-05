@@ -219,7 +219,7 @@ button{
 
 /*Save Button*/
 .thin{
-    width: 120px;
+    width: 120px !important;
 }
 
 /* Toggle Buttons (Edit) */

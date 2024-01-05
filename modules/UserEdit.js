@@ -83,7 +83,8 @@ function clickEditNode(event){
         if(superNodeButton){
             let nodeEditButton = document.createElement("button");
             nodeEditButton.id = "superNodeEditButton";
-            nodeEditButton.innerText = "Zustand bearbeiten";
+            nodeEditButton.innerText = "Edit State";
+            nodeEditButton.className = "grey-button"
             // Replace the existing button with the new button
             superNodeButton.parentNode.replaceChild(nodeEditButton, superNodeButton);
         }
@@ -92,7 +93,7 @@ function clickEditNode(event){
         if(!deleteButton){
             var newButton = document.createElement("button");
             newButton.id = "superNodeDeleteButton";
-            newButton.innerText = "Delete subTM";
+            newButton.innerText = "Delete State";
             newButton.className = "red-button";
             document.getElementById("deleteSuperNodeDiv").appendChild(newButton);
             addEventListenerWithCheck(newButton, 'click', userDeleteSuperNodeHandler)
@@ -139,7 +140,8 @@ function clickEditNode(event){
     if(nodeButton){
         var nodeEditButton = document.createElement("button");
         nodeEditButton.id = "nodeEditButton";
-        nodeEditButton.innerText = "Zustand bearbeiten";
+        nodeEditButton.innerText = "Edit State";
+        nodeEditButton.className = "grey-button";
         // Replace the existing button with the new button
         nodeButton.parentNode.replaceChild(nodeEditButton, nodeButton);
     }
@@ -149,7 +151,7 @@ function clickEditNode(event){
     if(!deleteButton){
         var newButton = document.createElement("button");
         newButton.id = "nodeDeleteButton";
-        newButton.innerText = "Zustand löschen";
+        newButton.innerText = "Delete State";
         newButton.className = "red-button";
         document.getElementById("deleteNodeDiv").appendChild(newButton);
         addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
@@ -230,7 +232,8 @@ function userEditNodeHandler(){
     var isRejecting = document.getElementById("stateRejecting").checked;
     //catch accepting&rejecting case
     if(isAccepting && isRejecting){
-        alert("Ein Zustand kann nicht gleichzeitig akzeptierend und verwerfend sein")
+        alert("A state cannot be Accepting and Rejecting at the same time");
+        nodeModal.style.display = 'block';
         return;
     }
 
@@ -437,8 +440,8 @@ cy.on('click', 'edge', function(event){
         if(edgeButton){
             var edgeEditButton = document.createElement("button");
             edgeEditButton.id = "edgeEditButton";
-            edgeEditButton.innerText = "Übergang bearbeiten";
-            edgeEditButton.style.width = "180px";
+            edgeEditButton.innerText = "Edit Transition";
+            edgeEditButton.className = "grey-button";
             edgeButton.parentNode.replaceChild(edgeEditButton, edgeButton);
         }
         
@@ -447,7 +450,7 @@ cy.on('click', 'edge', function(event){
         if(!deleteButton){
             var newButton = document.createElement("button");
             newButton.id = "edgeDeleteButton";
-            newButton.innerText = "Übergang löschen";
+            newButton.innerText = "Delete Transition";
             newButton.className = "red-button";
             document.getElementById("deleteEdgeDiv").appendChild(newButton);
             //event listener
@@ -482,7 +485,7 @@ function getCurrentEdgeProperties(){
         const labelElement = document.createElement("label");
         labelElement.id = "fromStateLabel"
         labelElement.setAttribute("for", "fromState");
-        labelElement.textContent = "Von: "
+        labelElement.textContent = "From: "
         const selectElement = document.createElement("select")
         selectElement.id = "fromState";
         //add to div

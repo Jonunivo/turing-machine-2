@@ -50,7 +50,9 @@ cy.on('click', (event) => {
         var nodeEditButton = document.getElementById("nodeEditButton");
         var nodeButton = document.createElement("button");
         nodeButton.id = "nodeButton";
-        nodeButton.innerText = "Zustand erstellen";
+        nodeButton.innerText = "Create state";
+        nodeButton.className = "green-button";
+
         if(nodeEditButton){
             // Replace the existing button with the new button
             nodeEditButton.parentNode.replaceChild(nodeButton, nodeEditButton);
@@ -114,7 +116,7 @@ function userNodeInputHandler(){
     let isRejectingState = document.getElementById("stateRejecting").checked === true;
     //catch accepting & rejecting case
     if(isAcceptingState && isRejectingState){
-        alert("Ein Zustand kann nicht gleichzeitig akzeptierend und verwerfend sein");
+        alert("A state cannot be Accepting and Rejecting at the same time");
         nodeModal.style.display = 'block';
         return;
     }
@@ -232,7 +234,7 @@ function dragCreateEdge(event){
             const labelElement = document.createElement("label");
             labelElement.id = "fromStateLabel"
             labelElement.setAttribute("for", "fromState");
-            labelElement.textContent = "Von: "
+            labelElement.textContent = "From: "
             const selectElement = document.createElement("select")
             selectElement.id = "fromState";
             //add to div

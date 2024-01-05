@@ -72,10 +72,16 @@ cy.on('cxttap', (event) => {
         var superNodeEditButton = document.getElementById("superNodeEditButton");
         var superNodeButton = document.createElement("button");
         superNodeButton.id = "superNodeButton";
-        superNodeButton.innerText = "Zustand erstellen";
+        superNodeButton.innerText = "Create State";
+        superNodeButton.className = "green-button";
         if(superNodeEditButton){
             // Replace the existing button with the new button
             superNodeEditButton.parentNode.replaceChild(superNodeButton, superNodeEditButton);
+        }
+        //remove delete node button (if exists)
+        let deleteButton = document.getElementById("superNodeDeleteButton");
+        if(deleteButton){
+            document.getElementById("deleteSuperNodeDiv").removeChild(deleteButton);
         }
 
         //Event Listener

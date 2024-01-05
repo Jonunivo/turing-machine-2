@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>TuringMachine</title>
+        <title>Turing Machine Simulator</title>
 
         <link rel="stylesheet" href="styles/styles.css">
 
@@ -15,7 +15,7 @@
     <body>
         <!-- Title -->
         <div id="titleDiv" class="centered-content">        
-            <h1 id="head-title">TuringMachine Simulator</h1>
+            <h1 id="head-title">Turing Machine Simulator</h1>
         </div>
 
 
@@ -31,15 +31,15 @@
         <div id="tapeControlDiv" class="centered-content">
             <button id="move-tape-right" class="grey-button"> ⮜ </button>
             <input type="text" id="tape-input-field" required>
-            <button id="tape-input" class="grey-button">Band überschreiben</button>
+            <button id="tape-input" class="grey-button">Write On Tape</button>
             <button id="move-tape-left" class="grey-button"> ➤ </button>
         </div>
 
         <!-- Simulation Control -->
         <div id="simulationControlDiv" class="centered-content">
-            <button id="resetSimulationButton" class="green-button"><| Zurücksetzen</button>
+            <button id="resetSimulationButton" class="thin green-button"><| Reset</button>
             <button id="runSimulationButton" class="green-button">Play Simulation</button>
-            <button id="stepSimulationButton" class="green-button">Schritt ></button>
+            <button id="stepSimulationButton" class="thin green-button">Step ></button>
             <div id="animationToggleDiv">
                 <input type="checkbox" id="fastSimulation" class="fancy-checkbox" name="fastSimulation" checked>
                 <label class="checkboxLabel" for="fastSimulation">Animation</label>
@@ -47,7 +47,7 @@
             <div id="simulationSpeeddiv">
                 <input type="range" min="1" max="10" step=0.01 value="2" class="slider" id="simulationSpeed">
                 <br>
-                <label for="simulationSpeed">Simulationsgeschwindigkeit</label>
+                <label for="simulationSpeed">Simulation Speed</label>
                 <br>
                
             </div>
@@ -57,11 +57,11 @@
         <div id="rightWindow">
             <!-- Edit Button -->
             <div>
-                <button id="editButton" class="toggle-button thin" onclick="toggleButton()">Bewegen</button>
+                <button id="editButton" class="toggle-button thin" onclick="toggleButton()">Move</button>
                 <br>
 
             </div>
-            <h3>Bedienung:</h3>
+            <h3>Instructions:</h3>
             <div id="userGuide">
                 Click on Canvas, <br> to Create State
                 <br><br>
@@ -85,9 +85,9 @@
             <div id="choosePreset" class="optionMenu">
                 
                 <select id="presetSelect" name="preset">
-                    <option value="empty" selected>Kein Preset</option>
+                    <option value="empty" selected>No Preset</option>
                      <option value="PresetOne">binary increment</option> 
-                     <option value="PresetTwo">ab Palindrom</option> 
+                     <option value="PresetTwo">ab Palindrome</option> 
                 </select> 
                 
             </div>
@@ -97,7 +97,7 @@
 
                 <input id="fileInput" type="file" accept=".json">
                 <br>
-                <button id="saveButton" class="button grey-button thin">TM speichern</button>
+                <button id="saveButton" class="button grey-button thin">Save TM</button>
             </div>
 
             <div>
@@ -120,19 +120,22 @@
         <!-- Save Modal -->
         <div id="saveModal" class="modal">
             <div id="saveModalContent" class="modal-content">
-                <h2>TuringMachine speichern</h2>
-                <div>
-                    <label id="saveTapeContent" for="filenameInput">Name: </label>            
-                    <input type="text" id="filenameInput" placeholder="TuringMachine.json">
-
+                <div class="cancel-button-div">
+                    <button id="cancelButton3" class ="cancel-button " type="button">x</button>
                 </div>
+
+                <h2>Save Turing Machine</h2>
                 <div>
-                    <input type="checkbox" class="basic-checkbox" id="saveTape">
-                    <label id="saveTapeCheckbox" for="saveTape">Band auch speichern?</label>
+                    <label id="saveTapeContent" for="filenameInput">Filename: </label>            
+                    <input type="text" id="filenameInput" placeholder="myTuringMachine">
+                </div>
+
+                <div class="centered-content">
+                    <input type="checkbox" id="saveTape" class="fancy-checkbox" name="saveTape">
+                    <label class="checkboxLabel" for="saveTape">Save&#160Tape&#160Content</label>
                 </div>
                 <br>
-                <button id="saveConfirm">Save</button>
-                <button id="cancelButton3">Cancel</button>
+                <button id="saveConfirm" class="grey-button">Save</button>
             </div>
         </div>
 
@@ -145,26 +148,26 @@
                     <button id="cancelButton" class ="cancel-button" type="button">x</button>
                 </div>
 
-                <h3>Zustand</h3>
+                <h3>State properties</h3>
 
                 <label for="stateName" >Name:</label>
                 <input type="text" id="stateName" oninput="limitNameSize(8)">
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateStarting" class="fancy-checkbox" name="startingState" value="false" required checked>
-                    <label class="checkboxLabel" for="stateStarting">Startzustand?</label>
+                    <label class="checkboxLabel" for="stateStarting">Starting?</label>
                 </div>
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateAccepting" class="fancy-checkbox" name="acceptingState" value="true" required>
-                    <label class="checkboxLabel" for="stateAccepting">akzeptierend?</label>
+                    <label class="checkboxLabel" for="stateAccepting">Accepting?</label>
                 </div>
                 <div class="checkbox-div">
                     <input type="checkbox" id="stateRejecting" class="fancy-checkbox" name="rejectingState" value="true" required>
-                    <label class="checkboxLabel" for="stateRejecting">verwerfend?</label>
+                    <label class="checkboxLabel" for="stateRejecting">Rejecting?</label>
                 </div>
                 
                 <br>
                 <div class="submit-button-div">
-                    <button id="nodeButton" type="button">Zustand erstellen</button>
+                    <button type="button" id="nodeButton" class="green-button" >Create State</button>
                 </div>
                 <div id="deleteNodeDiv">
                     <!-- UserEdit.js  will insert a delete button here -->
@@ -180,14 +183,14 @@
                     <button id="cancelButton4" class ="cancel-button" type="button">x</button>
                 </div>
 
-                <h3>Turingmachine as State</h3>
+                <h3>Turing machine as State</h3>
 
                 <label for="superStateName" >Name:</label>
                 <input type="text" id="superStateName" oninput="limitNameSize(8)">
                 
                 <br>
                 <div class="submit-button-div">
-                    <button id="superNodeButton" type="button">Zustand erstellen</button>
+                    <button id="superNodeButton" class="green-button" type="button">Create TM as state</button>
                 </div>
                 <div id="deleteSuperNodeDiv">
                     <!-- SuperStates.js  will insert a delete button here -->
@@ -202,9 +205,9 @@
                 <div class="cancel-button-div">
                     <button id="cancelButton2" class="cancel-button" type="button">x</button>
                 </div>
-                <h3>Übergang</h3>
+                <h3>Transition Properties</h3>
                 <div id="fromStateDiv"></div>
-                <label for="toState">Zu: </label>
+                <label for="toState">To: </label>
                 <select id="toState">🔍</select>
                 
                 <br>
@@ -225,7 +228,7 @@
                 <br>
                 <br>
                 <div class="slider-div">
-                    <label for="tapeMovement">Zeigerbewegung:</label>
+                    <label for="tapeMovement">Head movement: </label>
                     <input type="range" id="tapeMovement" min="-1" max="1" step="1" value="0">
                     <br>
                     <span id="slider-value">⯀</span>
@@ -234,7 +237,7 @@
                 
                 <br>
                 <div class="submit-button-div">
-                    <button id="edgeButton" type="button">Übergang erstellen</button>
+                    <button id="edgeButton" class="green-button" type="button">Create Transition</button>
                 </div>
                 <div id="deleteEdgeDiv">
                     <!-- cytoscape.js will insert a delete button here -->

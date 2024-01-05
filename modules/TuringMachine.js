@@ -139,7 +139,7 @@ export class TuringMachine{
                 document.getElementById('tape-input').disabled = false;
                 document.getElementById('fastSimulation').disabled = false;
 
-                alert(`Keinen Übergang für Zustand ${state.name} & Input ${charOnTape}`)
+                alert(`Simulation finished: Input Rejected \n\nReason: No Transition for State ${state.name} & Input ${charOnTape} \nConsider creating an else-transition to catch all cases`)
                 return null;
             }
 
@@ -209,11 +209,11 @@ export class TuringMachine{
         ////
         if(lastState == this.acceptstate){
             console.log("Simulation finished: Input Accepted!")
-            alert("Simulation finished: Input Accepted!")
+            alert("Simulation finished: Input Accepted! \n\nReason: Accepting State reached")
         }
         else if(this.rejectstate.has(lastState)){
             console.log("Simulation finished: Input Rejected!");
-            alert("Simulation finished: Input Rejected!")
+            alert("Simulation finished: Input Rejected!  \n\nReason: Rejecting State reached")
 
         }
         else{

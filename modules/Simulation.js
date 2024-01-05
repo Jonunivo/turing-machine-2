@@ -41,7 +41,7 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
         }
         //catch no start state defined
         if(turingMachine.startstate === undefined){
-            alert("Please create Start State first");
+            alert("Please create Starting State first");
             simIsRunning = false;
             return;
         }
@@ -72,7 +72,7 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     }
     //catch startstate not defined
     if(turingMachine.startstate === undefined){
-        alert("Please create Start State first");
+        alert("Please create Starting State first");
         return;
     }
     //Fast Simulation if Animation is set to off
@@ -130,7 +130,7 @@ function fastSimulation(){
     }
     //catch no startstate
     if(turingMachine.startstate === undefined){
-        alert("Please create Start State first");
+        alert("Please create Starting State first");
         return;
     }
 
@@ -172,7 +172,7 @@ function fastSimulationStep(){
 
     //catch no startstate
     if(turingMachine.startstate === undefined){
-        alert("Please create Start State first");
+        alert("Please create Starting State first");
         return;
     }
 
