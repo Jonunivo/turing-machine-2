@@ -1,6 +1,6 @@
 import {cy} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
-import { getLocalTM } from './SuperStates.js';
+import { currTreeNode, getLocalTM } from './SuperStates.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
 
 export{simulationReset, enableButtons};
@@ -559,26 +559,30 @@ function animateEdge(tmState, charOnTape, animationTime){
 */
 
 function animateEdgeIn(tmState, charOnTape, animationTime){
-
-
-
     //find corresponding edge
     edgeToAnimate = null;
     let elseEdgeToAnimate = null;
-    const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
-    outgoingEdges.forEach(edge => {
-        if(edge.data().readToken === charOnTape){
-            edgeToAnimate = edge;
+    //helper that detects edges from superstate (return null if not found)
+    edgeToAnimate = getLocalEdge(tmState, charOnTape);
+    console.log("picked edge", edgeToAnimate);
+    //standard case
+    if(edgeToAnimate === null){
+        const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
+        outgoingEdges.forEach(edge => {
+            if(edge.data().readToken === charOnTape){
+                edgeToAnimate = edge;
+            }
+            //catch else edge
+            else if (edge.data().readToken === 'else'){
+                elseEdgeToAnimate = edge;
+            }
+        })
+        //case else edge
+        if(edgeToAnimate === null && elseEdgeToAnimate !== null){
+            edgeToAnimate = elseEdgeToAnimate;
         }
-        //catch else edge
-        else if (edge.data().readToken === 'else'){
-            elseEdgeToAnimate = edge;
-        }
-    })
-    //case else edge
-    if(edgeToAnimate === null && elseEdgeToAnimate != null){
-        edgeToAnimate = elseEdgeToAnimate;
     }
+
 
     //Animation
     //fade-in
@@ -652,6 +656,49 @@ function animateTapeMovement(move, animationTime){
 //// --------------------- Helpers ---------------------- ////
 //////////////////////////////////////////////////////////////
 
+/**
+ * detects the special case of a local Edge being used for animation (from super state)
+ *
+ */
+function getLocalEdge(tmState, charOnTape){
+    let elseEdgeToAnimate = null;
+    let returnEdge = null;
+    let delta;
+    
+    //get all children
+    let childs = currTreeNode.children;
+    //for all childs, 
+    for(let i = 0; i<childs.length; i++){
+        //check if current node = accept node of child
+        if (childs[i].turingMachine.acceptstate.id === tmState.id){
+            //TRUE! find corresponding edge (take both nodes into account!) & return it
+            const outgoingEdges = cy.getElementById(childs[i].superNodeId).outgoers('edge');
+            outgoingEdges.forEach(edge => {
+                console.log("OUT", edge.data().readToken);
+                if(edge.data().readToken === charOnTape){
+                    returnEdge = edge;
+                }
+                //catch else edge
+                else if (edge.data().readToken === 'else'){
+                    elseEdgeToAnimate = edge;
+                }
+            })
+            //case else edge
+            if(returnEdge === null && elseEdgeToAnimate !== null){
+                returnEdge = elseEdgeToAnimate;
+            }
+            delta = childs[i].turingMachine.delta
+            //catch edge within subTM preferred
+            for(const [key, value] of delta){
+                if (key[1] === charOnTape){
+                    return null;
+                }
+            }
+        }
+
+    }
+    return returnEdge;
+}
 
 /**
  * 
