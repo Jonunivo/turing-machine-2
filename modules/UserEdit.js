@@ -51,8 +51,8 @@ cy.on('mouseup', 'node', (event) =>{
 function clickEditNode(event){
     //save node clicked on (global vars)
     cytoEditNode = event.target;
-    editNode = turingMachine.getStatebyId(cytoEditNode.id());
-    let localEditNode = getLocalTM().getStatebyId(cytoEditNode.id());
+    editNode = turingMachine.getStateById(cytoEditNode.id());
+    let localEditNode = getLocalTM().getStateById(cytoEditNode.id());
 
     //// Case 0: clicked on uneditable node
     //globally not accepting, but locally (-> local End State)
@@ -355,7 +355,7 @@ function userDeleteNodeHandler(){
 
     ////delete from local TM object
     const localTM = getLocalTM();
-    editNode = localTM.getStatebyId(editNode.id)
+    editNode = localTM.getStateById(editNode.id)
     localTM.states.delete(editNode);
     if(editNode.isStarting){
         localTM.startstate = null;
@@ -403,7 +403,7 @@ cy.on('click', 'edge', function(event){
         //get edge TM object (delta) (& put into global variable)
         //Local
         let localFromNodeId = cytoEditEdge.source().id();
-        let localFromNode = localTM.getStatebyId(localFromNodeId);
+        let localFromNode = localTM.getStateById(localFromNodeId);
         let readToken = cytoEditEdge.data("readToken");
         //!TO DO: getKeyByContent is problematic if multiple edges with same readToken exist
         //-> Value in "From" can be set wrong in getCurrentEdgeProperties()
@@ -413,11 +413,11 @@ cy.on('click', 'edge', function(event){
 
         //Global
         let globalFromNodeId = localFromNodeId;
-        let globalFromNode = turingMachine.getStatebyId(localFromNodeId);
+        let globalFromNode = turingMachine.getStateById(localFromNodeId);
         if(globalFromNode === undefined){
             //from node is super node
             globalFromNodeId = getAcceptSubTM(localFromNodeId);
-            globalFromNode = turingMachine.getStatebyId(globalFromNodeId);
+            globalFromNode = turingMachine.getStateById(globalFromNodeId);
         }
         globalEditEdgeKey = turingMachine.getKeyByContent([globalFromNode, readToken]);
         globalEditEdgeContent = turingMachine.delta.get(globalEditEdgeKey);
@@ -563,22 +563,22 @@ function userEditEdgeHandler(){
 
     //fromNode (Local & Global TM)
     let dropdownfrom = document.getElementById("fromState");
-    let localFromNode = localTM.getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let localFromNode = localTM.getStateByName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
     let fromNodeId = localFromNode.id;
-    let globalFromNode = turingMachine.getStatebyId(fromNodeId)
+    let globalFromNode = turingMachine.getStateById(fromNodeId)
     if (globalFromNode === undefined){
         //from node supernode (=not in global TM)
-        globalFromNode = turingMachine.getStatebyId(getAcceptSubTM(fromNodeId));
+        globalFromNode = turingMachine.getStateById(getAcceptSubTM(fromNodeId));
     }
     
     //toNode (Local & Global TM)
     let dropdown = document.getElementById("toState")
-    let localToNode = localTM.getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
+    let localToNode = localTM.getStateByName(dropdown.options[dropdown.selectedIndex].textContent);
     let toNodeId = localToNode.id;
-    let globalToNode = turingMachine.getStatebyId(toNodeId);
+    let globalToNode = turingMachine.getStateById(toNodeId);
     if(globalToNode === undefined){
         //to node supernode (=not in global TM)
-        globalToNode = turingMachine.getStatebyId(getStartSubTM(toNodeId));
+        globalToNode = turingMachine.getStateById(getStartSubTM(toNodeId));
     }
     
     //readToken

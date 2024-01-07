@@ -211,7 +211,7 @@ cy.on('mouseup', 'node', (event) =>{
 function dragCreateEdge(event){
     if(inEditMode()){
         //save from node (TM) (to global var)
-        fromNode = getLocalTM().getStatebyId(dragFromNode.id());
+        fromNode = getLocalTM().getStateById(dragFromNode.id());
         dragToNode = event.target;
 
         ////open modal
@@ -248,7 +248,7 @@ function dragCreateEdge(event){
 
         ////Create Option to Change ToState
         createDropdownMenues(document.getElementById("toState"))
-        var toNode = getLocalTM().getStatebyId(dragToNode.id());
+        var toNode = getLocalTM().getStateById(dragToNode.id());
         document.getElementById("toState").value = toNode.name;
 
 
@@ -310,22 +310,22 @@ function userEdgeInputHandler(){
 
     //fromNode (Local & Global TM)
     let dropdownfrom = document.getElementById("fromState");
-    let localFromNode = localTM.getStatebyName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
+    let localFromNode = localTM.getStateByName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
     let fromNodeId = localFromNode.id;
-    let globalFromNode = turingMachine.getStatebyId(fromNodeId)
+    let globalFromNode = turingMachine.getStateById(fromNodeId)
     if (globalFromNode === undefined){
         //from node supernode (=not in global TM)
-        globalFromNode = turingMachine.getStatebyId(getAcceptSubTM(fromNodeId));
+        globalFromNode = turingMachine.getStateById(getAcceptSubTM(fromNodeId));
     }
     
     //toNode (Local & Global TM)
     let dropdown = document.getElementById("toState")
-    let localToNode = localTM.getStatebyName(dropdown.options[dropdown.selectedIndex].textContent);
+    let localToNode = localTM.getStateByName(dropdown.options[dropdown.selectedIndex].textContent);
     let toNodeId = localToNode.id;
-    let globalToNode = turingMachine.getStatebyId(toNodeId);
+    let globalToNode = turingMachine.getStateById(toNodeId);
     if(globalToNode === undefined){
         //to node supernode (=not in global TM)
-        globalToNode = turingMachine.getStatebyId(getStartSubTM(toNodeId));
+        globalToNode = turingMachine.getStateById(getStartSubTM(toNodeId));
     }
 
     //readLabel

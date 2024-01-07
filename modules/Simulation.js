@@ -167,6 +167,8 @@ function fastSimulation(){
         return;
     }
 
+    let counter = 0;
+
     //limit run time to 5 seconds
     const startTime = new Date().getTime();
     const timeLimit = 5000; // 5 seconds in milliseconds
@@ -178,13 +180,14 @@ function fastSimulation(){
         //CORE
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         charOnTape = turingMachine.readTape();
-
+        counter++;
     }
     //simulation timeout
     if(new Date().getTime() - startTime >= timeLimit){
         tmTapetoCyto();
         enableButtons();
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
+        console.log("OPERATION COUNT", counter);
     }
 
     else if(currentState == turingMachine.acceptstate ||

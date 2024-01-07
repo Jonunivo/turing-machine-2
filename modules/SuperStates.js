@@ -145,11 +145,12 @@ function userSuperNodeInputHandler(){
 
     //merge into main TM (adds start & stop state to globalTM)
         //remove isStarting & isAccepting for global TM
-    subTuringMachine.getStatebyId(id1).isStarting = false;
-    subTuringMachine.getStatebyId(id2).isAccepting = false;
+    subTuringMachine.getStateById(id1).isStarting = false;
+    subTuringMachine.getStateById(id2).isAccepting = false;
     turingMachine.mergeInTuringMachine(subTuringMachine);
-    subTuringMachine.getStatebyId(id1).isStarting = true;
-    subTuringMachine.getStatebyId(id2).isAccepting = true;
+        //readd previously removed isStarting & isAccepting for global TM
+    subTuringMachine.getStateById(id1).isStarting = true;
+    subTuringMachine.getStateById(id2).isAccepting = true;
 
     //add SuperState to local TM (parent)
     let superState = new State(superStateId, stateName)
@@ -204,7 +205,7 @@ function userDeleteSuperNodeHandler(){
 
 
     ////check if any edges from/to this node
-    let stateToDelete = getLocalTM().getStatebyId(editNode.id);
+    let stateToDelete = getLocalTM().getStateById(editNode.id);
     for(const [key, value] of currTreeNode.turingMachine.delta){
         if(key[0] === stateToDelete ||
             value[0] === stateToDelete){
@@ -223,7 +224,7 @@ function userDeleteSuperNodeHandler(){
         //& global TM still contains nodes & edges (they are not connected however)
         
         //remove SubTM node from local TM
-        let localState = getLocalTM().getStatebyId(editNode.id);
+        let localState = getLocalTM().getStateById(editNode.id);
         getLocalTM().states.delete(localState);
         console.log("localTM::", getLocalTM());
         //remove from cytoscape window
@@ -367,7 +368,7 @@ function createCytoWindow(){
 //adjust local TM when node edit (borrow from global tm)
 function editNodeLocalTM(editNode, rejectAdded, rejectDeleted){
     //find state in local TM with corresponding id
-    let editNodeLocal = currTreeNode.turingMachine.getStatebyId(editNode.id);
+    let editNodeLocal = currTreeNode.turingMachine.getStateById(editNode.id);
 
     //copy properties
     editNodeLocal.name = editNode.name;

@@ -66,7 +66,7 @@ function cyTreeCreate(loadTM){
             if(loadTM){
                 //Case 1: function is called in a LoadTM style, currTreeNodeName unavailable
                 if(currentChild.parent !== null && currentChild.parent !== undefined){
-                    let currState = currentChild.parent.turingMachine.getStatebyId(currChildren[i].superNodeId);
+                    let currState = currentChild.parent.turingMachine.getStateById(currChildren[i].superNodeId);
                     if(currState !== undefined){
                         currname = currState.name;
                     }

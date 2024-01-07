@@ -1,7 +1,7 @@
 import { cy, cyClearCanvas, generateNodePosMap, cyCreateEdge, cyCreateNode, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { State } from "./State.js";
-import { TuringMachine, turingMachine } from "./TuringMachine.js"
+import { TuringMachine, turingMachine, resetGlobalTuringMachine } from "./TuringMachine.js"
 import { tmTree, setTmTree, currTreeNode, setCurrTreeNode, createCytoWindow, resetTree} from "./SuperStates.js";
 import { Tree, TreeNode } from "../datastructures/Tree.js";
 import {nodePresetHelper, nodePresetReset} from "./UserInput.js";
@@ -206,7 +206,7 @@ function loadFile(reader){
 
         //// core 
         //reset TM & canvas & simulation & tree
-        turingMachine.createTuringMachineBasic();
+        resetGlobalTuringMachine();
         cyClearCanvas();
         nodePresetReset();
         enableButtons();
@@ -244,8 +244,8 @@ function loadFile(reader){
         let globalTransitions = loadTransitions(lines);
         for(let j = 0; j<globalTransitions.length; j++){
             let currTransition = globalTransitions[j];
-            turingMachine.createTransition(turingMachine.getStatebyId(currTransition[0]), currTransition[1],
-                turingMachine.getStatebyId(currTransition[2]), currTransition[3], currTransition[4]);
+            turingMachine.createTransition(turingMachine.getStateById(currTransition[0]), currTransition[1],
+                turingMachine.getStateById(currTransition[2]), currTransition[3], currTransition[4]);
         }
         console.log(turingMachine.delta);
 
@@ -287,8 +287,8 @@ function loadFile(reader){
             let localTransitions = loadTransitions(lines);
             for(let j = 0; j<localTransitions.length; j++){
                 let currTransition = localTransitions[j];
-                localTM.createTransition(localTM.getStatebyId(currTransition[0]), currTransition[1],
-                    localTM.getStatebyId(currTransition[2]), currTransition[3], currTransition[4]);
+                localTM.createTransition(localTM.getStateById(currTransition[0]), currTransition[1],
+                    localTM.getStateById(currTransition[2]), currTransition[3], currTransition[4]);
             }
             lineId+=2;
             console.log("--||", lines[lineId], lines[lineId+1], lines[lineId+2], lines[lineId+3])
