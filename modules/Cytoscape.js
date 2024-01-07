@@ -1,18 +1,40 @@
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Defines cytoscape object cy (used for cytoscape main window)
+    - Provides functionality to manipulate & control cy object / cytoscape main window
+
+  Dependencies/Imports:
+    - cytoscape Library
+
+  Exports:
+    - Shared variable cy
+    - Functions to manipulate main cytoscape window
+    - Function that generates nodePosMap used to save nodes positions in other modules
+*/
+
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, addEventListenerWithCheck, moveNodesIntoWindow, cyGrabifyNodes, generateNodePosMap};
 
-
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, runLayout, addEventListenerWithCheck, refresh, moveNodesIntoWindow, cyGrabifyNodes, generateNodePosMap};
+/// Global/shared variables
 
 
 //////////////////////////////////////////////////////////////
 //// -------------------- Cytoscape --------------------- ////
 //////////////////////////////////////////////////////////////
-//// ----------- Cytoscape object
-//Creates standard cytoscape object & defines global properties.
+/**
+ * Cytoscape Global Configuration Object
+ *
+ * cy is initializes by Cytoscape instance with specified container, style, and interaction settings.
+ * All objects in main cytoscape window are save in cy
+*/
 var cy = cytoscape({
     container: document.getElementById('cytoscape'),
     style: [
     {
+        //default node styling
         selector: 'node',
         style: {
             shape: 'round-rectangle',
@@ -21,7 +43,7 @@ var cy = cytoscape({
         }
     },
     {
-        
+        //default edge styling
         selector: 'edge',
         style: {
             'line-color': 'darkgrey',
@@ -36,6 +58,7 @@ var cy = cytoscape({
             'loop-sweep': '-120deg',
             'text-margin-x': "-10px",
             'text-margin-y': "-5px",
+            'font-size': "12px",
 //            'text-rotation': 'autorotate',
         }
         
@@ -45,55 +68,28 @@ var cy = cytoscape({
     userPanningEnabled: false,
   });
 
-//disallow drag & drop in edit mode
-//global var: EditMode
-let editMode = document.getElementById("editMode")
-//disable move mode at page load
-if(!inEditMode()){
-    var button = document.querySelector('.toggle-button');
-    button.classList.toggle('active');
-}
-//cy nodes not grabbable during edit mode
-var button = document.getElementById("editButton");
-button.addEventListener('click', function (event) {
-    cyGrabifyNodes();
-})
-function cyGrabifyNodes(){
-    if(inEditMode()){
-        cy.nodes().ungrabify();
-    }
-    else{
-        cy.nodes().grabify();
-    }
-}
-
-
-
-//// ----------- Node Creation
-
 /**
  * Creates a Node in the cytoscape Object with the specified properties.
+ * The width of the node is dynamically set by length of nodeName.
+ * !will not create the node if a cytoscape node with this ID already exists
  * 
  * @param {number} nodeId - unique identifier of the node (same as in TM object)
  * @param {string} nodeName - Name of node displayed on node
- * @param {number} xPos - xCoord of node in window, if not specified, set to 200
- * @param {number} yPos - yCoord of node in window, if not specified, set to 200
- * @param {boolean} isStarting - used to specify style properties
- * @param {boolean} isAccepting - used to specify style properties
- * @param {boolean} isRejecting - used to specify style properties
+ * @param {number} xPos - xCoord of node in window
+ * @param {number} yPos - yCoord of node in window
+ * @param {boolean} isStarting - is node Starting?
+ * @param {boolean} isAccepting - is node Accepting?
+ * @param {boolean} isRejecting - is node Rejecting?
+ * @param {boolean} isSuperNode - is node subTM node?
  */
 function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccepting, isRejecting, isSuperNode = false){
-    console.log("cyCreateNode with id", nodeId, " xPos: ", xPos, " yPos: ", yPos);
-    
-    //default values
-    let label = nodeName;
-    let id = nodeId;
+    //style variables set to default values
     let color = 'lightgrey';
     let borderWidth = 0;
     let borderColor = 'white';
     let borderStyle = 'solid';
 
-    //adjust style for Accepting/Starting/Rejecting nodes
+    //adjust style for Starting/Accepting/Rejecting nodes
     if(isStarting){
         borderWidth = 2;
         borderColor = 'black';
@@ -115,154 +111,62 @@ function cyCreateNode(nodeId, nodeName, xPos=200, yPos=200, isStarting, isAccept
     //core
     cy.add({
         group: 'nodes',
-        data: {id: id},
+        data: {id: nodeId},
         style: {
             'background-color': `${color}`,
             'border-width': `${borderWidth}`, // Set the border width for the nodes
             'border-color': `${borderColor}`,
             'border-style': `${borderStyle}`,
-            'label': `${label}`,
+            'label': `${nodeName}`,
             "text-valign": "center",
             "text-halign": "center",
-            'width': `${label.length*10 + 10}px` //dynamically set width
+            'width': `${nodeName.length*10 + 10}px` //dynamically set width
         },
         position: { x: parseInt(xPos), y: parseInt(yPos)},
     });
 }
 
-//// ----------- Edge Creation
-
 /**
  * Creates an Edge in the Cytoscape object
  * 
- * @param {number} fromNode ID of node Edge originates from
- * @param {number} toNode ID of node Edge goes to
+ * @param {number} fromNodeId ID of node Edge originates from
+ * @param {number} toNodeId ID of node Edge goes to
  * @param {string} label Label of Edge
  * @param {char} readToken Edge responsible for when this token is read (used in EdgeAnimation)
  */
-function cyCreateEdge(fromNode, toNode, label, readToken){
-    console.log("cyCreateEdge " + fromNode + " | " + toNode + " | " + label);
-
-    //core
+function cyCreateEdge(fromNodeId, toNodeId, label, readToken){
     cy.add({ 
         group: 'edges', 
         data: { 
-            source: `${fromNode}`, 
-            target: `${toNode}`,
+            source: `${fromNodeId}`, 
+            target: `${toNodeId}`,
             readToken: `${[readToken]}`,
         },
         style: {
             'label': `${label}`,
-            'font-size': '12px',
-            'classes': 'autorotate',
-
           },
-        classes: 'autorotate',
-
         },
     );
 }
 
-//// ----------- Edge Merging
-//TO DO - decide how to merge edges 
-function mergeEdges(edge1, edge2){
-    //catch source/target not matching
-    if(edge1.data().source !== edge2.data().source ||
-    edge1.data().target !== edge2.data().target){
-        return;
-    }
-
-    //save edge data
-
-    let mergedSource = edge1.data().source;
-    let mergedTarget = edge1.data().target;
-    let readToken1 = edge1.data().readToken;
-    let readToken2 = edge2.data().readToken;
-
-    //remove old edges
-    cy.remove(edge1);
-    cy.remove(edge2);
-
-    //create merged edge
-    cyCreateEdge(mergedSource, mergedTarget, label, readToken1);
-
-}
-
-//// ----------- Clear Canvas
 /**
- * Clears Canvas (Reset Cytoscape object)
+ * Clears Canvas (Removes all nodes and edges from cy)
  */
 function cyClearCanvas(){
+    //removing all nodes will also remove all edges
     var cyNodes = cy.nodes();
     cyNodes.remove();
 }
-
-
-
-
-//////////////////////////////////////////////////////////////
-//// ---------------------- Layout ---------------------- ////
-//////////////////////////////////////////////////////////////
-
-//specifies node (&edge) layout
-/**
- * Specifies a default layout of the nodes in the cytoscape object
- * note: not used at the moment
- */
-function runLayout(){
-    var layoutOptions = {
-        name: 'grid',
-        avoidOverlap: true,
-        padding: 20,
-        randomize: false,
-        fit: true,
-    };
-    var layout = cy.layout(layoutOptions);
-    layout.run();
-}
-/**
- * Refreshes cytoscape window (upon edit)
- * note: not used at the moment
- */
-function refresh(){
-    var layoutOptions = {
-        name:"grid",
-    };
-    var layout = cy.layout(layoutOptions);
-    layout.run;
-}
-
-//////////////////////////////////////////////////////////////
-//// -------------------- SuperNode --------------------- ////
-//////////////////////////////////////////////////////////////
-
-/**
- * Experimental Area to try to create supernode
- */
-/*
-cy.on('dbltap', 'node', function(event){
-    var node = event.target;
-    openNewSubWindow();
-})
-
-document.getElementById("subWindowOpener").addEventListener('click', openNewSubWindow);
-
-function openNewSubWindow(){
-    var newWindow = window.open('sub_window.html', '_blank', 'width=800, height=600');
-}
-*/
-
 
 //////////////////////////////////////////////////////////////
 //// --------------------- Helpers ---------------------- ////
 //////////////////////////////////////////////////////////////
 
 /**
- * 
  * Helper: that generates the positionMap of current Cytoscape window 
  * used in TreeNode to save Positions of CytoNodes
  * 
- * @returns Map<number, [number, number]> positionMap
+ * @returns {Map<number, [number, number]>} positionMap
  */
 function generateNodePosMap(){
     let positionMap = new Map();
@@ -273,7 +177,7 @@ function generateNodePosMap(){
     return positionMap;
 }
 
-
+//TO DO: move to UserInput or UserEdit or ..., function is not even used in this module
 /**
  * 
  * Helper: that creates EventListeners, if not yet existent (avoids duplication of EventListeners)
@@ -310,14 +214,11 @@ function moveNodesIntoWindow(){
             node.position().y = 0+60;
         } 
     })
-
+    //run default layout to refresh cytoscape window
     var layoutOptions = {
         name: 'preset',
     }
     cy.layout(layoutOptions).run();
-
-
-    seperateNodes();
 }
 //call function whenever window resizes
 window.addEventListener('resize', function () {
@@ -328,17 +229,34 @@ cy.on('mouseup', function (e) {
     moveNodesIntoWindow();
 })
 
-
-//Helper: seperates Nodes too close to each other
-//TO DO
-function seperateNodes(){
-
-}
-
-
+/**
+ * Helper: that checks if the Move button is deactivated
+ * @returns {boolean} true if move button is deactivated
+ */
 function inEditMode(){
     var button = document.querySelector('.toggle-button');
-    // Check if the button is currently active
-    var isActive = !button.classList.contains('active');
-    return isActive;
+    var isNotActive = !button.classList.contains('active');
+    return isNotActive;
 }
+//disable move mode at page load
+if(!inEditMode()){
+    var button = document.querySelector('.toggle-button');
+    button.classList.toggle('active');
+}
+
+/**
+ * Helper: enables/disables moving nodes in cytoscape window.
+ */
+function cyGrabifyNodes(){
+    if(inEditMode()){
+        cy.nodes().ungrabify();
+    }
+    else{
+        cy.nodes().grabify();
+    }
+}
+//call whenever move button is pressed
+var button = document.getElementById("editButton");
+button.addEventListener('click', function (event) {
+    cyGrabifyNodes();
+})
