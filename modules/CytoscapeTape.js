@@ -10,7 +10,7 @@
 
   Dependencies/Imports:
     - cytoscape Library
-    - global Turing Machine object
+    - TuringMachine.js | global Turing Machine object
 
   Exports:
     - Shared variable cyTape
@@ -564,9 +564,10 @@ function tmTapetoCyto(){
     //add remaining nodes to rightOverflow
     let j = numElements + shift;
     while(j < turingMachine.tape.length){
-        rightOverflow += turingMachine.tape[j];
+        rightOverflow = turingMachine.tape[j] + rightOverflow;
         j++;
     }
+    //rightOverflow += turingMachine.tape[j];
     //lock node movement
     cyTape.nodes().lock();
 }
