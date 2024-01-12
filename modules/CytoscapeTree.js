@@ -1,10 +1,31 @@
-import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Defines cytoscape Tree object cyTree (used for tree representation)
+    - Builds visual Tree representation of sub Turing machines in cyTree window.
 
-import { turingMachine } from './TuringMachine.js';
+  Dependencies/Imports:
+    - cytoscape Library
+    - SuperStates.js | global variables: the tmTree & currTreeNodeName
+
+  Exports:
+    - Functions to manipulate visible Tree
+*/
+
+import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
 import { tmTree, currTreeNodeName } from "./SuperStates.js";
 
 export{cyTreeCreate, cyTreeStyleCurrentNode, cyTreeReset}
 
+
+/**
+ * Cytoscape Global Configuration Object
+ *
+ * cyTree is initializes by Cytoscape instance with specified container, style, and interaction settings.
+ * Global style properties are set here
+*/
 var cyTree = cytoscape({
     container: document.getElementById('cytoscape-tree'),
     style: [
@@ -44,17 +65,22 @@ var cyTree = cytoscape({
 cyTreeCreateNode("root", 0, 0, 0);
 cyTreeStyleCurrentNode(0);
 
-//buildup cyTree
+/**
+ * Creates the Cytoscape tree structure based on the global Variable tmTree
+ *
+ * @param loadTM Flag indicating whether the function is called after loading in a TM.
+ *               If true, it retrieves node names from all the Turing Machine's super states.
+ *               If false, it suffices to just take the name of the new super state just provided by the user
+ */
 function cyTreeCreate(loadTM){
+    // Initialize variables for tree traversal
     let currTreeNode = tmTree.root;
-
     let depth = 1;
     let width = 0;
-    let id = 1;
     let currChildren = currTreeNode.children;
     let nextLevelChildren = [];
 
-    //until no more children left
+    // Traverse the tree until no more children are left
     while(currChildren.length > 0){
         //level by level
         for(let i = 0; i < currChildren.length; i++){
@@ -77,13 +103,12 @@ function cyTreeCreate(loadTM){
                 currname = currTreeNodeName;
             }
 
+            // Create a node and edge for the current TreeNode
             cyTreeCreateNode(currname, currChildren[i].superNodeId, depth, width);
             cyTreeCreateEdge(currChildren[i].parent.superNodeId, currChildren[i].superNodeId);
-            id++;
             width++;
             //save children of next level 
             for(let j = 0; j < currChildren[i].children.length; j++){
-                console.log("adding children");
                 nextLevelChildren.push(currChildren[i].children[j])
             }
         }
@@ -93,10 +118,20 @@ function cyTreeCreate(loadTM){
         currChildren = nextLevelChildren;
         nextLevelChildren = [];
     }
+    //move nodes into window
+    moveNodesIntoWindow();
 }
 
+/**
+ * Creates a node in CyTree with the specified characteristics.
+ *
+ * @param name   The name of the node to be displayed. If undefined, an empty string is used.
+ * @param id     The identifier of the node.
+ * @param depth  The depth level at which the node should be positioned in the tree.
+ * @param width  The horizontal position of the node within its level, affecting its X-coordinate.
+ */
 function cyTreeCreateNode(name, id, depth, width){
-    if(name=== undefined){
+    if(name === undefined){
         name = "";
     }
     cyTree.add({
@@ -113,6 +148,13 @@ function cyTreeCreateNode(name, id, depth, width){
     })
 }
 
+/**
+ * Creates an edge in CyTree between the specified source and target nodes.
+ * Checks if the edge already exists before creating it to avoid duplicates.
+ *
+ * @param fromNodeId The identifier of the source node.
+ * @param toNodeId   The identifier of the target node.
+ */
 function cyTreeCreateEdge(fromNodeId, toNodeId){
     //check if edge already exists
     for (let edge of cyTree.edges()) {
@@ -125,18 +167,21 @@ function cyTreeCreateEdge(fromNodeId, toNodeId){
         data: { 
             source: `${fromNodeId}`, 
             target: `${toNodeId}`,
-        },
-        style: {
-          }
+        }
         }
     );
 }
 
+/**
+ * Colors the node with @param nodeId in the cyTree blue, while
+ * coloring all others grey.
+ *
+ * @param nodeId The identifier of the current node to be styled.
+ */
 function cyTreeStyleCurrentNode(nodeId){
     cyTree.nodes().forEach(node => {
-        console.log(node.id(), " | ", nodeId);
         if (parseInt(node.id()) === nodeId) {
-          // Change color to red for the specified node
+          // Change color to blue for the specified node
           node.style('background-color', '#5463ff');
         } else {
           // Change color to grey for all other nodes
@@ -145,6 +190,10 @@ function cyTreeStyleCurrentNode(nodeId){
       });
 }
 
+/**
+ * Resets cyTree to state a page load time (only root node)
+ *
+ */
 function cyTreeReset(){
     var cyNodes = cyTree.nodes();
     cyNodes.remove();
@@ -152,4 +201,34 @@ function cyTreeReset(){
     cyTreeStyleCurrentNode(0);
 }
 
-
+/**
+ * Helper: that moves all nodes back inside of window if user drags them out of it
+ */
+function moveNodesIntoWindow(){
+    console.log("here");
+    let w = cyTree.width();
+    let h = cyTree.height();
+    cyTree.nodes().forEach(node => {
+        if(node.position().x > w-10){
+            node.position().x = w-10;
+        }
+        if(node.position().x < 0+10){ 
+            node.position().x = 0+10;
+        }
+        if(node.position().y > h-10){
+            node.position().y = h-10;
+        } 
+        if(node.position().y < 0+10){
+            node.position().y = 0+10;
+        } 
+    })
+    //run default layout to refresh cytoscape window
+    var layoutOptions = {
+        name: 'preset',
+    }
+    cyTree.layout(layoutOptions).run();
+}
+//call function on user moving node (releasing node)
+cyTree.on('mouseup', function (e) {
+    moveNodesIntoWindow();
+})
