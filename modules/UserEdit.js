@@ -1,6 +1,6 @@
 import { cy, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
-import { TuringMachine, turingMachine } from "./TuringMachine.js";
-import {createDropdownMenues, disableSliders, inEditMode, userNodeInputHandler, userEdgeInputHandler } from "./UserInput.js";
+import { turingMachine } from "./TuringMachine.js";
+import {createDropdownMenues, disableSliders, inEditMode} from "./UserInput.js";
 import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, userDeleteSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }
