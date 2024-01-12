@@ -1,4 +1,27 @@
-import { cy, cyClearCanvas, generateNodePosMap, cyCreateEdge, cyCreateNode, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Saves Turing machine build into .json file
+    - Loads Turing machine build into Simulator from .json file
+
+  Dependencies/Imports:
+    - Cytoscape.js     | function to control main Cytoscape canvas
+    - CytoscapeTape.js | function to write on Tape
+    - State.js         | State class
+    - TuringMachine.js | TuringMachine class & global TM object
+    - SuperState.js    | buildup tmTree & cytoscape main window from nodePosMap
+    - Tree.js          | Tree & TreeNode class
+    - userInput.js     | functions to maintain state id invariant
+    - Simulation.js    | Reset simulation
+    - CytoscapeTree.js | Reset & creates visual Tree representation
+
+  Exports:
+    - loadFile function 
+*/
+
+import { cyClearCanvas, generateNodePosMap, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
 import { cyWriteOnTape } from "./CytoscapeTape.js";
 import { State } from "./State.js";
 import { TuringMachine, turingMachine, resetGlobalTuringMachine } from "./TuringMachine.js"
@@ -12,7 +35,7 @@ export {loadFile};
 
 
 //global Variables
-//Array of TM properties to be saved
+//Array of TM properties to be saved (used across 2 functions)
 let tmProperties = []
 //Line of Read Cursor
 let lineId = 0;
@@ -22,65 +45,61 @@ let lineId = 0;
 //////////////////////////////////////////////////////////////
 /**
  * Saving works as follows:
- * User presses SaveButton -> saveTuringMachine() -> Modal open
- * -> User makes Modal input
- * (1) presses Save in Modal -> saveFile() & close Modal
+ * User presses SaveButton -> 
+ * saveTuringMachine() 
+ * -> Modal open -> User makes Modal input
+ * (1) User presses Save in Modal -> saveFile() & close Modal
  * (2) User presses Cancel -> close Modal
  */
 
 /**
- * Puts States & Transitions of TM into imProperties array & opens SaveModal
+ * Puts States & Transitions of TM into tmProperties array & opens SaveModal
  * called when user presses "Save TM"
  */
 function saveTuringMachine(){
-
     //Open Save File Modal
     document.getElementById("saveModal").style.display = "block";
 
-    //save Node Positions of current window
+    //update Node Positions of current window
     currTreeNode.nodePositions = generateNodePosMap();
 
-    //// Global TM
     tmProperties = [];
-    //convert states to JSON
+    //// Global TM
+    //states
     for(const state of turingMachine.states){
         tmProperties.push(JSON.stringify(state));
     }
-
-    //line break
     tmProperties.push('\n');
 
-    //convert transitions to JSON
+    //transitions
     for(const [key, value] of turingMachine.delta){
-        //[fromState{properties(5)}, readChar, toState{properties(5)}, writeChar, move]
+        //format: [fromState{properties(5)}, readChar, toState{properties(5)}, writeChar, move]
         tmProperties.push([key[0].id, key[0].name, key[0].isStarting, key[0].isAccepting, key[0].isRejecting, 
             key[1], value[0].id, value[0].name, value[0].isStarting, value[0].isAccepting, value[0].isRejecting,
             value[1], value[2]]);
     }
-
     tmProperties.push("\n");
 
-    ////Local TMs   
+    ////Local TMs  
+    // Process each node of tmTree (BFS)
     let nodes = [];
     nodes.push(tmTree.root);
     while(nodes.length > 0){
         //pop first element
         let currNode = nodes.shift();
 
-        //push properties of this node to file
         //superNodeId
         tmProperties.push(currNode.superNodeId);
-        //parent superNodeId
+        //parent superNodeId (-1 for root)
         if(currNode !== tmTree.root){
             tmProperties.push(currNode.parent.superNodeId);
         }
         else{
             tmProperties.push(-1);
         }
-
         tmProperties.push("\n");
 
-        //TM
+        //local TuringMachine
         for(const state of currNode.turingMachine.states){
             tmProperties.push(JSON.stringify(state));
         }
@@ -92,36 +111,28 @@ function saveTuringMachine(){
                 value[1], value[2]]);
         }
         tmProperties.push("\n");
-        //nodePositions
+
+        //nodePositions map
         for(const [key, value] of currNode.nodePositions){
             //[nodeId] -> [nodeXPos, nodeYPos]
             tmProperties.push([key, value[0], value[1]])
         }
-        //parent
-
-        //children (dont need to be saved)
-        
+        tmProperties.push("\n");
 
         //add all children to list
         for(let i = 0; i<currNode.children.length; i++){
             nodes.push(currNode.children[i]);
         }
-        tmProperties.push("\n");
-
     }
-
 }
-//EventListener for SaveButton
+//EventListener for the Save Button
 document.getElementById("saveButton").addEventListener("click", saveTuringMachine);
 
 
 /**
- * 
  * Reads User Modal input & saves Tape if requested
- * Handles all the file creation & download part
- * 
- * @returns - aborts when user doesn't provide a filename (cancelled saving file prompt);
- *              otherwise returns nothing.
+ * Handles file creation and download.
+ *
  */
 function saveFile(){
 
@@ -148,21 +159,16 @@ function saveFile(){
     // Create a downloadable link
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
-
-    // Set suggested filename for the downloaded file
     downloadLink.download = filename;
-
-    // Append the link to the DOM (optional)
     document.body.appendChild(downloadLink);
-
-    // Programmatically trigger the download
+    // Trigger the download
     downloadLink.click();
-
     // Clean up the object URL
     URL.revokeObjectURL(downloadLink.href);
 }
+// Event listener for the Save Confirm button in the Save Modal
 document.getElementById("saveConfirm").addEventListener("click", saveFile);
-//Cancel button pressed
+// Event listener for the Cancel button in the Save Modal
 document.getElementById("cancelButton3").addEventListener('click', function(){
     document.getElementById("saveModal").style.display = "none";
 })
@@ -174,16 +180,17 @@ document.getElementById("cancelButton3").addEventListener('click', function(){
 
 /**
  * Handles the whole loading process from Prompting the user to submit file until creating all the
- * necessary cytoscape objects & handle turingMachine object specifically:
+ * necessary cytoscape objects & handle turingMachine object, specifically:
  *  - Prompt User to input file
- *  - Resets TM & canvas
- *  - Load States & Transitions at position specified in savefile
+ *  - Resets TM, canvas, simulation, tape, tree
+ *  - Load States & Transitions into cyto window at position specified in savefile
  *  - load Tape content (if provided)
  */
+
+//EventListener for fileInput
 document.getElementById('fileInput').addEventListener('change', (event) => {
     const fileList = event.target.files;
     if(fileList.length != 1){
-        //not 1 file selected
         return;
     }
     //load file
@@ -192,39 +199,42 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
     reader.readAsText(file);
 
     loadFile(reader);
-
-   
-
 });
 
+
+/**
+ * Reads the content of the selected file and initiates the loading process. 
+ * Resets the global Turing Machine, canvas, simulation, tape, and tree before laoding. 
+ * Loads states, transitions, tape content, and builds the tree structure.
+ * Invoked after the user selects a file for loading.
+ *
+ * @param {FileReader} reader - FileReader object containing the content of the selected file.
+ */
 function loadFile(reader){
-     ////read file content
      reader.onload = (event) => {
         const fileContent = event.target.result;
         //split into lines
         const lines = fileContent.split('\n');
 
-        //// core 
-        //reset TM & canvas & simulation & tree
+        // Reset Turing Machine, canvas, simulation, tape, and tree
         resetGlobalTuringMachine();
         cyClearCanvas();
         nodePresetReset();
         enableButtons();
-        //reset Tree
         resetTree();
         cyTreeReset();
+
         //reset lineId
         lineId = 0;
 
         //
-        //Global TM
+        // Global TM
         //
         //load States
         let globalStates = loadStates(lines)
         for(const state of globalStates){
             turingMachine.states.add(state);
-
-            //setting turingMachine.startstate etc..
+            //setting turingMachine.startstate etc.
             if (state.isStarting){
                 turingMachine.startstate = state;
             }
@@ -235,10 +245,7 @@ function loadFile(reader){
                 turingMachine.rejectstate.add(state);
             }
         }
-        console.log(turingMachine.states);
         lineId += 2;
-        //initialize TM Array to all empty strings
-        turingMachine.tape = Array.from({ length: 41 }, () => "");
 
         //load Transitions
         let globalTransitions = loadTransitions(lines);
@@ -247,22 +254,23 @@ function loadFile(reader){
             turingMachine.createTransition(turingMachine.getStateById(currTransition[0]), currTransition[1],
                 turingMachine.getStateById(currTransition[2]), currTransition[3], currTransition[4]);
         }
-        console.log(turingMachine.delta);
+        //initialize TM tape to all empty strings
+        turingMachine.tape = Array.from({ length: 41 }, () => "");
+
+        lineId += 2;
 
         //
         //Local TMs & Tree buildup
         //
-        lineId += 2;
         let tree;
         let root;
         //do until no more local TMs
         while(lines[lineId] !== "" && lines[lineId] !== undefined){
-
+            //read treeNodeId & parentId
             let treeNodeId = parseInt(lines[lineId]);
             lineId++;
             let parentId = parseInt(lines[lineId]);
             let parent = null;
-            console.log(treeNodeId, " | ", parentId);
 
             lineId+=3;
 
@@ -291,15 +299,12 @@ function loadFile(reader){
                     localTM.getStateById(currTransition[2]), currTransition[3], currTransition[4]);
             }
             lineId+=2;
-            console.log("--||", lines[lineId], lines[lineId+1], lines[lineId+2], lines[lineId+3])
-            console.log(localTM);
 
-            //node Positions
+            //read node Positions
             let nodePositions = loadPosMap(lines);
-            console.log(nodePositions);
             lineId+=2;
 
-            ////Add to tree
+            //Create TreeNode & add to Tree
             if(parentId === -1){
                 //root: start buildup tree (base case)
                 root = new TreeNode(localTM, nodePositions, null, treeNodeId)
@@ -322,13 +327,12 @@ function loadFile(reader){
         //
         lineId+=4;
         const tapeString = lines[lineId];
-        console.log("Tape: ",tapeString);
         if(tapeString !== "" && tapeString !== undefined){
             //convert to string[]
             const tape = tapeString.split(",");
             //add to TM object
             turingMachine.tape = tape;
-            //cyto
+            //write content onto tape
             cyWriteOnTape(tapeString.replace(/,/g, ''));
             lineId++;
         }
@@ -336,29 +340,20 @@ function loadFile(reader){
             //reset tape to empty
             cyWriteOnTape("");
         }
-        moveNodesIntoWindow();
 
+        moveNodesIntoWindow();
 
         //currTreeNode = tree.root;
         setCurrTreeNode(tree.root);
         setTmTree(tree);
-        //build little tree showing global structure
+        //build cyTree showing global structure
         cyTreeCreate(true);
         //build root window
         createCytoWindow();
         cyGrabifyNodes();
         //reset simulation
         simulationReset();
-
-
-
-
-
-
-
-
     }
-
 }
 
 
@@ -367,10 +362,9 @@ function loadFile(reader){
  * 
  * @param {[string]} lines - input lines
  * @returns {[State]} list of states read from input
+ * @throws {Error} Throws an error if there is an issue parsing the input
  */
 function loadStates(lines){
-
-
     let stateSet = new Set();
     while(true){
         const currentLine = lines[lineId];
@@ -388,11 +382,11 @@ function loadStates(lines){
             const isRejecting = parsedData.isRejecting;
             //adjust nodeId (such that it is ready after loading TM)
             nodePresetHelper();
-            //add State to return
+            //create & add state to stateSet
             stateSet.add(new State(id, name, isStarting, isAccepting, isRejecting));
             
         } catch(error){
-            console.log('Error parsing JSON:', error.message);
+            console.error('Error parsing JSON:', error.message);
             alert(`Failed to load .json file, line: ${lineId} function: loadStates`);
             location.reload();
             return;
@@ -406,6 +400,7 @@ function loadStates(lines){
  * 
  * @param {[string]} lines - input lines
  * @returns {[[fromStateId, readChar, toStateId, writeChar, move]]} list of transitions read from input
+ * @throws {Error} Throws an error if there is an issue parsing the input
  */
 function loadTransitions(lines){
     let transitionList = [];
@@ -428,7 +423,7 @@ function loadTransitions(lines){
             transitionList.push(transition);
         }
         catch(error){
-            console.log('Error parsing JSON:', error.message);
+            console.error('Error parsing JSON:', error.message);
             alert(`Failed to load .json file, line: ${lineId} function: loadTransitions`);
             location.reload();
             return;
@@ -437,6 +432,14 @@ function loadTransitions(lines){
     }
 }
 
+/**
+ * Reads lines containing node position data and creates a nodePosMap.
+ * Continues reading lines until an empty line or the end of the input is reached.
+ *
+ * @param {string[]} lines - Array of lines containing node position data.
+ * @returns {Map<number, [number, number]>} - A mapping of node IDs to their respective positions (x, y).
+ * @throws {Error} - Throws an error if there is an issue parsing the input.
+ */
 function loadPosMap(lines){
     let nodePosMap = new Map();
     while(true){
@@ -451,11 +454,11 @@ function loadPosMap(lines){
             const nodeId = parseInt(positionEntry[0]);
             const xPos = parseInt(positionEntry[1]);
             const yPos = parseInt(positionEntry[2]);
-            //add to return
+            //add to the return map
             nodePosMap.set(nodeId, [xPos, yPos]);
         }
         catch(error){
-            console.log('Error parsing JSON:', error.message);
+            console.error('Error parsing JSON:', error.message);
             alert(`Failed to load .json file, line: ${lineId} function: loadPosMap`);
             location.reload();
             return;
