@@ -1,7 +1,18 @@
-import { cyCreateNode, cyCreateEdge, cyClearCanvas, cyGrabifyNodes } from "./Cytoscape.js";
-import { cyTapeClear } from "./CytoscapeTape.js";
-import { turingMachine } from "./TuringMachine.js";
-import { nodePresetHelper, nodePresetReset } from "./UserInput.js";
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Loads presets into the simulator using the loadFile function from SaveLoad.js.
+    - Provides global arrays (fileList & presetNames) that can be changed to change the Presets provided to users.
+
+  Dependencies/Imports:
+    - SaveLoad.js | loadFile function
+
+  Exports:
+    none
+*/
+
 import {loadFile} from "./SaveLoad.js"
 
 // Add filenames from the presets folder to this list and their correcponding name to presetNames list
@@ -10,51 +21,46 @@ const fileList = ['empty.json', 'binaryincrement.json', 'abPalindrome.json', 'co
 const presetNames = ['No Preset', 'Binary Increment', 'ab Palindrome', 'copy Ones', 'Word Length', 'divisible by 3 base10']
 
 /**
- * Generate selectElements from file list & presetNames
+ * Populates the presetSelect element with options based on the provided fileList and presetNames arrays.
+ * Text content is "unnamed preset" if no name provided
  */
 function createPresets(){
-
-    //the select element
-
     const selectElement = document.getElementById("presetSelect");
 
-    //for every file in fileList
+    //Loop through the fileList and create option elements
     for(let i = 0; i<fileList.length; i++){
-
-      // Loop through the preset options and create option elements
       var option = document.createElement("option");
-
       // Set the value and text content of the option
-      option.value = fileList[i];  // You can set the value to whatever you need
+      option.value = fileList[i];
       if(presetNames[i]){
         option.text = presetNames[i];
       }
       else{
         option.text = "unnamed preset";
       }
-
       // Append the option to the select element
       selectElement.appendChild(option);
     }
 }
+//run at page load
 createPresets();
 
 /**
- * Load Preset clicked on
+ * EventListener to detect when a preset is selected.
+ * it retrieves the selected value and fetches the file content.
+ * Reads the file content using FileReader and calls the loadFile method.
  */
 var presetSelect = document.getElementById("presetSelect");
 presetSelect.addEventListener("change", function() {
     var selectedValue = presetSelect.value;
 
-    ////get absolute path
-    // Get the URL of the current module
+    ////get absolute path (relative path wouldn't work on n.ethz.ch/~mavogel)
     const moduleUrl = new URL(import.meta.url);
-    //relative path
     const relativePath = `../presets/${selectedValue}`;
     //combine to get absolute path
     const filePath = new URL(relativePath, moduleUrl).pathname;
 
-
+    //fetch file content
     fetch(filePath)
     .then(response => {
       if (!response.ok) {
@@ -63,7 +69,7 @@ presetSelect.addEventListener("change", function() {
       return response.text();
     })
     .then(data => {
-      // read File & call loadFile method (SaveLoad.json)
+      // read File & call loadFile method (from SaveLoad.json)
       const blob = new Blob([data], { type: 'application/octet-stream' });
       const reader = new FileReader();
       reader.readAsText(blob);
@@ -73,132 +79,3 @@ presetSelect.addEventListener("change", function() {
       console.error('Error reading file:', error);
     });
 });
-
-/* code not used anymore
-
-
-
-// Empties canvas & tape & turingMachine object,
-// called when loading preset
-
-function empty(){
-    //load empty
-    ////get filepath
-    // Get the URL of the current module
-    const moduleUrl = new URL(import.meta.url);
-    //relative path
-    const relativePath = '../presets/empty.json';
-    //combine to get absolute path
-    const filePath = new URL(relativePath, moduleUrl).pathname;
-
-    fetch(filePath)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(data => {
-        // read File & call loadFile method (SaveLoad.json)
-        const blob = new Blob([data], { type: 'application/octet-stream' });
-        const reader = new FileReader();
-        reader.readAsText(blob);
-        loadFile(reader);
-      })
-      .catch(error => {
-        console.error('Error reading file:', error);
-      });
-}
-
-
-// Loads Preset 1 (binary Increment)
-//  - calls SaveLoad's load function to load file from ../presets
-
-function loadPresetOne(){
-    //load binary Increment preset
-    ////get filepath
-    // Get the URL of the current module
-    const moduleUrl = new URL(import.meta.url);
-    //relative path
-    const relativePath = '../presets/binaryincrement.json';
-
-    //combine to get absolute path
-    const filePath = new URL(relativePath, moduleUrl).pathname;
-
-
-    fetch(filePath)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(data => {
-        // read File & call loadFile method (SaveLoad.json)
-        const blob = new Blob([data], { type: 'application/octet-stream' });
-        const reader = new FileReader();
-        reader.readAsText(blob);
-        loadFile(reader);
-      })
-      .catch(error => {
-        console.error('Error reading file:', error);
-      });
-}
-
-
-// Loads Preset 1 (ab Palindrom checker)
-//- calls SaveLoad's load function to load file from ../presets
-
-function loadPresetTwo(){
-    //ab Palindrom
-    ////get filepath
-    // Get the URL of the current module
-    const moduleUrl = new URL(import.meta.url);
-    //relative path
-    const relativePath = '../presets/abPalindrome.json';
-
-    //combine to get absolute path
-    const filePath = new URL(relativePath, moduleUrl).pathname;
-
-    fetch(filePath)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(data => {
-        // read File & call loadFile method (SaveLoad.json)
-        const blob = new Blob([data], { type: 'application/octet-stream' });
-        const reader = new FileReader();
-        reader.readAsText(blob);
-        loadFile(reader);
-      })
-      .catch(error => {
-        console.error('Error reading file:', error);
-      });
-}
-
-
-//Handles Dropdown menu & calls functions accordingly (upon change)
- 
-
-var presetSelect = document.getElementById("presetSelect");
-    
-presetSelect.addEventListener("change", function() {
-        if (presetSelect.value === "empty") {
-            empty()
-            console.log("empty clicked");
-        }
-        else if (presetSelect.value === "PresetOne") {
-            loadPresetOne();
-            console.log("PresetOne clicked");
-        } 
-        else if (presetSelect.value === "PresetTwo") {
-            loadPresetTwo();
-            console.log("PresetTwo clicked");
-        } 
-        // Add more conditions for other options as needed
-    });
-
-*/

@@ -3,7 +3,7 @@
   Date: January 2024
   
   Description: 
-    - Defines cytoscape Tree object cyTree (used for tree representation)
+    - Defines cytoscape Tree object cyTree (used for tree representation).
     - Builds visual Tree representation of sub Turing machines in cyTree window.
 
   Dependencies/Imports:
@@ -205,7 +205,6 @@ function cyTreeReset(){
  * Helper: that moves all nodes back inside of window if user drags them out of it
  */
 function moveNodesIntoWindow(){
-    console.log("here");
     let w = cyTree.width();
     let h = cyTree.height();
     cyTree.nodes().forEach(node => {

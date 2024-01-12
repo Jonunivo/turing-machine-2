@@ -1,11 +1,23 @@
-export {simulateButtonClick};
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Provides functions that allow users to use "Enter" and "Escape"
+        to control Simulator
 
-//////////////////////////////////////////////////////////////
-//// ------------- User Keyboard controls --------------- ////
-//////////////////////////////////////////////////////////////
+  Dependencies/Imports:
+    none
 
+  Exports:
+    none
+    
+*/
+
+/**
+ * EventListener for user pressing "Enter" or "Escape"
+ */
 window.addEventListener("keydown", function(event) {
-    // Check if the pressed key is Enter (key code 13)
     if (event.key === "Enter") {
         userPressEnter();
     }
@@ -16,10 +28,10 @@ window.addEventListener("keydown", function(event) {
 
 
 /**
- * Helper function that lets user use "Enter" to confirm modals, write tape, or Run/Pause simulation
+ * Simulates a user pressing the Enter key based on the current context, triggering relevant actions.
+ * Checks for open modals and focused elements to determine the appropriate action.
  */
 function userPressEnter(){
-    //decide on what to do when user presses enter
     const nodeModal = document.getElementById('nodeModal');
     const edgeModal = document.getElementById('edgeModal');
     const saveModal = document.getElementById('saveModal');
@@ -59,37 +71,42 @@ function userPressEnter(){
 
 }
 
-//User presses Escape
+/**
+ * Simulates a user pressing the Escape key based on the current context, closing relevant modals.
+ * Checks for open modals to determine the appropriate action for each scenario.
+ */
 function userPressEscape(){
-    //decide on what to do when user presses enter
     const nodeModal = document.getElementById('nodeModal');
     const edgeModal = document.getElementById('edgeModal');
     const saveModal = document.getElementById('saveModal');
-    //Node Create/Edit Modal open
+    //Node Create/Edit Modal open, close it
     if(nodeModal.style.display === 'block'){
-        console.log("0");
         simulateButtonClick("cancelButton");
     }
-    //Edge Create/Edit Modal open
+    //Edge Create/Edit Modal open, close it
     else if(edgeModal.style.display === 'block'){
         simulateButtonClick("cancelButton2");
     }
-    //Save/Load modal open
+    //Save/Load modal open, close it
     else if(saveModal.style.display === "block"){
         simulateButtonClick("cancelButton3");
     }
 }
 
 
-//simulate as if user pressed the button (leftclick)
+/**
+ * Simulates a button click event for the button with the id @param id.
+ * Checks if the button is disabled before dispatching the click event.
+ *
+ * @param id The identifier of the button to be clicked.
+ */
 function simulateButtonClick(id){
     var button = document.getElementById(id);
     //catch button disabled
     if(button && button.disabled){
-        console.log('button disabled');
+        //do nothing
     }
     else if (button) {
-        // Create a new MouseEvent
         var event = new MouseEvent('click', {
             view: window
         });
