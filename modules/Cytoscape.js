@@ -173,7 +173,6 @@ function generateNodePosMap(){
     cy.nodes().forEach(node => {
         positionMap.set(parseInt(node.data().id), [parseInt(node.position().x), parseInt(node.position().y)])
     });
-    console.log(positionMap);
     return positionMap;
 }
 

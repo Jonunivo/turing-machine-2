@@ -1,7 +1,31 @@
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - in general handles everything related to super states & structure of sub turingmachines.
+    - Create Tree of TreeNodes saving structure of Sub turingmachines
+    - Function to let user create, edit & delte super states
+    - Functions to Enter & Leave sub Turingmachines & build cytoscape window doing it
+    - Provide getters & setters to other modules wanting to access Tree structure or parts of TreeNodes
+
+  Dependencies/Imports:
+    - Tree.js          | Tree & TreeNode class to create Tree & TreeNodes
+    - TuringMachine.js | global variable global turingMachine & TuringMachine class
+    - State.js         | State class
+    - Cytoscape.js     | Controls to manipulate Cytoscape window (buildup window when switching between TreeNodes)
+    - UserInput.js     | uphold id invariant & detect if in editmode
+    - UserEdit.js      | global variables editNode & cytoEditNode, used for editing & deleting super states
+    - CytoscapeTree.js | functions to control Tree Representation in cyTree window
+
+  Exports:
+    - the global variables tmTree, currTreeNode & currTreeNodeName
+*/
+
+
 import { Tree, TreeNode } from "../datastructures/Tree.js";
 import { TuringMachine, turingMachine} from "./TuringMachine.js";
 import { State } from "./State.js";
-
 import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
 import { nodePresetHelper, inEditMode } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
@@ -10,16 +34,15 @@ import { cyTreeCreate, cyTreeReset, cyTreeStyleCurrentNode } from "./CytoscapeTr
 export{currTreeNodeName, currTreeNode, tmTree, resetTree, setTmTree, setCurrTreeNode, editNodeLocalTM, getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM,  userEditSuperNodeHandler, createCytoWindow, userDeleteSuperNodeHandler};
 
 //Global Variables
-
 //current TreeNode (initialized to empty TM = local TM of root)
 var currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0));
 currTreeNode.superNodeId = 0;
-//currTreeNodeName
+//used to save user chosen name of super state across multiple functions
 var currTreeNodeName;
 
-// Tree of TMs
+// create Tree of TMs
 var tmTree = new Tree(currTreeNode);
-//createNode Position
+// position super state is created (saved across multiple functions)
 var position;
 //imported globals
 //turingMachine - global TM object
@@ -27,42 +50,58 @@ var position;
 //cytoEditNode  - cyto node currently being edited
 //editNode      - node currently being edited
 
+
+//////////////////////////////////////////////////////////////
+//// --------------------- Helpers ---------------------- ////
+//////////////////////////////////////////////////////////////
+/**
+ * Resets the tree structure. Creates a new root tree node and resets currTreeNode
+ * to a new TreeNode with an empty TuringMachine.
+ */
 function resetTree(){
     tmTree = new Tree(currTreeNode);
     currTreeNode = new TreeNode(new TuringMachine(new Set(), new Set(), new Set(), new Map(), undefined, undefined, new Set(), null, 0));
     currTreeNode.superNodeId = 0;
 }
 
-
-//!should be called before entering new window!
+/**
+ * Adds a new Turing machine to the tree structure.
+ * 
+ * @param {TuringMachine} turingMachine - The Turing machine to be added to the tree.
+ * @param {Map} positionMap - The position map for nodes in the new Turing machine.
+ * @param {number} superNodeId - The super node ID to link the new Turing machine to the tree.
+ */
 function addTuringmaschine(turingMachine, positionMap = new Map(), superNodeId){
     //add new TM to tree
     let newNode = new TreeNode(turingMachine, positionMap, currTreeNode, superNodeId)
     currTreeNode.children.push(newNode);
     newNode.parent = currTreeNode;
-
-
-
 }
 
 //////////////////////////////////////////////////////////////
 //// ------------------ User Creation ------------------- ////
 //////////////////////////////////////////////////////////////
 
-//rightclick on canvas: create superState
+/**
+ * Handles right-click on the canvas to create a super state.
+ * It prepares & displays a modal to create a super state
+ * 
+ * @param {Event} event - The context menu event.
+ * 
+ */
 cy.on('cxttap', (event) => {
     //only allow in editMode (& click on canvas)
     if(inEditMode() && event.target === cy){
         position = event.position;
 
-        //Modal Element
+        //// Prepare Modal Element
         const superNodeModal = document.getElementById('superNodeModal');
         
         //get cytoscape window position
         const cytoWindow = document.querySelector('#cytoscape');
         const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
         const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
-        //display modal at doubleclick position
+        //display modal at click position
         superNodeModal.style.paddingLeft = `${position.x + leftValue}px`
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
@@ -84,17 +123,25 @@ cy.on('cxttap', (event) => {
             document.getElementById("deleteSuperNodeDiv").removeChild(deleteButton);
         }
 
-        //Event Listener
+        //Event Listener for Confirming creation
         addEventListenerWithCheck(document.getElementById('superNodeButton'), 'click', userSuperNodeInputHandler)
-
-
     }
 });
 
+/**
+ * Handles user input for creating a super state.
+ * Called by the user pressing "Create TM as state" button
+ * Reads user input, creates super state
+ * creates local subTuringmachine & adds it to the tree structure
+ * creates default states and transition in subTuringmachine (local starting & accepting states)
+ * 
+ * This function is called when the user clicks the "Create State" button in the super state modal.
+ */
 function userSuperNodeInputHandler(){
     //Close the modal
     superNodeModal.style.display = 'none';
-    //Read user input
+    ////Read user input
+    //state Name
     let stateName = document.getElementById('superStateName').value;
     //catch name already exists in current TreeNode
     for(const state of currTreeNode.turingMachine.states){
@@ -104,10 +151,9 @@ function userSuperNodeInputHandler(){
             return;
         }
     }
-
     currTreeNodeName = stateName;
     
-    //create cyto node
+    ////create cyto node & uphold id invariant
     let superStateId = nodePresetHelper();
     cyCreateNode(superStateId, stateName, position.x, position.y, false, false, false, true);
 
@@ -115,7 +161,7 @@ function userSuperNodeInputHandler(){
     currTreeNode.nodePositions = generateNodePosMap();
 
     //// Create SubTM & add to TreeStructure (child)
-    //Create Start & End Node
+    //Create default Start & Accept Node
     let id1 = nodePresetHelper();
     let id2 = nodePresetHelper();
     let startState = new State(id1, "start", true, false, false);
@@ -123,14 +169,13 @@ function userSuperNodeInputHandler(){
     //Add default transition between start & end node
     let delta = new Map();
     delta.set([startState, "else"], [endState, "nothing", "N"]);
-    //tape (from parent)
+    //tape (from parent) (unused in local TMs but added for completeness anyways)
     let tape = currTreeNode.turingMachine.tape;
     let tapePosition = currTreeNode.turingMachine.tapePosition;
     //Create TM Object 
     let subTuringMachine = new TuringMachine(new Set(), new Set(), new Set(), delta, startState, endState, new Set(), tape, tapePosition);
     subTuringMachine.states.add(startState);
     subTuringMachine.states.add(endState);
-
 
     //add TM Object to tree 
     //add positionmap (default)
@@ -140,25 +185,23 @@ function userSuperNodeInputHandler(){
     positionMap.set(id2, [500, 200])
     //add TM to tree
     addTuringmaschine(subTuringMachine, positionMap, superStateId);
-    //create visible Tree
+    //create visible cyTree structure
     cyTreeCreate(false);
 
-    //merge into main TM (adds start & stop state to globalTM)
-        //remove isStarting & isAccepting for global TM
+    //merge local into global TM (adds start & stop state to globalTM)
+    //remove isStarting & isAccepting for local TM to not also add the to global TM
     subTuringMachine.getStateById(id1).isStarting = false;
     subTuringMachine.getStateById(id2).isAccepting = false;
     turingMachine.mergeInTuringMachine(subTuringMachine);
-        //readd previously removed isStarting & isAccepting for global TM
+    //readd previously removed isStarting & isAccepting for global TM
     subTuringMachine.getStateById(id1).isStarting = true;
     subTuringMachine.getStateById(id2).isAccepting = true;
 
-    //add SuperState to local TM (parent)
+    ////add SuperState to local TM (parent)
     let superState = new State(superStateId, stateName)
     currTreeNode.turingMachine.states.add(superState);
 
-
-
-    //increase ID
+    //increase ID to uphold id invariant
     nodePresetHelper();
 
     cyGrabifyNodes();
@@ -172,8 +215,8 @@ function userEditSuperNodeHandler(){
     //Close the modal
     superNodeModal.style.display = 'none';
 
+    ////Read user input
     let newName = document.getElementById('superStateName').value;
-
     //catch name already exists in current TreeNode
     for(const state of currTreeNode.turingMachine.states){
         if(state.name === stateName){
@@ -183,27 +226,28 @@ function userEditSuperNodeHandler(){
         }
     }
 
-    //get edit node
-
+    ////edit nodes
     //cyto main window
     cytoEditNode.style('label', newName);
     cytoEditNode.style('width', `${newName.length*10 + 10}px`)
     cyGrabifyNodes();
     //global TM object
     //no change, since node not in global TM
-
     //local TM object
     editNode.name = newName;
 
-    //cyto Tree window
+    //update cytoTree window
     cyTreeReset();
     cyTreeCreate(true);
 }
 
+/**
+ * Handles User editing supernode (called by user clicking "delete node" within supernode modal)
+ * note:    lazy solution: leaves local root unused in background & global TM still contains nodes & edges (they are not connected however)
+ *          limited solution: deletion only possible for empty super nodes with nod connected edges
+ */
 function userDeleteSuperNodeHandler(){
     superNodeModal.style.display = 'none';
-
-
     ////check if any edges from/to this node
     let stateToDelete = getLocalTM().getStateById(editNode.id);
     for(const [key, value] of currTreeNode.turingMachine.delta){
@@ -217,8 +261,6 @@ function userDeleteSuperNodeHandler(){
     ////check if subTM only consists of start & end state ("empty" subTM)
     //get subnode current tm:
     let currTM = getSubNode(editNode.id).turingMachine
-    console.log(currTM);
-    
     if(currTM.states.size === 2 && currTM.delta.size === 1){
         //remove node: !lazy solution leaves local root unused in background
         //& global TM still contains nodes & edges (they are not connected however)
@@ -226,30 +268,23 @@ function userDeleteSuperNodeHandler(){
         //remove SubTM node from local TM
         let localState = getLocalTM().getStateById(editNode.id);
         getLocalTM().states.delete(localState);
-        console.log("localTM::", getLocalTM());
         //remove from cytoscape window
         cy.remove(cytoEditNode);
 
         //remove child from tree & rebuild visual tree 
         let indexOfChild = currTreeNode.children.indexOf(getSubNode(editNode.id))
         currTreeNode.children.splice(indexOfChild, 1);
-        console.log(currTreeNode.children);
-        //rebuild tree
+        //rebuild cyTree
         cyTreeReset();
         cyTreeCreate(true);
         cyTreeStyleCurrentNode(currTreeNode.superNodeId);
-
     }
     else{
         alert("removing SubTM nodes is currently only possible if their content is empty (only contains the default states and transitions)");
     }
-
-
-
 }
 
-
-//User presses cancel button in NodeModal -> hide nodeModal
+//EventListener for User presses cancel button in SuperNodeModal -> hide superNodeModal
 document.getElementById("cancelButton4").addEventListener('click', function(){
     superNodeModal.style.display = 'none';
 })
@@ -258,12 +293,21 @@ document.getElementById("cancelButton4").addEventListener('click', function(){
 //// ------------------ Enter/Leave state --------------- ////
 //////////////////////////////////////////////////////////////
 
-//enter superstate
+/**
+ * Handles the event when a user enters a super state by right-clicking on a node.
+ * 
+ * @param {Object} event - The Cytoscape event object.
+ * 
+ * @returns {void}
+ * 
+ * It saves the old canvas positions, creates nodes and edges according to the Turing Machine object that is being entered.
+ * Additionally, it updates the CyTree styles to highlight the current node.
+ */
 cy.on('cxttap', 'node', function(event){
     //Save old Canvas Positions
     currTreeNode.nodePositions = generateNodePosMap();
 
-    //find parent with superStateId == target node id
+    //find child being enetered
     let childrenArr = currTreeNode.children
     let found = false;
     for(let i = 0; i<childrenArr.length; i++){
@@ -274,22 +318,26 @@ cy.on('cxttap', 'node', function(event){
     }
     if(!found){
         //Node is Not a Super Node, ignore rightclick
-        console.log("Right Click not on super node");
         return;
     }
 
     ////Create Nodes & Edges according to TM object that is being entered
     createCytoWindow();
-    //show current cyTree node red
+    //highlightcurrent cyTree node blue
     cyTreeStyleCurrentNode(currTreeNode.superNodeId);
 
 });
 
-//leave superstate (to parent)
+/**
+ * Handles the event when a user leaves a super state.
+ * is called by user pressing "Leave Sub" button
+ * 
+*/
 function leaveSuperState(){
     //Save old Canvas Positions
     currTreeNode.nodePositions = generateNodePosMap();
 
+    //go to parent
     if(currTreeNode.parent === null || currTreeNode.parent === undefined){
         //in root, cannot "leave superstate"
         return;
@@ -298,19 +346,23 @@ function leaveSuperState(){
 
     ////Create Nodes & Edges according to TM object that is being entered
     createCytoWindow();
-
+    //highlight current cyTree node blue
     cyTreeStyleCurrentNode(currTreeNode.superNodeId);
 }
+//EventListener for button "Leave Sub"
 document.getElementById("leaveSuperState").addEventListener("click", leaveSuperState);
 
 
-//Helper: creates cytowindow according to TreeNode description (currTreeNode)
+/**
+ * Helper function that creates the main CytoWindow according to the TreeNode description (currTreeNode).
+ * Clears the canvas, creates nodes, and edges based on the current local Turing Machine object.
+ *
+ * @returns {void}
+ * 
+ */
 function createCytoWindow(){
     //Clear Canvas
     cyClearCanvas();
-    console.log("LOCAL TM: ", currTreeNode.turingMachine);
-    console.log("GLOBAL TM: ", turingMachine);
-    console.log(currTreeNode);
 
     //get Ids of SuperNodes
     let superNodeIds = new Set();
@@ -318,8 +370,9 @@ function createCytoWindow(){
         superNodeIds.add(child.superNodeId)
     }
 
-    //Create Nodes
+    //Create Cytoscape Nodes
     for(let state of currTreeNode.turingMachine.states){
+        //get node positions from nodePositions map
         let nodePositionX = currTreeNode.nodePositions.get(parseInt(state.id))[0];
         let nodePositionY = currTreeNode.nodePositions.get(state.id)[1];
         //cyto create node
@@ -332,9 +385,8 @@ function createCytoWindow(){
             cyCreateNode(state.id, state.name, nodePositionX, nodePositionY, state.isStarting, state.isAccepting, state.isRejecting);
         }
     }
-    //Create Edges
+    //Create Cytoscape Edges
     for(let [key, value] of currTreeNode.turingMachine.delta){
-        console.log(key, " ", value);
         let fromNode = key[0].id;
         let toNode = value[0].id;
         //determine label
@@ -346,7 +398,6 @@ function createCytoWindow(){
         if(value[2] === "R"){
             labelMove = "➤"
         }
-
         if(value[1] !== 'nothing'){
             cyLabel = "🔍 " + key[1] + "  | ✎ " + value[1] + " | " + labelMove;
         }
@@ -356,16 +407,21 @@ function createCytoWindow(){
         //cyto create Edge
         cyCreateEdge(fromNode, toNode, cyLabel, key[1]);
     }
-
-
     cyGrabifyNodes();
 }
 
 //////////////////////////////////////////////////////////////
-//// ---------------- Create/Edit Local TM -------------- ////
+//// ---------------- Helper Edit Local TM -------------- ////
 //////////////////////////////////////////////////////////////
 
-//adjust local TM when node edit (borrow from global tm)
+/**
+ * Helper Function to edit a node in the local Turing Machine (TM) within the current tree node.
+ * Copies properties such as name, starting, accepting, and rejecting status.
+ *
+ * @param {object} editNode - The node to be edited.
+ * @param {boolean} rejectAdded - Indicates whether the node has been marked as rejecting.
+ * @param {boolean} rejectDeleted - Indicates whether the node has been unmarked as rejecting.
+ */
 function editNodeLocalTM(editNode, rejectAdded, rejectDeleted){
     //find state in local TM with corresponding id
     let editNodeLocal = currTreeNode.turingMachine.getStateById(editNode.id);
@@ -390,18 +446,33 @@ function editNodeLocalTM(editNode, rejectAdded, rejectDeleted){
 }
 
 //////////////////////////////////////////////////////////////
-//// ---------------- Getters -------------- ////
+//// ---------------- Getters --------------------------- ////
 //////////////////////////////////////////////////////////////
 
+/**
+ * Function to get the local Turing Machine (TM) within the current tree node.
+ *
+ * @returns {object} - The local Turing Machine.
+ */
 function getLocalTM(){
     return currTreeNode.turingMachine;
 }
 
+/**
+ * Function to get the root Turing Machine (TM) from the tree structure.
+ *
+ * @returns {object} - The root local Turing Machine.
+ */
 function getRootTM(){
     return tmTree.root.turingMachine;
 }
 
-//return child with corresp. ID
+/**
+ * Function to get the sub-node (TreeNode) with the specified superstateId from the current tree node.
+ *
+ * @param {number} superstateId - The superstateId to find the corresponding sub-node.
+ * @returns {object|null} - The sub-node with the specified superstateId, or null if not found.
+ */
 function getSubNode(superstateId){
     let childrenArr = currTreeNode.children
     for(let i = 0; i<childrenArr.length; i++){
@@ -410,9 +481,14 @@ function getSubNode(superstateId){
         }
     }
     return null;
-
 }
 
+/**
+ * Function to get the id of the start state in the sub-Turing Machine (TM) associated with the specified superstateId.
+ *
+ * @param {number} superstateId - The superstateId to find the corresponding sub-Turing Machine.
+ * @returns {number|undefined} - The id of the start state in the sub-Turing Machine, or undefined if not found.
+ */
 function getStartSubTM(superstateId){
     //find requested node in local TM & get childTM
     let childrenArr = currTreeNode.children
@@ -438,8 +514,13 @@ function getStartSubTM(superstateId){
     }
 }
 
+/**
+ * Function to get the id of the accept state in the sub-Turing Machine (TM) associated with the specified superstateId.
+ *
+ * @param {number} superstateId - The superstateId to find the corresponding sub-Turing Machine.
+ * @returns {number|undefined} - The id of the accept state in the sub-Turing Machine, or undefined if not found.
+ */
 function getAcceptSubTM(superstateId){
-
     //find requested node in local TM & get childTM
     let childrenArr = currTreeNode.children
     let childTreeNode;
@@ -460,16 +541,26 @@ function getAcceptSubTM(superstateId){
         console.error("getAcceptSubTM not found");
         return undefined;
     }
-    
 }
 
 //////////////////////////////////////////////////////////////
-//// ---------------- Setters -------------- ////
+//// ---------------------- Setters --------------------- ////
 //////////////////////////////////////////////////////////////
+
+/**
+ * Function to set the Turing Machine (TM) tree to the specified tree.
+ *
+ * @param {Tree} tree - The tree to set as the TM tree.
+ */
 function setTmTree(tree){
     tmTree = tree;
 }
 
+/**
+ * Function to set the current tree node to the specified node.
+ *
+ * @param {TreeNode} node - The tree node to set as the current node.
+ */
 function setCurrTreeNode(node){
     currTreeNode = node;
 }
