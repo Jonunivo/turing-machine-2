@@ -496,7 +496,6 @@ function getStartSubTM(superstateId){
     let found = false;
 
     for(let i = 0; i<childrenArr.length; i++){
-        console.log("check ",childrenArr[i].superNodeId," | ", parseInt(superstateId))
         if(childrenArr[i].superNodeId === parseInt(superstateId)){
             childTreeNode = childrenArr[i];
             found = true;
