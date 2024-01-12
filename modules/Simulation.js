@@ -1,6 +1,28 @@
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Reads user pressing Simulation control buttons & reacts to it accordingly
+    - Defines & controls simulation without animation
+    - Defines & controls simulation with animation
+        - Defines cytoscape animations
+        - controls disabling buttons during simulation
+
+  Dependencies/Imports:
+    - Cytoscape.js     | Cytoscape main window object & function to enable/disable moving nodes.
+    - CytoscapeTape.js | functions that control & manipulate the Tape
+    - SuperStates.js   | global variable currTreeNode, which returns the TreeNode the user is currently at.
+    - TuringMachine.js | the global TM object (turingMachine) and the TuringMachine class
+
+  Exports:
+    - Function to reset Simulation back to start state
+    - Function to reenable Buttons disabled during simulation
+*/
+
 import {cy, cyGrabifyNodes} from './Cytoscape.js';
 import {cyTape, cyWriteCurrentPos, cyMoveTapeLeft, cyMoveTapeRight, getWriteNodeId, fixTapePosition, tmTapetoCyto} from './CytoscapeTape.js';
-import { currTreeNode, getLocalTM } from './SuperStates.js';
+import { currTreeNode} from './SuperStates.js';
 import {TuringMachine, turingMachine } from './TuringMachine.js';
 
 export{simulationReset, enableButtons};
@@ -10,30 +32,32 @@ export{simulationReset, enableButtons};
 let simIsRunning = false;
 // saves state the Sim is currently at 
 let currentState;
-// wait-notify
-let isReady = false;
-// original color
-let originalColorNode = "grey";
-let originalColorEdge = "grey";
-//animationColor
+// original color of cyto elements (saved across fade-in & fade-out functions)
+let originalColorNode;
+let originalColorEdge;
+//sets color of Animation (=blue)
 let animationColor = "#5463ff";
-
-//find corresponding edge
+//saves edge to be animated across fade-in & fade-out
 let edgeToAnimate = null;
 
 //////////////////////////////////////////////////////////////
 //// -------------------- User Action ------------------- ////
 //////////////////////////////////////////////////////////////
 
-//Event Listener: Run Simulation / Pause Simulation Button pressed
+/**
+ * EventListener for the 'runSimulationButton' element.
+ * If Animation is turned off, it triggers the fastSimulation function.
+ * If Animation is turned on, it starts or pauses the simulation&animation based on the current simulation state.
+ * Checks for special conditions (e.g., no starting state defined or starting simulation on accept/reject state),
+ * enables/disables relevant buttons accordingly.
+ */
 document.getElementById('runSimulationButton').addEventListener('click', function(){
-    //Animation off -> FastSimulation
+    //Case 1: Animation off -> FastSimulation
     if(!document.getElementById('fastSimulation').checked){
         fastSimulation();
-        console.log("fast simulation");
         return;
     }
-    //(Re-) run simulation
+    //Case 2.1: Animation on & simulation not running -> (Re-) run simulation
     if(!simIsRunning){
         simIsRunning = true;
 
@@ -48,7 +72,6 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
             return;
         }
         //catch starting simulation on accept/reject state
-        console.log("CURR", currentState);
         if(currentState === turingMachine.acceptstate || 
             turingMachine.rejectstate.has(currentState)){
             //animate last state & call simulationResult
@@ -70,7 +93,7 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
         //CORE
         animRunSimulation(turingMachine, currentState, turingMachine.readTape());
     }
-    //Pause simulation
+    //Case 2.2: Animation runnning -> pause simulation
     else{
         simIsRunning = false;
         //disable runsimulation button until animation finished
@@ -81,8 +104,21 @@ document.getElementById('runSimulationButton').addEventListener('click', functio
 
 })
 
-//Event Listener: Run Single Step of Animation
+/**
+ * EventListener for the 'stepSimulationButton'
+ * If Animation is turned off, it triggers the fastSimulationStep function.
+ * If Animation is turned on, it simulates&animates one simulation step.
+ * Checks for special conditions (e.g., no starting state defined or starting simulation on accept/reject state),
+ * enables/disables relevant buttons accordingly.
+ */
 document.getElementById('stepSimulationButton').addEventListener('click', function(){
+    //Case 1: Animation off -> FastSimulation
+    if(!document.getElementById('fastSimulation').checked){
+            fastSimulationStep();
+            return;
+    }
+    
+    //Case 2: Animation on
     //catch first simulation step
     if(currentState === undefined){
         currentState = turingMachine.startstate;
@@ -93,7 +129,6 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
         return;
     }
     //catch starting simulation on accept/reject state
-    console.log("CURR", currentState);
     if(currentState === turingMachine.acceptstate || 
         turingMachine.rejectstate.has(currentState)){
         //animate last state & call simulationResult
@@ -107,12 +142,7 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
         document.getElementById('stepSimulationButton').disabled = true;
         return;
     }
-    //Fast Simulation if Animation is set to off
-    if(!document.getElementById('fastSimulation').checked){
-        console.log("fast simulation step");
-        fastSimulationStep();
-        return;
-    }
+
     //disable buttons during simulation
     disableButtons("all");
 
@@ -122,13 +152,17 @@ document.getElementById('stepSimulationButton').addEventListener('click', functi
     currentState = turingMachine.simulationStep(currentState, turingMachine.readTape());
 })
 
-//Event Listener: Go back to start state (Reset Simulation)
+/**
+ * EventListener for 'resetSimulationButton'
+ * resets currentState to turingMachine.startstate.
+ * Animates a quick blink on the start state and re-enables buttons that might have been disabled at end of the simulation.
+ */
 document.getElementById('resetSimulationButton').addEventListener('click', function(){
     //set Simulation state to startstate
     currentState = turingMachine.startstate;
     //quickly blink start state
     animateNode(currentState, 200);
-    //reenable buttons that might have been disabled
+    //reenable buttons that might have been disabled at end of simulation
     document.getElementById("runSimulationButton").disabled = false;
     document.getElementById("stepSimulationButton").disabled = false;
 })
@@ -148,9 +182,8 @@ document.getElementById('resetSimulationButton').addEventListener('click', funct
 
 /**
  * Executes TM Simulation until Accept or Reject state reached, without Animation
- * Aborts after 5 seconds telling the user that the TM might be running forever
+ * Aborts after 5 seconds telling the user that the TM might continue running forever
  * Runs Simulation fully within turingMachine object, adjusting cyTape accordingly at end of Simulation.
- * resets back to StartState after end of Simulation, allowing to directly rerun simulation on new tape state.
  */
 function fastSimulation(){
     disableButtons();
@@ -167,11 +200,9 @@ function fastSimulation(){
         return;
     }
 
-    let counter = 0;
-
     //limit run time to 5 seconds
     const startTime = new Date().getTime();
-    const timeLimit = 5000; // 5 seconds in milliseconds
+    const timeLimit = 5000;
     while(
         currentState !== turingMachine.acceptstate &&
         !turingMachine.rejectstate.has(currentState) &&
@@ -180,14 +211,12 @@ function fastSimulation(){
         //CORE
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         charOnTape = turingMachine.readTape();
-        counter++;
     }
     //simulation timeout
     if(new Date().getTime() - startTime >= timeLimit){
         tmTapetoCyto();
         enableButtons();
         alert("Simulation timed out after 5 seconds, maybe it would run forever");
-        console.log("OPERATION COUNT", counter);
     }
 
     else if(currentState == turingMachine.acceptstate ||
@@ -198,10 +227,7 @@ function fastSimulation(){
             enableButtons();
             document.getElementById('runSimulationButton').disabled = true;
             document.getElementById('stepSimulationButton').disabled = true;
-
         }
-
-
 }
 
 /**
@@ -210,7 +236,6 @@ function fastSimulation(){
  * 
  */
 function fastSimulationStep(){
-
     //catch no startstate
     if(turingMachine.startstate === undefined){
         alert("Please create Starting State first");
@@ -218,16 +243,12 @@ function fastSimulationStep(){
     }
 
     let charOnTape = turingMachine.readTape()
-    console.log(currentState + " " + charOnTape);
     //get next state
     currentState = turingMachine.simulationStep(currentState, charOnTape);
     //cyto
-    console.log("here1");
     tmTapetoCyto();
-    console.log("here2");
 
-
-    //last state reached
+    //catch last state reached
     if(currentState === turingMachine.acceptstate || turingMachine.rejectstate.has(currentState)){
         turingMachine.simulationResult(currentState);
         //disable buttons
@@ -235,9 +256,6 @@ function fastSimulationStep(){
         document.getElementById('runSimulationButton').disabled = true;
         document.getElementById('stepSimulationButton').disabled = true;
     }
-
-
-
 }
 
 
@@ -247,15 +265,17 @@ function fastSimulationStep(){
 
 /**
  * Simulation with Animation works as Follows:
- * [Animation slider on] User Presses Simulation Button -> animRunSimulation() -> [
+ * [Animation slider on] User Presses Simulation Button -> 
+ *          animRunSimulation() -> [
  *          animateSimulationStep() [-> animateNode() -> animateTapeRead() -> animateEdge() ->
- *          animateTapeWrite() -> animateTapeMovement() -> fixTapePosition()]]
+ *              animateTapeWrite() -> animateTapeMovement() -> fixTapePosition()]
+ *          ]
  * repeats until user pauses simulation or simulation reaches Accept/Reject state
  * 
  * Simulation Step with Animation works as Follows:
  * [Animation slider on] User Presses Step Button ->
  *          animateSimulationStep() [-> animateNode() -> animateTapeRead() -> animateEdge() ->
- *          animateTapeWrite() -> animateTapeMovement() -> fixTapePosition()]
+ *              animateTapeWrite() -> animateTapeMovement() -> fixTapePosition()]
  */
 
 
@@ -274,51 +294,40 @@ async function animRunSimulation(turingMachine, startState, startCharOnTape){
     currentState = startState;
     let charOnTape = startCharOnTape;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
-    //loop
+    //do until pausing & final state reached
     while(simIsRunning && 
         currentState !== turingMachine.acceptstate &&
         !turingMachine.rejectstate.has(currentState)){
 
-        //disable things that shouldn't be accessed during simulation
         disableButtons();
 
         //run animation
         //recalculate animation time
         animationTime = 1000/document.getElementById('simulationSpeed').value;
         animateSimulationStep(turingMachine, currentState, charOnTape);
-        //wait for simulation step to finish
+        //wait for animation step to finish
         await new Promise(resolve => setTimeout(resolve, 8*animationTime+350));
-        //wait an additional 100ms (test to fix animation not looking correct)
+        //wait an additional 100ms (added to resolve problem of older cpus not fully completing animation)
         await new Promise(resolve => setTimeout(resolve, 100));
 
-
         //run Simulation in TuringMachine.js on turingMachine object to get next state
-
         currentState = turingMachine.simulationStep(currentState, charOnTape);
         if(currentState === null){
-            //error occured in turingMachine.simulationStep
-            console.log("error occured");
+            //error occured in turingMachine.simulationStep, no transition found
             simIsRunning = false;
             break;
         }
         charOnTape = turingMachine.readTape();
-
-        ////logging
-        console.log("----------ANIMATION------------")
-        console.log(`at State ${currentState.name} reading ${charOnTape}`);
-        ////
-
     }
     if(simIsRunning){
-        //handle simulation result when accept or reject state reached
-        //moved to animateSimulationStep
+        //accept or reject state reached, disable simIsRunning
         simIsRunning = false;
     }
 }
 
 /**
  * 
- * Core Function that handles single Simulation/Animation step by calling the responsible AnimationFunctions
+ * Core Function that handles single Simulation/Animation step by calling the responsible Animation Functions
  * 
  * @param {TuringMachine} turingMachine - TM object the simulator works with
  * @param {State} tmState - State the Simulation step starts on
@@ -328,7 +337,6 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     //read animationTime
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
     let deltaValue = null;
-
 
     //find corresponding transition in delta
     try{
@@ -348,51 +356,33 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
 
     }
 
-
-
-    
-    //// animate node IN
-    //animateNode(tmState, animationTime);
+    //// animate node fade in
     animateNodeIn(tmState, animationTime);
-    //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, animationTime+10));
-
 
     //// animate tape read
     animateTapeRead(animationTime);
-    //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, 2*(animationTime+10)));
 
-
-    //// animate edge IN
-   // animateEdge(tmState, charOnTape, animationTime);
-   // animateEdge(tmState, charOnTape, animationTime);
+    //// animate edge fade in
     animateEdgeIn(tmState, charOnTape, animationTime);
-
-    //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+10)));
-
 
     //// animate tape write
     animateTapeWrite(deltaValue[1], animationTime)
-    //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+100)));
 
     //// animate tape movement
     animateTapeMovement(deltaValue[2], animationTime)
-    //wait for simulation step to finish
     await new Promise(resolve => setTimeout(resolve, (animationTime+100)));
 
-
-    //// animate node OUT & edge OUT
+    //// animate node fade out & edge fade out
     animateNodeOut(tmState, animationTime);
     animateEdgeOut(tmState, charOnTape, animationTime);
     await new Promise(resolve => setTimeout(resolve, (2*animationTime+100)));
 
-
     //fix tape position if animation (for some reason) didnt work correctly
     fixTapePosition();
-
 
     //re-enable run simulation buttons after simulation step finished (for single step)
     if(!simIsRunning && !deltaValue[0].isAccepting && !deltaValue[0].isRejecting){
@@ -400,7 +390,6 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
     }
     else if(deltaValue[0].isAccepting || deltaValue[0].isRejecting){
         //final state reached
-
         //animate last state & call simulationResult
         animateNode(deltaValue[0], 2*animationTime);
         await new Promise(resolve => setTimeout(resolve, 2*animationTime));
@@ -411,11 +400,10 @@ async function animateSimulationStep(turingMachine, tmState, charOnTape){
         document.getElementById('runSimulationButton').innerHTML = "Run Simulation"
         document.getElementById('runSimulationButton').disabled = true;
         document.getElementById('stepSimulationButton').disabled = true;
-
     }
 }
 
-//reset simulation back to startstate. Used when loading new TM/editing TM
+//reset simulation back to startstate. Used when loading new TM.
 function simulationReset(){
     currentState = turingMachine.startstate;
 }
@@ -427,10 +415,11 @@ function simulationReset(){
 
 /**
  * 
- * Runs red blinking Animation on cytoNode for @param animationTime ms
+ * Runs blinking Animation on cytoNode for @param animationTime ms
+ * Replaced by animateNodeIn & animateNodeOut for animation during simulation
  * 
  * @param {State} tmState - Node to run animation on
- * @param {number} animationTime - animationTime in ms
+ * @param {number} animationTime - The duration of the animation in milliseconds.
  */
 
 function animateNode(tmState, animationTime){
@@ -466,25 +455,33 @@ function animateNode(tmState, animationTime){
     });
 }
 
-
+/**
+ * Animates fade in given by @param tmState.
+ * 
+ * @param {State} tmState - The Turing state for which the node should be animated.
+ * @param {number} animationTime - The duration of the animation in milliseconds.
+ */
 function animateNodeIn(tmState, animationTime){
-
     //get cyto node
     let cyCurrentNode = cy.getElementById(tmState.id);
-    //get node origianl color
+    //set node original color
     originalColorNode = cyCurrentNode.style("background-color");
     //animate (fade in)
     cyCurrentNode.animate({
         style: {
             "background-color": `${animationColor}`,
         },
-
     },
     {
         duration: animationTime,
     })
 }
-
+/**
+ * Animates fade out of node given by tmState.
+ * 
+ * @param {State} tmState - The Turing state for which the node should be animated.
+ * @param {number} animationTime - The duration of the animation in milliseconds.
+ */
 function animateNodeOut(tmState, animationTime){
     //get cyto node
     let cyCurrentNode = cy.getElementById(tmState.id);
@@ -504,9 +501,9 @@ function animateNodeOut(tmState, animationTime){
 
 /**
  * 
- * Runs red blinking Animation on Tapeobject at cursor location for @param animationTime ms
+ * Runs blinking Animation on Tapeobject at cursor location for animationTime ms
  * 
- * @param {number} animationTime - animationTime in ms
+ * @param {number} animationTime - The duration of the animation in milliseconds.
  */
 function animateTapeRead(animationTime){
     //blink center node
@@ -542,14 +539,13 @@ function animateTapeRead(animationTime){
 
 /**
  * 
- * Runs red blinking Animation on correcsponding Edge for @param animationTime ms
+ * Runs blinking Animation on correcsponding Edge for animationTime ms
+ * replaced by animateEdgeIn & animateEdgeOut, hence left unused
  * 
  * @param {State} tmState - State from which the edge originates
  * @param {char} charOnTape - charOnTape for this animation step
  * @param {number} animationTime - animationTime in ms
  */
-//replaced by animateEdgeIn & animateEdgeOut
-/*
 function animateEdge(tmState, charOnTape, animationTime){
     //find corresponding edge
     let edgeToAnimate = null;
@@ -585,27 +581,28 @@ function animateEdge(tmState, charOnTape, animationTime){
             },
             {
                 duration: animationTime,
-                complete: function(){
-                    //console.log("edge animation complete")
-                }
             }
             );
         }
         }
         );
-        
     }
-
 }
-*/
 
+/**
+ * 
+ * Runs fade-in Animation on corresponding Edge for animationTime ms
+ * 
+ * @param {State} tmState - State from which the edge originates
+ * @param {char} charOnTape - charOnTape for this animation step
+ * @param {number} animationTime - animationTime in ms
+ */
 function animateEdgeIn(tmState, charOnTape, animationTime){
     //find corresponding edge
     edgeToAnimate = null;
     let elseEdgeToAnimate = null;
     //helper that detects edges from superstate (return null if not found)
     edgeToAnimate = getLocalEdge(tmState, charOnTape);
-    console.log("picked edge", edgeToAnimate);
     //standard case
     if(edgeToAnimate === null){
         const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
@@ -624,9 +621,7 @@ function animateEdgeIn(tmState, charOnTape, animationTime){
         }
     }
 
-
     //Animation
-    //fade-in
     if(edgeToAnimate != null){
         originalColorEdge = edgeToAnimate.style("line-color");
         edgeToAnimate.animate({
@@ -641,12 +636,19 @@ function animateEdgeIn(tmState, charOnTape, animationTime){
     }
 }
 
+/**
+ * 
+ * Runs fade-out Animation on corresponding Edge for animationTime ms
+ * 
+ * @param {State} tmState - State from which the edge originates
+ * @param {char} charOnTape - charOnTape for this animation step
+ * @param {number} animationTime - animationTime in ms
+ */
 function animateEdgeOut(tmState, charOnTape, animationTime){
     //find corresponding edge
     //done in animateEdgeIn
 
     //Animation
-    //fade-out
     if(edgeToAnimate != null){
         edgeToAnimate.animate({
             style: {
@@ -663,7 +665,7 @@ function animateEdgeOut(tmState, charOnTape, animationTime){
 
 /**
  * 
- * Animate Tape Write for @param animationTime ms, just calls the cyWriteCurrentPos() from CytoscapeTape.js
+ * Animate Tape Write writing happened, just calls the cyWriteCurrentPos() from CytoscapeTape.js
  * 
  * @param {char} writeToken - token to be written on Tape
  * @param {number} animationTime - animationTime in ms
@@ -677,7 +679,7 @@ function animateTapeWrite(writeToken, animationTime){
 
 /**
  * 
- * Runs Move Tape for @param animationTime ms (calls functions from CytoscapeTape.js)
+ * Runs Move Tape animation (calls functions from CytoscapeTape.js)
  * 
  * @param {char} move - specifies Movement direction {"L", "N", "R"}
  * @param {number} animationTime - animationTime in ms
@@ -700,7 +702,7 @@ function animateTapeMovement(move, animationTime){
 //////////////////////////////////////////////////////////////
 
 /**
- * detects the special case of a local Edge being used for animation (from super state)
+ * detects and handles the special case of a local Edge being used for animation (= edge from super state)
  *
  */
 function getLocalEdge(tmState, charOnTape){
@@ -717,7 +719,6 @@ function getLocalEdge(tmState, charOnTape){
             //TRUE! find corresponding edge (take both nodes into account!) & return it
             const outgoingEdges = cy.getElementById(childs[i].superNodeId).outgoers('edge');
             outgoingEdges.forEach(edge => {
-                console.log("OUT", edge.data().readToken);
                 if(edge.data().readToken === charOnTape){
                     returnEdge = edge;
                 }
@@ -738,7 +739,6 @@ function getLocalEdge(tmState, charOnTape){
                 }
             }
         }
-
     }
     return returnEdge;
 }
@@ -746,8 +746,9 @@ function getLocalEdge(tmState, charOnTape){
 /**
  * 
  * Helper: disables all buttons that shouldn't be accessed during simulation
+ * switches to move mode during simulation to disable user editing TM during simulation
  * 
- * @param {string} mode - mode of function, allows for use in multiple scenarios
+ * @param {string} mode - use "all" to also disable runSimulationButton
  */
 function disableButtons(mode){
     document.getElementById('stepSimulationButton').disabled = true;
@@ -761,7 +762,6 @@ function disableButtons(mode){
     }
     //automatically switch to move mode to avoid editing during animation
     var button = document.querySelector('.toggle-button');
-    console.log("test", button.classList);
     if(!button.classList.contains('active')){
         button.classList.toggle('active');
     }
@@ -770,6 +770,7 @@ function disableButtons(mode){
 }
 /**
  * Helper: ree-enables Buttons after Simulation finished
+ * switches back to edit mode
  */
 function enableButtons(){
     document.getElementById('runSimulationButton').disabled = false;
@@ -779,35 +780,10 @@ function enableButtons(){
     document.getElementById('move-tape-left').disabled = false;
     document.getElementById('tape-input').disabled = false;
     document.getElementById('fastSimulation').disabled = false;
-
     //switch to move mode off again
     var button = document.querySelector('.toggle-button');
     if(button.classList.contains('active')){
         button.classList.toggle('active');
     }
     cyGrabifyNodes();
-
-}
-
-//////////////////////////////////////////////////////////////
-//// ------------------- wait/notify -------------------- ////
-//////////////////////////////////////////////////////////////
-
-//tried to do simulation with wait/notify, not yet working, not yet used
-
-function waitFor(ms){
-    return new Promise((resolve) => {setTimeout(resolve, ms);
-    })
-}
-
-function notify(){
-    console.log("notify");
-    isReady = true;
-}
-
-async function waitUntilReady(){
-    while(!isReady){
-        console.log("waiting");
-        await waitFor(100);
-    }
 }

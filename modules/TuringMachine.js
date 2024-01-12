@@ -107,6 +107,8 @@ export class TuringMachine{
      * @param {State} state - State to step from
      * @param {char} charOnTape - Char on Tape being read
      * @returns {State}  - Returns State we end upon
+     * @throws {error} - if no valid transition found, disable simulation
+
      */
     simulationStep(state, charOnTape){
         //find corresponding transition in delta
