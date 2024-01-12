@@ -1,4 +1,17 @@
-//State Object
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Defines the State class
+
+
+  Dependencies/Imports:
+    none
+
+  Exports:
+    - State class
+*/
 export class State{
     /**
      * Constructs a State object with the provided attributes.
