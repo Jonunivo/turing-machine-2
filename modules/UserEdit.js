@@ -1,12 +1,27 @@
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+  
+  Description: 
+    - Detects user action to edit&delete States & Transitions
+    - Manages Edit modals & reads user input
+
+  Dependencies/Imports:
+    - Cytoscape.js     | cy Object & functions to create Edges
+    - TuringMachine.js | global variable global turingMachine
+    - UserInput.js     | functions to prepare modal & detect if in edit mode
+    - SuperState.js    | Helper functions to edit edges from/to super states & to edit local TM object
+
+  Exports:
+    - variables editNode & cytoeditNode specifying which node is being edited
+*/
+
 import { cy, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import {createDropdownMenues, disableSliders, inEditMode} from "./UserInput.js";
 import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, userDeleteSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }
-//////////////////////////////////////////////////////////////
-//// -------------------- User Edit --------------------- ////
-//////////////////////////////////////////////////////////////
 
 //Globals
 //editNode to save node clicked on to edit
@@ -14,11 +29,7 @@ var cytoEditNode;
 var editNode;
 //editEdge to save edge clicked on to edit
 var cytoEditEdge;
-var editEdgeKey;
-var editEdgeKeyLocal;
-var editEdgeContent;
-var editEdgeContentLocal;
-
+//variables saved across multiple functions
 var localEditEdgeKey;
 var localEditEdgeContent;
 var globalEditEdgeKey;
@@ -26,16 +37,21 @@ var globalEditEdgeContent;
 
 
 
+//////////////////////////////////////////////////////////////
+//// -------------------- Node Edit --------------------- ////
+//////////////////////////////////////////////////////////////
 
-//// ----------- Node Edit
 /**Node Edit works as follows:
- * User right click on node -> Open Edit Node Modal ->
+ * User click on node -> Open Edit Node Modal ->
  *      (1) User submit modal -> userEditNodeHandler() -> hide Modal
  *      (2) User delete Node -> userDeleteNodeHandler() -> hide Modal
  *      (3) User cancels modal -> hide Modal
  */
+
+/**
+ * EventListeners that detect a click on a node
+ */
 let clickTime = 0;
-//mousedown on node
 cy.on('mousedown', 'node', (event) =>{
     clickTime = Date.now();
 })
@@ -44,15 +60,29 @@ cy.on('mouseup', 'node', (event) =>{
     clickTime = Date.now() - clickTime;
     //in edit mode & clicked not longer than 200ms (otherwise it is a loop edge creation)
     if(inEditMode() && clickTime < 200){
-        console.log("clicked on node");
         clickEditNode(event);
     }
 })
+
+/**
+ * Handles the click event on a node in edit mode. Opens the node modal at the clicked position
+ * and prepares the Modal for node editing.
+ * Handles both normal nodes and super nodes
+ *
+ * @param {Object} event - The click event.
+ */
 function clickEditNode(event){
-    //save node clicked on (global vars)
+    //save node clicked on (to global vars)
     cytoEditNode = event.target;
     editNode = turingMachine.getStateById(cytoEditNode.id());
     let localEditNode = getLocalTM().getStateById(cytoEditNode.id());
+
+    //helpers for opening modals at click position
+    const position = event.position;
+    const cytoWindow = document.querySelector('#cytoscape');
+    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
+    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
+
 
     //// Case 0: clicked on uneditable node
     //globally not accepting, but locally (-> local End State)
@@ -63,16 +93,8 @@ function clickEditNode(event){
     if(editNode !== undefined && !editNode.isStarting && localEditNode.isStarting){
         return;
     }
+    
 
-    
-    ////open Modal at click position helpers
-    //get click position
-    const position = event.position;
-    //get cytoscape window position
-    const cytoWindow = document.querySelector('#cytoscape');
-    const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
-    const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
-    
     //// Case 1: clicked on SuperNode
     if(editNode === undefined){
         //open superNode window & return
@@ -88,7 +110,7 @@ function clickEditNode(event){
             // Replace the existing button with the new button
             superNodeButton.parentNode.replaceChild(nodeEditButton, superNodeButton);
         }
-        ////Create Delete button (if not yet existing)
+        //Create Delete button (if not yet existing)
         const deleteButton = document.getElementById("superNodeDeleteButton");
         if(!deleteButton){
             var newButton = document.createElement("button");
@@ -99,18 +121,18 @@ function clickEditNode(event){
             addEventListenerWithCheck(newButton, 'click', userDeleteSuperNodeHandler)
         }
         else{
-            //user delete node (Event Listener)
+            //EventListener: user delete node (Event Listener)
             addEventListenerWithCheck(deleteButton, 'click', userDeleteSuperNodeHandler)
         }
-
 
         //get current node name
         document.getElementById("superStateName").value = editNode.name;
 
-        //event listener, userEditSuperNodeHandler implemented in SuperStates.js
+        //event listener for edit button, userEditSuperNodeHandler implemented in SuperStates.js
         addEventListenerWithCheck(document.getElementById('superNodeEditButton'), 'click', userEditSuperNodeHandler);
 
-        //open modal at node position
+        ////open SuperNodeModal at node position
+        const superNodeModal = document.getElementById('superNodeModal');
         superNodeModal.style.paddingLeft = `${position.x + leftValue}px`;
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
         superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
@@ -118,24 +140,11 @@ function clickEditNode(event){
         return;
     }
 
+
     //// Case 2: clicked on normal node
-
-
-    //
     const nodeModal = document.getElementById('nodeModal');
-    const modal = document.querySelector('.modal-content');
 
-
-
-    //display modal at node position
-    nodeModal.style.paddingLeft = `${position.x + leftValue}px`;
-    let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
-    nodeModal.style.paddingTop = `${maxPaddingTop}px`;
-    nodeModal.style.display = 'block';
-
-
-
-    ////change button from "create node" to "edit node"
+    //change button from "create node" to "edit node"
     var nodeButton = document.getElementById("nodeButton");
     if(nodeButton){
         var nodeEditButton = document.createElement("button");
@@ -146,7 +155,7 @@ function clickEditNode(event){
         nodeButton.parentNode.replaceChild(nodeEditButton, nodeButton);
     }
 
-    ////Create Delete button (if not yet existing)
+    //Create Delete button (if not yet existing)
     const deleteButton = document.getElementById("nodeDeleteButton");
     if(!deleteButton){
         var newButton = document.createElement("button");
@@ -157,12 +166,11 @@ function clickEditNode(event){
         addEventListenerWithCheck(newButton, 'click', userDeleteNodeHandler)
     }
     else{
-        //user delete node (Event Listener)
+        //Event Listener for Delete button
         addEventListenerWithCheck(deleteButton, 'click', userDeleteNodeHandler)
     }
 
     ////get current node properties
-    //disable sliders
     disableSliders();
 
     //get name
@@ -181,24 +189,22 @@ function clickEditNode(event){
         document.getElementById("stateRejecting").checked= true;
     }
 
-    //user submit node inputs (Event Listener)
+    //Event Listener for Submit button
     addEventListenerWithCheck(document.getElementById('nodeEditButton'), 'click', userEditNodeHandler);
 
+    //display modal at node position
+    nodeModal.style.paddingLeft = `${position.x + leftValue}px`;
+    let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
+    nodeModal.style.paddingTop = `${maxPaddingTop}px`;
+    nodeModal.style.display = 'block';
 }
 
-//Right click on Node to Edit node (opens Edit Node Modal)
-/*
-cy.on('click', 'node', function(event){
-    //only if in edit mode
-    if(inEditMode() && clickTime < 200){
-        
-    }
-})
-*/
 
 /**
  * Handles the User editing a node (TM object & cyto node) & closes Modal
  * note: simmilar to userNodeInputHandler but more sophisticated
+ * called by user pressing "Edit Node" button
+ * 
  */
 function userEditNodeHandler(){
     //close modal
@@ -206,7 +212,6 @@ function userEditNodeHandler(){
 
     ////Name
     var newName = document.getElementById("stateName").value;
-
     //catch name already exists
     if(newName !== editNode.name)
     for(const state of getLocalTM().states){
@@ -216,14 +221,11 @@ function userEditNodeHandler(){
             return;
         }
     }
-
     //cyto
     cytoEditNode.style('label', newName);
     cytoEditNode.style('width', `${newName.length*10 + 10}px`)
     //Global TM object (node)
     editNode.name = newName;
-
-
 
     ////Starting/Accepting/Rejecting property
     var isStarting = document.getElementById("stateStarting").checked;
@@ -239,8 +241,6 @@ function userEditNodeHandler(){
     //booleans to save editing rejectset, parameters for editNodeLocalTM()
     let rejectAdded = false;
     let rejectDeleted = false;
-
-
     //isStarting
     if (isStarting){
         //cyto
@@ -305,13 +305,7 @@ function userEditNodeHandler(){
 
     //edit localTM object
     editNodeLocalTM(editNode, rejectAdded, rejectDeleted);
-
-    ////logging
-    console.log("---NODE EDITED---")
-    console.log("global TM ", turingMachine);
-    console.log('local TM ', getLocalTM());
-
-
+    
     //Grabify nodes
     cyGrabifyNodes();
 
@@ -322,6 +316,7 @@ function userEditNodeHandler(){
 
 /**
  * Handles the User deleting a node (TM object & cyto node) & closes Modal
+ * called by user pressing "Delete Node"
  * 
  */
 function userDeleteNodeHandler(){
@@ -379,7 +374,10 @@ function userDeleteNodeHandler(){
 }
 
 
-//// ----------- Edge Edit
+//////////////////////////////////////////////////////////////
+//// -------------------- Edge Edit --------------------- ////
+//////////////////////////////////////////////////////////////
+
 /**Edge Edit works as follows:
  * User right click on edge -> Open Edit Edge Modal ->
  *      (1) User submit modal -> userEditEdgeHandler() -> hide Modal
@@ -387,24 +385,27 @@ function userDeleteNodeHandler(){
  *      (3) User cancels modal -> hide Modal
  */
 
-//Click on Edge to Edit edge (opens Edit Edge Modal)
-
+/**
+ * Handles the click event on a edge in edit mode. Opens the edge modal at the clicked position
+ * and prepares the Modal for edge editing.
+ *
+ * @param {Object} event - The click event.
+ */
 cy.on('click', 'edge', function(event){
     //only if in edit mode
     if(inEditMode()){
         ////Precalculations
         //save edge clicked on (global var)
         cytoEditEdge = event.target;
-
         //local TM
         let localTM = getLocalTM();
-
-        //get edge TM object (delta) (& put into global variable)
+        //get edge TM object (delta) (& put into global variables)
+        
         //Local
         let localFromNodeId = cytoEditEdge.source().id();
         let localFromNode = localTM.getStateById(localFromNodeId);
         let readToken = cytoEditEdge.data("readToken");
-        //!TO DO: getKeyByContent is problematic if multiple edges with same readToken exist
+        //!ATTENTION: getKeyByContent is problematic if multiple edges from the same state with same readToken exist
         //-> Value in "From" can be set wrong in getCurrentEdgeProperties()
         //does not have impact on actual edit, but might confuse User expecting it to be correct
         localEditEdgeKey = localTM.getKeyByContent([localFromNode, readToken]);
@@ -422,22 +423,19 @@ cy.on('click', 'edge', function(event){
         globalEditEdgeContent = turingMachine.delta.get(globalEditEdgeKey);
 
         
-        //open Modal at click position
+        ////display modal at node position
         const position = event.position;
         const edgeModal = document.getElementById('edgeModal');
         //get cytoscape window position
         const cytoWindow = document.querySelector('#cytoscape');
         const leftValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('left'), 10);
         const topValue = parseInt(window.getComputedStyle(cytoWindow).getPropertyValue('top'), 10);
-
-        //display modal at node position
         edgeModal.style.paddingLeft = `${position.x + leftValue}px`
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-410);
         edgeModal.style.paddingTop = `${maxPaddingTop}px`;
         edgeModal.style.display = 'block';
 
-        ////change nodeModal to edit style
-        //replace "create edge" with "edit edge" button
+        ////replace "create edge" with "edit edge" button
         var edgeButton = document.getElementById("edgeButton");
         if(edgeButton){
             var edgeEditButton = document.createElement("button");
@@ -455,18 +453,18 @@ cy.on('click', 'edge', function(event){
             newButton.innerText = "Delete Transition";
             newButton.className = "red-button";
             document.getElementById("deleteEdgeDiv").appendChild(newButton);
-            //event listener
+            //event listener for delete button
             addEventListenerWithCheck(newButton, 'click', userDeleteEdgeHandler)
         }
         else{
-            //event listener
+            //event listener for delete button
             addEventListenerWithCheck(deleteButton, 'click', userDeleteEdgeHandler)
         }
-
 
         ////get current edge properties
         getCurrentEdgeProperties();
 
+        //Event listener for edit button
         addEventListenerWithCheck(document.getElementById("edgeEditButton"), "click", userEditEdgeHandler);
 
         //Grabify nodes
@@ -479,11 +477,9 @@ cy.on('click', 'edge', function(event){
  * Helper: that retrieves the Current Edge Properties to be displayed in Edge Modal
  */
 function getCurrentEdgeProperties(){
-    //from State
-    //Create Option to Change FromState (if not yet existing)
+    ////from State
     const fromState = document.getElementById("fromState")
     if(!fromState){
-        //if not: create it!
         const labelElement = document.createElement("label");
         labelElement.id = "fromStateLabel"
         labelElement.setAttribute("for", "fromState");
@@ -498,11 +494,11 @@ function getCurrentEdgeProperties(){
     createDropdownMenues(document.getElementById("fromState"))
     document.getElementById("fromState").value = localEditEdgeKey[0].name;
 
-    //to State
+    ////to State
     createDropdownMenues(document.getElementById("toState"))
     document.getElementById("toState").value = localEditEdgeContent[0].name;
 
-    //read Label
+    ////read Label
     if(localEditEdgeKey[1] === 'else'){
         document.getElementById("readLabelElse").checked = true;
         document.getElementById("readLabel").value = '';
@@ -513,7 +509,7 @@ function getCurrentEdgeProperties(){
         document.getElementById("readLabel").value = localEditEdgeKey[1];
     }
 
-    //write Label
+    ////write Label
     if(localEditEdgeContent[1] === 'nothing'){
         //write Nothing was eneabled
         document.getElementById("writeLabel").value = '';
@@ -525,7 +521,7 @@ function getCurrentEdgeProperties(){
         document.getElementById('writeLabelNothing').checked = false;
     }
 
-    //tape Movement
+    ////tape Movement
     switch (localEditEdgeContent[2]){
         case "L":
             document.getElementById("tapeMovement").value = -1;
@@ -537,29 +533,27 @@ function getCurrentEdgeProperties(){
             document.getElementById("tapeMovement").value = 1;
             break;       
     }
-
     //Tape Movement slider input info
     const slider = document.getElementById("tapeMovement");
     const sliderValue = document.getElementById("slider-value");
     const value = parseFloat(slider.value);
     sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
     sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
-
 }
 
 /**
  * Handles the User editing an edge (TM object & cyto node) & closes Modal
  * note: simmilar to userEdgeInputHandler but more sophisticated
+ * called by user pressing "Edit Edge" button
+ * 
  */
 function userEditEdgeHandler(){
     //close modal
     edgeModal.style.display = 'none';
-
-    ////Read User Input
-
     //get local TM
     let localTM = getLocalTM();
 
+    ////Read User Input
     //fromNode (Local & Global TM)
     let dropdownfrom = document.getElementById("fromState");
     let localFromNode = localTM.getStateByName(dropdownfrom.options[dropdownfrom.selectedIndex].textContent);
@@ -615,7 +609,7 @@ function userEditEdgeHandler(){
     }
 
 
-    ////Edit Global & Local TM object
+    ////Edit Global & Local TM object & Cyto edge
 
     //Global TM object
     //remove old
@@ -623,28 +617,22 @@ function userEditEdgeHandler(){
     //create new
     turingMachine.createTransition(globalFromNode, readToken, globalToNode, writeToken, tapeMovement);
 
-    
     //Local TM object
     //remove old
     localTM.delta.delete(localEditEdgeKey);
     //create new
     localTM.createTransition(localFromNode, readToken, localToNode, writeToken, tapeMovement);
 
-    
     ////Cyto
-    //remove
+    //remove old
     cy.remove(cytoEditEdge);
     //create new
     cyCreateEdge(localFromNode.id, localToNode.id, cyLabel, readToken);
-
-
-    ////Logging
-    console.log('---Edge Edited---');
-
 }
 
 /**
  * Handles the User deleting an edge (TM object & cyto node) & closes Modal
+ * called by user pressing "Delete Edge" button
  * 
  */
 function userDeleteEdgeHandler(){
@@ -654,11 +642,6 @@ function userDeleteEdgeHandler(){
     turingMachine.delta.delete(globalEditEdgeKey);
     //delete in local TM object
     getLocalTM().delta.delete(localEditEdgeKey);
-
     //delete in cyto
     cy.remove(cytoEditEdge);
 }
-
-
-
-
