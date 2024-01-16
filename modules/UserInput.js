@@ -18,6 +18,11 @@
     - functions to uphold node Id invariant
     - Helper function that disables sliders in Node modal
     - Helper function detecting if in edit mode
+    - Helper function that avoid duplicating EventListeners
+
+  Invariant to keep up:
+    - Every state in a TM has a unique ID. Each Cytoscape node representing this state has the same ID.
+
 */
 
 

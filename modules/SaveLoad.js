@@ -19,6 +19,9 @@
 
   Exports:
     - loadFile function 
+
+  Invariant to keep up:
+    - Every state in a TM has a unique ID. Each Cytoscape node representing this state has the same ID.
 */
 
 import { cyClearCanvas, generateNodePosMap, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";

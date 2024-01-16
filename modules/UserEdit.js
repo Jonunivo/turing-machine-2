@@ -14,6 +14,9 @@
 
   Exports:
     - variables editNode & cytoeditNode specifying which node is being edited
+
+  Invariant to keep up:
+    - Every state in a TM has a unique ID. Each Cytoscape node representing this state has the same ID.
 */
 
 import { cy, cyCreateEdge, cyGrabifyNodes} from "./Cytoscape.js";

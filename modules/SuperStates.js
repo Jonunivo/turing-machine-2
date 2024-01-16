@@ -20,6 +20,9 @@
 
   Exports:
     - the global variables tmTree, currTreeNode & currTreeNodeName
+
+  Invariant to keep up:
+    - Every state in a TM has a unique ID. Each Cytoscape node representing this state has the same ID.
 */
 
 
