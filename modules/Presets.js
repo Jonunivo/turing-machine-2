@@ -15,7 +15,7 @@
 
 import {loadFile} from "./SaveLoad.js"
 
-// Add filenames from the presets folder to this list and their correcponding name to presetNames list
+// Add filenames from the presets folder to this list and their corresponding name to presetNames list
 // to add them as Presets to the simulator
 const fileList = ['empty.json', 'binaryincrement.json', 'abPalindrome.json', 'copyOnes.json', 'countWordLength.json', 'base10divby3.json']
 const presetNames = ['No Preset', 'Binary Increment', 'ab Palindrome', 'copy Ones', 'Word Length', 'divisible by 3 base10']
