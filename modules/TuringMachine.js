@@ -166,6 +166,9 @@ export class TuringMachine{
                 }
                 this.tapePosition++;
                 break;
+            case "N":
+                //no movement
+                break;
             default:
                 throw new Error("Could not interpret movement")
         }

@@ -423,7 +423,7 @@ cy.on('click', 'edge', function(event){
         globalEditEdgeContent = turingMachine.delta.get(globalEditEdgeKey);
 
         
-        ////display modal at node position
+        ////prepare modal at node position
         const position = event.position;
         const edgeModal = document.getElementById('edgeModal');
         //get cytoscape window position
@@ -433,7 +433,6 @@ cy.on('click', 'edge', function(event){
         edgeModal.style.paddingLeft = `${position.x + leftValue}px`
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-410);
         edgeModal.style.paddingTop = `${maxPaddingTop}px`;
-        edgeModal.style.display = 'block';
 
         ////replace "create edge" with "edit edge" button
         var edgeButton = document.getElementById("edgeButton");
@@ -469,6 +468,10 @@ cy.on('click', 'edge', function(event){
 
         //Grabify nodes
         cyGrabifyNodes();
+
+        //display modal
+        edgeModal.style.display = 'block';
+
     }
 
 });
@@ -507,6 +510,7 @@ function getCurrentEdgeProperties(){
     else{
         document.getElementById("readLabelElse").checked = false;
         document.getElementById("readLabel").value = localEditEdgeKey[1];
+        document.getElementById("readLabel").style.display = '';
     }
 
     ////write Label
@@ -519,6 +523,7 @@ function getCurrentEdgeProperties(){
     else{
         document.getElementById("writeLabel").value = localEditEdgeContent[1];
         document.getElementById('writeLabelNothing').checked = false;
+        document.getElementById("writeLabel").style.display = '';
     }
 
     ////tape Movement
@@ -610,6 +615,26 @@ function userEditEdgeHandler(){
 
 
     ////Edit Global & Local TM object & Cyto edge
+
+    try{
+        //! bad design, but it works
+        //catch Edge with this readLabel already exists
+        //if Error (getKeyByContent not found) -> all good
+        localTM.getKeyByContent([localFromNode, readToken])
+        if(localEditEdgeKey[1] === readToken){
+            //if it is the Edge we're about to edit -> all good -> Throw error
+            throw Error;
+        }
+        //No Error thrown: alert user as he is trying to create Edge with readLabel that already exists
+        alert(`Transition with readLabel ${readToken} from this state already exists`);
+        edgeModal.style.display = 'block';
+        return;
+
+    }
+    catch{
+        //can be left empty
+    }
+    //edge does not yet exist, edit allowed:
 
     //Global TM object
     //remove old

@@ -603,8 +603,9 @@ function animateEdgeIn(tmState, charOnTape, animationTime){
     let elseEdgeToAnimate = null;
     //helper that detects edges from superstate (return null if not found)
     edgeToAnimate = getLocalEdge(tmState, charOnTape);
-    //standard case
+
     if(edgeToAnimate === null){
+        //standard case
         const outgoingEdges = cy.getElementById(tmState.id).outgoers('edge');
         outgoingEdges.forEach(edge => {
             if(edge.data().readToken === charOnTape){
@@ -734,7 +735,7 @@ function getLocalEdge(tmState, charOnTape){
             delta = childs[i].turingMachine.delta
             //catch edge within subTM preferred
             for(const [key, value] of delta){
-                if (key[1] === charOnTape){
+                if (key[0].id === tmState.id && key[1] === charOnTape){
                     return null;
                 }
             }

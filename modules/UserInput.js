@@ -377,6 +377,21 @@ function userEdgeInputHandler(){
 
     //// --- CORE --- ////
 
+    try{
+        //! bad design, but it works
+        //catch Edge with this readLabel already exists
+        localTM.getKeyByContent([localFromNode, readLabel])
+
+        //edge with this readLabel from this state does already exist!
+        alert(`Transition with readLabel ${readLabel} from this state already exists`);
+        edgeModal.style.display = 'block';
+        return;
+
+    }
+    catch{
+        //can be left empty
+    }
+    //edge does not yet exist:
     //create Edge Cytoscape
     cyCreateEdge(`${fromNodeId}`, `${toNodeId}`, cyLabel, readLabel);
 
@@ -385,6 +400,8 @@ function userEdgeInputHandler(){
     
     //create Edge in Local TM
     localTM.createTransition(localFromNode, readLabel, localToNode, writeLabel, tapeMovement);
+
+
 
     //////////////////////
 }

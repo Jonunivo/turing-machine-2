@@ -22,7 +22,7 @@
 */
 
 import { cyClearCanvas, generateNodePosMap, moveNodesIntoWindow, cyGrabifyNodes } from "./Cytoscape.js";
-import { cyWriteOnTape } from "./CytoscapeTape.js";
+import { cyWriteOnTape, tmTapetoCyto } from "./CytoscapeTape.js";
 import { State } from "./State.js";
 import { TuringMachine, turingMachine, resetGlobalTuringMachine } from "./TuringMachine.js"
 import { tmTree, setTmTree, currTreeNode, setCurrTreeNode, createCytoWindow, resetTree} from "./SuperStates.js";
@@ -147,6 +147,8 @@ function saveFile(){
         tmProperties.push("\n");
         tmProperties.push("\n");
         tmProperties.push(turingMachine.tape);
+        //and tapePosition
+        tmProperties.push(turingMachine.tapePosition);
     }
     tmProperties.push("\n");
 
@@ -333,7 +335,10 @@ function loadFile(reader){
             //add to TM object
             turingMachine.tape = tape;
             //write content onto tape
-            cyWriteOnTape(tapeString.replace(/,/g, ''));
+            lineId++;
+            turingMachine.tapePosition = parseInt(lines[lineId]);
+            tmTapetoCyto();
+            //cyWriteOnTape(tapeString.replace(/,/g, ''));
             lineId++;
         }
         else{
