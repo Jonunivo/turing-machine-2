@@ -1,3 +1,8 @@
+/*
+  Author: Mauro Vogel
+  Date: January 2024
+*/
+
 /* ----- Body ----- */
 body{
     font-family: Helvetica;
@@ -16,7 +21,7 @@ body{
 /* ----- Horizontal line ----- */
 hr {
     border: none;
-    height: 1px; /* Sets the height of the line */
+    height: 1px;
     background-color: #000;
 }
 
@@ -46,6 +51,7 @@ hr {
 }
 
 /* ----- CytoScape ----- */
+/* -- main window -- */
 #cytoscape {
     min-width: 640px;
     width: calc(100% - 300px);
@@ -58,6 +64,7 @@ hr {
     border: dotted 1px black;
 
 }
+/* -- tape window -- */
 #cytoscapeTape {
     min-width: 640px;
     max-width: calc(100% - 300px);
@@ -68,6 +75,7 @@ hr {
     position: absolute;
     top: 615px;
 }
+/* -- tree window -- */
 #cytoscapeTree{
     position: absolute;
     top: 140px;
@@ -88,7 +96,7 @@ hr {
     top: 525px;
   }
 
-/* ----- Move Tape div ----- */
+/* ----- Tape Control div (buttons etc) ----- */
 #tapeControlDiv{
     min-width: 950px;
     position: relative;
@@ -100,8 +108,36 @@ hr {
     position: relative;
     top: 590px;
 }
+/*Simulation Speed */
+.slider {
+    -webkit-appearance: none;
+    cursor: pointer;
+    width: 200px;
+    height: 22px;
+    border-radius: 100px;
+    background: #ccc;
+    margin: 0 auto; /* Center the slider horizontally */
+    margin-top: 8px;
+    transition: transform 0.2s;
+}
+.slider:hover{
+    border: solid 2px rgb(109, 109, 109);
+    transition: background-color 0.3s;
 
-/* ----- presets & save & load ----- */
+}
+#simulationSpeed{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* ---- Animation Toggle ---- */
+#animationToggleDiv{
+    display: flex;
+    justify-content: center;
+}
+
+
+/* ----- Right Window ----- */
 #rightWindow{
     min-width: max-content;
     position: fixed;
@@ -229,7 +265,7 @@ button{
     width: 120px !important;
 }
 
-/* Toggle Buttons (Edit) */
+/* Toggle Buttons ("Move") */
 .toggle-button {
     background-color: #ccc;
     border: 2px solid darkgray;
@@ -247,9 +283,7 @@ border: 2px solid darkgreen;
 
 
 
-
-
-/* Text Fields */
+/*----- Text Input Fields -----*/
 .modal-input{
     width: 20px !important;
     font-weight: 700 !important;
@@ -297,35 +331,6 @@ option {
     border: 1px solid #ccc;
 }
 
-/*Simulation Speed */
-/* ----- Simulation Speed Slider */
-.slider {
-    -webkit-appearance: none;
-    cursor: pointer;
-    width: 200px;
-    height: 22px;
-    border-radius: 100px;
-    background: #ccc;
-    margin: 0 auto; /* Center the slider horizontally */
-    margin-top: 8px;
-    transition: transform 0.2s;
-}
-.slider:hover{
-    border: solid 2px rgb(109, 109, 109);
-    transition: background-color 0.3s;
-
-}
-#simulationSpeed{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ---- Animation Toggle ---- */
-#animationToggleDiv{
-    display: flex;
-    justify-content: center;
-}
 
 
 /* ------- Modals ------*/
@@ -411,7 +416,7 @@ option {
 
 
 
-/*tape movement*/
+/*tape movement input (in Edge Modal)*/
 
 /* Styling for input[type="range"] */
 #tapeMovement {
@@ -429,7 +434,6 @@ option {
 #slider-value {
     color: black;
     display: inline-block;
-
 }
 
 /* Stil für den neutralen Wert */
