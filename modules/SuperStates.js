@@ -26,8 +26,8 @@
 import { Tree, TreeNode } from "../datastructures/Tree.js";
 import { TuringMachine, turingMachine} from "./TuringMachine.js";
 import { State } from "./State.js";
-import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap, addEventListenerWithCheck } from "./Cytoscape.js";
-import { nodePresetHelper, inEditMode } from "./UserInput.js";
+import { cy, cyClearCanvas, cyCreateEdge, cyCreateNode, cyGrabifyNodes, generateNodePosMap } from "./Cytoscape.js";
+import { nodePresetHelper, inEditMode, addEventListenerWithCheck } from "./UserInput.js";
 import { cytoEditNode, editNode } from "./UserEdit.js";
 import { cyTreeCreate, cyTreeReset, cyTreeStyleCurrentNode } from "./CytoscapeTree.js";
 

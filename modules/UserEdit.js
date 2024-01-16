@@ -16,9 +16,9 @@
     - variables editNode & cytoeditNode specifying which node is being edited
 */
 
-import { cy, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
+import { cy, cyCreateEdge, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
-import {createDropdownMenues, disableSliders, inEditMode} from "./UserInput.js";
+import {createDropdownMenues, disableSliders, inEditMode, addEventListenerWithCheck} from "./UserInput.js";
 import { editNodeLocalTM, getLocalTM, userEditSuperNodeHandler, userDeleteSuperNodeHandler, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
 export { editNode, cytoEditNode }

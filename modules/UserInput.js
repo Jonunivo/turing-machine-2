@@ -21,11 +21,11 @@
 */
 
 
-import { cy, cyCreateNode, cyCreateEdge, addEventListenerWithCheck, cyGrabifyNodes} from "./Cytoscape.js";
+import { cy, cyCreateNode, cyCreateEdge, cyGrabifyNodes} from "./Cytoscape.js";
 import { turingMachine } from "./TuringMachine.js";
 import { getLocalTM, getRootTM, getAcceptSubTM, getStartSubTM } from "./SuperStates.js";
 
-export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode};
+export {createDropdownMenues, nodePresetHelper, nodePresetReset, disableSliders, inEditMode, addEventListenerWithCheck};
 
 
 //////////////////////////////////////////////////////////////
@@ -491,4 +491,20 @@ function inEditMode(){
     // Check if the button is currently active
     var isActive = !button.classList.contains('active');
     return isActive;
+}
+
+/**
+ * 
+ * Helper: that creates EventListeners, if not yet existent (avoids duplication of EventListeners)
+ * 
+ * @param {document Element} element - HTML element the EventListener is used on
+ * @param {string} eventType - specifies event Type (such as 'click')
+ * @param {function} listener - Function that is called when the eventlistener triggers
+ */
+function addEventListenerWithCheck(element, eventType, listener){
+    const existingListeners = element.__eventListeners || {};
+    if(!existingListeners[eventType]){
+        element.addEventListener(eventType, listener);
+        existingListeners[eventType] = listener;
+    }
 }

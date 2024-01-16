@@ -267,7 +267,7 @@ export class TuringMachine{
     }
 
     /**
-     * TO DO: maybe replace/remove this function as it is only used once
+     * TO DO: maybe replace/remove this function as it is only used in one specific case
      * !!use with caution
      * Helper: Add all info from @param other into caller Turingmachine object; start & accept state from "this"
      * note: Only states and transitions are merged into "this", rest of

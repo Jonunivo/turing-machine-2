@@ -16,7 +16,7 @@
 */
 
 import cytoscape from '../node_modules/cytoscape/dist/cytoscape.esm.min.js';
-export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, addEventListenerWithCheck, moveNodesIntoWindow, cyGrabifyNodes, generateNodePosMap};
+export {cy, cyCreateNode, cyCreateEdge, cyClearCanvas, moveNodesIntoWindow, cyGrabifyNodes, generateNodePosMap};
 
 /// Global/shared variables
 
@@ -177,21 +177,7 @@ function generateNodePosMap(){
 }
 
 //TO DO: move to UserInput or UserEdit or ..., function is not even used in this module
-/**
- * 
- * Helper: that creates EventListeners, if not yet existent (avoids duplication of EventListeners)
- * 
- * @param {document Element} element - HTML element the EventListener is used on
- * @param {string} eventType - specifies event Type (such as 'click')
- * @param {function} listener - Function that is called when the eventlistener triggers
- */
-function addEventListenerWithCheck(element, eventType, listener){
-    const existingListeners = element.__eventListeners || {};
-    if(!existingListeners[eventType]){
-        element.addEventListener(eventType, listener);
-        existingListeners[eventType] = listener;
-    }
-}
+
 
 /**
  * Helper: that moves all nodes back inside of window if user drags them out of it, or if window is resized
