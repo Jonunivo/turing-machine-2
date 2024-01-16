@@ -13,6 +13,13 @@ body{
     }
 }
 
+/* ----- Horizontal line ----- */
+hr {
+    border: none;
+    height: 1px; /* Sets the height of the line */
+    background-color: #000;
+}
+
 /* ----- centered content class ----- */
 .centered-content{
     text-align: center;
@@ -51,7 +58,7 @@ body{
     border: dotted 1px black;
 
 }
-#cytoscape-tape {
+#cytoscapeTape {
     min-width: 640px;
     max-width: calc(100% - 300px);
     width: 100%;
@@ -61,7 +68,7 @@ body{
     position: absolute;
     top: 615px;
 }
-#cytoscape-tree{
+#cytoscapeTree{
     position: absolute;
     top: 140px;
     width: 140px;
@@ -203,7 +210,7 @@ button{
 }
 
 /*move tape left, move tape right*/
-#move-tape-left, #move-tape-right{
+#moveTapeLeft, #moveTapeRight{
     width: 50px;
 }
 
@@ -212,8 +219,8 @@ button{
     width: 130px;
 }
 /*move left move right button*/
-#move-tape-right,
-#move-tape-left {
+#moveTapeRight,
+#moveTapeLeft {
     width: 50px;
 }
 

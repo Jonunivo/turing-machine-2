@@ -129,9 +129,9 @@ export class TuringMachine{
                 document.getElementById('stepSimulationButton').disabled = true;
                 document.getElementById('resetSimulationButton').disabled = false;
                 document.getElementById('runSimulationButton').innerHTML = "Run Simulation";
-                document.getElementById('move-tape-left').disabled = false;
-                document.getElementById('move-tape-right').disabled = false;
-                document.getElementById('tape-input').disabled = false;
+                document.getElementById('moveTapeLeft').disabled = false;
+                document.getElementById('moveTapeRight').disabled = false;
+                document.getElementById('tapeInput').disabled = false;
                 document.getElementById('fastSimulation').disabled = false;
                 //switch to move mode off again
                 var button = document.querySelector('.toggle-button');

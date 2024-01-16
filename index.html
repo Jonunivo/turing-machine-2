@@ -1,38 +1,49 @@
+<!-- 
+  Author: Mauro Vogel
+  Date: January 2024
+-->
+
+
+
 <!DOCTYPE html>
 <html>
 
     <head>
 
+        <!-- Metadata Section -->
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <!-- Title -->
         <title>Turing Machine Simulator</title>
 
+        <!-- Stylesheet Link -->
         <link rel="stylesheet" href="styles/styles.css">
 
     </head>
 
     <body>
-        <!-- Title -->
-        <div id="titleDiv" class="centered-content">        
-            <h1 id="head-title">Turing Machine Simulator</h1>
+        <!-- Title Section -->
+        <div id="titleDiv" class="centered-content">
+            <!-- Main Title -->
+            <h1 id="headTitle">Turing Machine Simulator</h1>
         </div>
 
 
-        <!-- Cytoscape windows -->
+        <!-- Cytoscape Windows -->
         <div id="cytoscape"></div>
-        <div id="cytoscape-tape"></div>
-        <div id="cytoscape-tree"></div>
+        <div id="cytoscapeTape"></div>
+        <div id="cytoscapeTree"></div>
 
         <!-- Tape Arrow -->
         <div class="arrow-down"></div>
 
         <!-- Tape control -->
         <div id="tapeControlDiv" class="centered-content">
-            <button id="move-tape-right" class="grey-button"> ⮜ </button>
-            <input type="text" id="tape-input-field" required>
-            <button id="tape-input" class="grey-button">Write On Tape</button>
-            <button id="move-tape-left" class="grey-button"> ➤ </button>
+            <button id="moveTapeRight" class="grey-button"> ⮜ </button>
+            <input type="text" id="tapeInputField" required>
+            <button id="tapeInput" class="grey-button">Write On Tape</button>
+            <button id="moveTapeLeft" class="grey-button"> ➤ </button>
         </div>
 
         <!-- Simulation Control -->
@@ -49,18 +60,18 @@
                 <br>
                 <label for="simulationSpeed">Simulation Speed</label>
                 <br>
-               
             </div>
         </div>
 
-        <!-- Presets & Save & Load -->
+        <!-- Section Right of main cytoscape window -->
         <div id="rightWindow">
             <!-- Edit Button -->
             <div>
                 <button id="editButton" class="toggle-button thin" onclick="toggleButton()">Move</button>
                 <br>
-
             </div>
+            <hr>
+            <!-- Instructions -->
             <h3>Instructions:</h3>
             <div id="userGuide">
                 Click on Canvas, <br> to Create State
@@ -74,21 +85,17 @@
                 Click on Transition, <br> to Edit Transition
                 <br><br>
                 Click on move, <br> to Move States
-
             </div>
             <br>
+            <hr>
 
-
-
-            <!-- Preset -->
-
+            <!-- Presets -->
             <div id="choosePreset" class="optionMenu">
-                
                 <select id="presetSelect" name="preset">
-
                 </select> 
-                
+
             </div>
+            <hr>
 
             <!-- Save/Load -->
             <div id="saveLoad">
@@ -96,10 +103,6 @@
                 <input id="fileInput" type="file" accept=".json">
                 <br>
                 <button id="saveButton" class="button grey-button thin">Save TM</button>
-            </div>
-
-            <div>
-                <!-- <button id="subWindowOpener" class="button grey-button">Open SubWindow</button> -->
             </div>
         </div>
 
@@ -114,7 +117,6 @@
 
 
         <!-------- Modals -------->
-
         <!-- Save Modal -->
         <div id="saveModal" class="modal">
             <div id="saveModalContent" class="modal-content">
@@ -137,9 +139,7 @@
             </div>
         </div>
 
-
-
-        <!-- Node Creation Modal -->
+        <!-- Node Creation/Edit Modal -->
         <div id="nodeModal" class="modal">
             <div id="nodeModalContent" class="modal-content">
                 <div class="cancel-button-div">
@@ -174,7 +174,7 @@
             </div>
         </div>
 
-        <!-- Super Node Creation Modal -->
+        <!-- Super Node Creation/Edit Modal -->
         <div id="superNodeModal" class="modal">
             <div id="superNodeModalContent" class="modal-content">
                 <div class="cancel-button-div">
@@ -197,7 +197,7 @@
             </div>
         </div>
 
-        <!-- Edge Creation Modal -->
+        <!-- Edge Creation/Edit Modal -->
         <div id="edgeModal" class="modal">
             <div id="edgeModalContent" class="modal-content">
                 <div class="cancel-button-div">
@@ -238,35 +238,29 @@
                     <button id="edgeButton" class="green-button" type="button">Create Transition</button>
                 </div>
                 <div id="deleteEdgeDiv">
-                    <!-- cytoscape.js will insert a delete button here -->
+                    <!-- userEdit.js will insert a delete button here -->
                 </div>
 
             </div>
         </div>
 
-
-
-        <footer>
-
-            Note: this is a developer build, some things might not yet be working as intended
-            <br>
-            <a href="../prototype/">Prototype</a>
-
-        </footer>
-
-        
-        
+    
 
         <!--- links to the scripts -->
 
         <!-- functions directly used in index.html -->
         <script>
-            // Disable the default context menu on the entire document (right click)
+            /**
+             * Disables the default context menu on the entire document (right-click).
+             */
             document.addEventListener('contextmenu', function(event) {
                 event.preventDefault();
             });
 
-            //limit input to 1 character
+            /**
+             * Limits the input length of a text input field to one character.
+             * @param {HTMLInputElement} input - The input.
+             */
             function limitInputTo1Character(input) {
                 if (input.value.length >= 1) {
                     // If more than one character is entered, only keep the first character
@@ -278,14 +272,20 @@
                 }
             }
 
-            //replace " " with ﹍ in input field
+            /**
+             * Replaces spaces with " " with ﹍ in input field
+             */
             function replaceSpace(){
-                let input = document.getElementById("tape-input-field").value;
+                let input = document.getElementById("tapeInputField").value;
                 let output = input.replace(/ /g, '\uFE4D');
-                document.getElementById("tape-input-field").value = output;
+                document.getElementById("tapeInputField").value = output;
             }
 
-            //limit node name size to size
+            /**
+             * Limits the input length of a text input field to size amount of characters.
+             * used to limit node name size
+             * @param {number} size - The maximum length of the input
+             */
             function limitNameSize(size){
                 let input = document.getElementById("stateName").value;
                 let output = "";
@@ -301,23 +301,29 @@
                 }
             }
 
-            //Tape Movement slider input info
+            /**
+             * Updates the Tape Movement slider input information.
+             * used within the Edge Modal
+             */
             const slider = document.getElementById("tapeMovement");
             const sliderValue = document.getElementById("slider-value");
-
             slider.addEventListener("input", function() {
                 const value = parseFloat(slider.value);
                 sliderValue.textContent = value === -1 ? "⮜" : value === 0 ? "⯀" : "➤";
                 sliderValue.className = value === -1 ? "left" : value === 0 ? "neutral" : "right";
             });
 
-            //Toggle Button ("Bewegen")
+            /**
+             * Toggles the state of a button with the class 'toggle-button'. (used for "Move" button)
+             */
             function toggleButton() {
                 var button = document.querySelector('.toggle-button');
                 button.classList.toggle('active');
             }
 
-            //disable Read (in Edge Modal)
+            /**
+             * Disables the read input in the Edge Modal if "else"-checkbox is active.
+             */
             function disableRead(){
                 const readLabelInput = document.getElementById("readLabel");
                 if(document.getElementById("readLabelElse").checked){
@@ -327,7 +333,9 @@
                     readLabelInput.style.display = '';
                 }
             }
-            //disable Write (in Edge Modal)
+            /**
+             * Disables the write input in the Edge Modal if "don't write"-checkbox is active.
+             */
             function disableWrite(){
                 const writeLabelInput = document.getElementById("writeLabel");
                 if(document.getElementById("writeLabelNothing").checked){
@@ -340,7 +348,7 @@
 
         </script>
         
-        <!-- modules -->
+        <!-- Links to the JavaScript modules -->
         <script type="module" src="./modules/General.js" ></script>
 
         <script type="module" src="./datastructures/Tree.js"></script>
@@ -356,7 +364,6 @@
 
         <script type="module" src="./modules/SuperStates.js"></script>
         <script type="module" src="./modules/CytoscapeTree.js"></script>
-
 
         <script type="module" src="./modules/Simulation.js"></script>
 

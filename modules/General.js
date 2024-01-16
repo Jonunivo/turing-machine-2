@@ -61,8 +61,8 @@ function userPressEnter(){
     }
 
     //write tape field in focus
-    else if(document.activeElement === document.getElementById("tape-input-field")){
-        simulateButtonClick("tape-input");
+    else if(document.activeElement === document.getElementById("tapeInputField")){
+        simulateButtonClick("tapeInput");
     }
     else{
         //else: play/pause simulation

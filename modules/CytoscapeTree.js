@@ -27,7 +27,7 @@ export{cyTreeCreate, cyTreeStyleCurrentNode, cyTreeReset}
  * Global style properties are set here
 */
 var cyTree = cytoscape({
-    container: document.getElementById('cytoscape-tree'),
+    container: document.getElementById('cytoscapeTree'),
     style: [
     {
         selector: 'node',

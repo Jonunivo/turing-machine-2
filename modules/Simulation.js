@@ -754,9 +754,9 @@ function getLocalEdge(tmState, charOnTape){
 function disableButtons(mode){
     document.getElementById('stepSimulationButton').disabled = true;
     document.getElementById('resetSimulationButton').disabled = true;
-    document.getElementById('move-tape-right').disabled = true;
-    document.getElementById('move-tape-left').disabled = true;
-    document.getElementById('tape-input').disabled = true;
+    document.getElementById('moveTapeRight').disabled = true;
+    document.getElementById('moveTapeLeft').disabled = true;
+    document.getElementById('tapeInput').disabled = true;
     document.getElementById('fastSimulation').disabled = true;
     if(mode === "all"){
         document.getElementById('runSimulationButton').disabled = true;
@@ -777,9 +777,9 @@ function enableButtons(){
     document.getElementById('runSimulationButton').disabled = false;
     document.getElementById('stepSimulationButton').disabled = false;
     document.getElementById('resetSimulationButton').disabled = false;
-    document.getElementById('move-tape-right').disabled = false;
-    document.getElementById('move-tape-left').disabled = false;
-    document.getElementById('tape-input').disabled = false;
+    document.getElementById('moveTapeRight').disabled = false;
+    document.getElementById('moveTapeLeft').disabled = false;
+    document.getElementById('tapeInput').disabled = false;
     document.getElementById('fastSimulation').disabled = false;
     //switch to move mode off again
     var button = document.querySelector('.toggle-button');

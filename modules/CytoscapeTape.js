@@ -45,7 +45,7 @@ let nodeAtHead = 8;
  * Global style properties are set here
 */
 var cyTape = cytoscape({
-    container: document.getElementById('cytoscape-tape'),
+    container: document.getElementById('cytoscapeTape'),
     style: [
     {
         selector: 'nodes',
@@ -212,7 +212,7 @@ function cyMoveTapeLeft(animationTime){
     }
 }
 //Event Listener for Button manually moving tape to left
-document.getElementById("move-tape-left").addEventListener("click", function(){
+document.getElementById("moveTapeLeft").addEventListener("click", function(){
     simulation = false;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
     cyMoveTapeLeft(animationTime)
@@ -331,7 +331,7 @@ function cyMoveTapeRight(animationTime){
     }
 }
 //Event Listener for Button manually moving tape to right
-document.getElementById("move-tape-right").addEventListener("click", function(){
+document.getElementById("moveTapeRight").addEventListener("click", function(){
     simulation = false;
     let animationTime = 1000/document.getElementById('simulationSpeed').value;
     cyMoveTapeRight(animationTime)
@@ -430,8 +430,8 @@ function cyWriteOnTape(input, animationTime){
     turingMachine.tapePosition = writeid;
 }
 //Event Listener for "Write on Tape" button
-document.getElementById("tape-input").addEventListener("click", function(){
-    cyWriteOnTape(document.getElementById("tape-input-field").value, 
+document.getElementById("tapeInput").addEventListener("click", function(){
+    cyWriteOnTape(document.getElementById("tapeInputField").value, 
                     1000/document.getElementById('simulationSpeed').value
                 );
 });
@@ -611,13 +611,13 @@ function cyTapeClear(){
  * @param {number} time - how long the buttons should be deactivated
  */
 async function deactivateMoveButtons(time){
-    document.getElementById("move-tape-left").disabled = true;
-    document.getElementById("move-tape-right").disabled = true;
+    document.getElementById("moveTapeLeft").disabled = true;
+    document.getElementById("moveTapeRight").disabled = true;
 
     await new Promise(resolve => setTimeout(resolve, time+10));
 
-    document.getElementById("move-tape-left").disabled = false;
-    document.getElementById("move-tape-right").disabled = false;
+    document.getElementById("moveTapeLeft").disabled = false;
+    document.getElementById("moveTapeRight").disabled = false;
 }
 
 
