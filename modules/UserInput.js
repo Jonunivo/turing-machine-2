@@ -105,6 +105,8 @@ cy.on('click', (event) => {
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         nodeModal.style.paddingTop = `${maxPaddingTop}px`;
         nodeModal.style.display = 'block';
+        //focus on name field
+        document.getElementById("stateName").focus()
     }
 });
 
@@ -309,6 +311,8 @@ function dragCreateEdge(event){
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         edgeModal.style.paddingTop = `${maxPaddingTop}px`;
         edgeModal.style.display = 'block';
+        //focus on readLabel
+        document.getElementById("readLabel").focus()
     }
 }
 

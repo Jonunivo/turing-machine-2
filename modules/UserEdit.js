@@ -140,6 +140,8 @@ function clickEditNode(event){
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
         superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
         superNodeModal.style.display = 'block';
+        //focus on name field
+        document.getElementById("superStateName").focus()
         return;
     }
 
@@ -200,6 +202,8 @@ function clickEditNode(event){
     let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-390);
     nodeModal.style.paddingTop = `${maxPaddingTop}px`;
     nodeModal.style.display = 'block';
+    //focus on name field
+    document.getElementById("stateName").focus()
 }
 
 
@@ -474,6 +478,8 @@ cy.on('click', 'edge', function(event){
 
         //display modal
         edgeModal.style.display = 'block';
+        //focus on readLabel
+        document.getElementById("readLabel").focus()
 
     }
 

@@ -62,6 +62,8 @@ let lineId = 0;
 function saveTuringMachine(){
     //Open Save File Modal
     document.getElementById("saveModal").style.display = "block";
+    //focus on name field
+    document.getElementById("filenameInput").focus()
 
     //update Node Positions of current window
     currTreeNode.nodePositions = generateNodePosMap();

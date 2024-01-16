@@ -355,8 +355,9 @@ option {
 
 /*save  modal */
 #saveModal{
-    padding-top: 100px;
-    padding-left: 100px;
+    position: fixed;
+    padding-top: calc(30vh);
+    padding-left: calc(100vw - 350px); 
     background-color: rgba(0, 0, 0, 0.7);
 }
 

@@ -109,6 +109,8 @@ cy.on('cxttap', (event) => {
         let maxPaddingTop = Math.min(position.y + topValue, window.innerHeight-350);
         superNodeModal.style.paddingTop = `${maxPaddingTop}px`;
         superNodeModal.style.display = 'block';
+        //focus on name field
+        document.getElementById("superStateName").focus()
 
         ////change button from "edit node" to "create node"
         var superNodeEditButton = document.getElementById("superNodeEditButton");
