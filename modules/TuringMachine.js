@@ -20,6 +20,7 @@
 //note: Global/shared variable turingMachine is found below definition of TuringMachine class
 
 
+import { cyGrabifyNodes } from './Cytoscape.js';
 import {State} from './State.js';
 export {turingMachine, resetGlobalTuringMachine};
 
@@ -140,6 +141,7 @@ export class TuringMachine{
                 }
                 //alert User
                 alert(`Simulation finished: Input Rejected \n\nReason: No Transition for State ${state.name} & Input ${charOnTape} \nConsider creating an else-transition to catch all cases`)
+                cyGrabifyNodes();
                 return null;
             }
         }
