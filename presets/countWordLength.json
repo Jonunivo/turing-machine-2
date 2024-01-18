@@ -15,7 +15,6 @@
 8,right,false,false,false,﹍,0,next,false,false,false,,L
 0,next,false,false,false,,6,end,false,true,false,nothing,L
 4,start,false,false,false,else,9,carry,false,false,false,nothing,L
-4,start,false,false,false,,9,carry,false,false,false,nothing,L
 9,carry,false,false,false,else,5,end,false,false,false,1,R
 9,carry,false,false,false,1,9,carry,false,false,false,0,L
 0,next,false,false,false,else,7,left,false,false,false,﹍,L
@@ -64,7 +63,6 @@
 
 
 4,start,true,false,false,else,9,carry,false,false,false,nothing,L
-4,start,true,false,false,,9,carry,false,false,false,nothing,L
 9,carry,false,false,false,else,5,end,false,true,false,1,R
 9,carry,false,false,false,1,9,carry,false,false,false,0,L
 
